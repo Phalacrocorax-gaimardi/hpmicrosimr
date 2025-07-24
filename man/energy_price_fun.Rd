@@ -19,3 +19,6 @@ euros
 \description{
 energy price model
 }
+\examples{
+energy_price_fun("oil", sD, 2036)
+}

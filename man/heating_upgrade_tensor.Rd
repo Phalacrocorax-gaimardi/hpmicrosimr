@@ -10,9 +10,11 @@ heating_upgrade_tensor(
   tech_old,
   tech_new,
   house_type,
-  qc2,
+  construction_year,
+  region,
   floor_area,
-  params
+  params,
+  include_grants = TRUE
 )
 }
 \arguments{
@@ -26,15 +28,19 @@ heating_upgrade_tensor(
 
 \item{house_type}{house type in seai codes}
 
-\item{qc2}{region}
+\item{construction_year}{year,integer}
+
+\item{region}{region}
 
 \item{floor_area}{floor area of property in m2}
 
 \item{params}{params}
+
+\item{include_grants}{TRUE/FALSE}
 }
 \value{
 euros
 }
 \description{
-calculates an element of the heating upgrade cost tensor (ber_old,tech_old) -> (ber_new,tech_new)
+calculates an element of the heating system upgrade cost tensor (ber_old,tech_old) -> (ber_new,tech_new)
 }

@@ -19,3 +19,6 @@ a dataframe with columns
 \description{
 creates the agent initial state including model weights, stochastically imputed ground floor areas
 }
+\examples{
+initialise_agents(sD,2015,10)
+}

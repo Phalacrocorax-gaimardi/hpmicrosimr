@@ -29,3 +29,6 @@ kW capacity
 \description{
 returns the kW heating system required to heat building (rounded up to nearest kW).
 }
+\examples{
+heating_system_size(200*200)
+}

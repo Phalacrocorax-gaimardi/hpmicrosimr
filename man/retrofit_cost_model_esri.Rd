@@ -7,8 +7,8 @@
 retrofit_cost_model_esri(
   ber_old,
   ber_new,
-  house_type = "house",
-  qc2 = "Munster",
+  house_type,
+  region = "Munster",
   floor_area = 100
 )
 }
@@ -19,7 +19,7 @@ retrofit_cost_model_esri(
 
 \item{house_type}{seai house type}
 
-\item{qc2}{region}
+\item{region}{region}
 
 \item{floor_area}{total floor area m2}
 }

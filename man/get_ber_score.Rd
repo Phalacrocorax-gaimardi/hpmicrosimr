@@ -16,3 +16,6 @@ character
 get the BER score corresponding to a ber rating given in terms of kWh/m2/year
 assuming 21C in living areas and 18C in other ares during the heating season
 }
+\examples{
+get_ber_score(133)
+}

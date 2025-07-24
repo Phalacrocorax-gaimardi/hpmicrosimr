@@ -128,4 +128,4 @@ initialise_agents <- function(sD,yeartime,cal_run){
   return(agents %>% dplyr::ungroup())
 }
 
-init_agents <- initialise_agents(sD,2024,100)
+#init_agents <- initialise_agents(sD,2024,100)

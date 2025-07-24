@@ -16,3 +16,6 @@ input dataframe with imputed qh values
 imputes missing household income (qh) using data on car ownership from the household survey.
 Uses random forest
 }
+\examples{
+impute_hh_income(hp_survey_oo)
+}

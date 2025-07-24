@@ -1,0 +1,7 @@
+"0","##work out the optimal system upgrade for a detached house in Munster with a C2 BER score, an oil boiler and a floor area of 100m2
+optimise_upgrade(ber_old=180,tech_old = ""oil"",house_type=""detached"",2003,region=""Munster"",floor_area=100,params)
+"
+"2","G1;H1;Errorh in ber_old * floor_area : non-numeric argument to binary operator
+Error during wrapup: not that many frames on the stack
+Error: no more error handlers available (recursive errors?); invoking 'abort' restart
+g"

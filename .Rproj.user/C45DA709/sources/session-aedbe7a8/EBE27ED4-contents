@@ -1,3 +1,9 @@
+#load params and tech_params to run examples
+#params <- scenario_params(sD,2026)
+#tech_params <- tech_params_fun()
+
+
+
 # finance functions for hpmicrosimr
 #
 #' crf
@@ -56,6 +62,7 @@ heating_system_size <- function(annual_heating_requirement, hdd_annual=2200, col
 #' @param tech primary heating technology
 #' @param kW system capacity
 #' @param house_type seai house type
+#' @param construction_year year of construction, integer
 #' @param installation "new" or "swap"
 #' @param params current cost parameters output from scenario_params
 #' @param include_vat TRUE/FALSE
@@ -64,9 +71,9 @@ heating_system_size <- function(annual_heating_requirement, hdd_annual=2200, col
 #' @returns euro cost
 #' @export
 #'
-#' @examples  heating_system_capital_cost("heat_pump",18,"semi_detached","swap",params,include_grant=T)
-heating_system_capital_cost <- function(tech,kW,house_type,installation = "swap", params, include_vat = TRUE,include_grant=TRUE){
-
+#' @examples
+heating_system_capital_cost <- function(tech,kW,house_type,construction_year,installation = "swap", params, include_vat = TRUE,include_grant=FALSE){
+  #heating_system_capital_cost("heat_pump",18,"semi_detached","swap",params,include_grant=T)
   stopifnot(tech %in% c("heat_pump","gas","oil","electricity","solid_fuel"))
   stopifnot(house_type %in% c("detached","semi_detached","terraced","apartment"))
   #house_type <- ifelse(house_type=="apartment","apartment","house")
@@ -78,7 +85,7 @@ heating_system_capital_cost <- function(tech,kW,house_type,installation = "swap"
   #cost include ancilliary costs of not replacing an existing system
   cost <- cost_goods+cost_service
 
-  cost - ifelse(tech=="heat_pump" & installation=="new" & include_grant, heat_pump_grant(house_type,params),0)
+  cost - ifelse(tech=="heat_pump" & installation=="new" & include_grant, heat_pump_grant(house_type,construction_year,params),0)
 }
 
 #' annualised_heating_system_cost
@@ -88,6 +95,7 @@ heating_system_capital_cost <- function(tech,kW,house_type,installation = "swap"
 #' @param tech heating technology
 #' @param kW system capacity
 #' @param house_type seai house type
+#' @param construction_year year, integer
 #' @param installation "swap" or "new"
 #' @param params parameters output from scenario_params()
 #' @param include_grant TRUE/FALSE
@@ -95,10 +103,10 @@ heating_system_capital_cost <- function(tech,kW,house_type,installation = "swap"
 #' @returns euro amount
 #' @export
 #'
-#' @examples annualised_capex("gas",24,"semi_detached","swap",params,include_grant=TRUE)
-annualised_capex <- function(tech,kW,house_type,installation="swap",params,include_grant=TRUE){
-
-  heating_system_capital_cost(tech,kW,house_type,installation,params,include_grant = include_grant)*crf(params$delta.,params[[paste(tech,"_system_lifetime",sep="")]])
+#' @examples
+annualised_capex <- function(tech,kW,house_type,construction_year,installation="swap",params,include_grant=TRUE){
+  #annualised_capex("gas",24,"semi_detached","swap",params,include_grant=TRUE)
+  heating_system_capital_cost(tech,kW,house_type,construction_year,installation,params,include_grant = include_grant)*crf(params$delta.,params[[paste(tech,"_system_lifetime",sep="")]])
 }
 
 #tech_fuel_dictionary <- c("electricity"="electricity","heat_pump"= "electricity","solid_fuel"="solid_fuel","gas"="gas","oil"="oil")
@@ -115,9 +123,9 @@ annualised_capex <- function(tech,kW,house_type,installation="swap",params,inclu
 #' @returns
 #' @export
 #'
-#' @examples heating_system_operating_cost("electricity",150*125,params)
+#' @examples
 heating_system_operating_cost <- function(tech, heating_requirement,params){
-  #
+  #heating_system_operating_cost("electricity",150*125,params)
   tech_fuel_dictionary <- c("electricity"="electricity","heat_pump"= "electricity","solid_fuel"="solid_fuel","gas"="gas","oil"="oil")
   fuel_type <- tech_fuel_dictionary[tech]
   opex <- heating_requirement*params[[paste(fuel_type,"price",sep="_")]]/(100*params[[paste(tech,"system_efficiency",sep="_")]]) #prices given in cents per kWh
@@ -130,21 +138,22 @@ heating_system_operating_cost <- function(tech, heating_requirement,params){
 #' @param installation new or swap
 #' @param heating_requirement inferred heating requirement
 #' @param house_type housing type (q1)
+#' @param construction_year year, integer
 #' @param params parameter values at yeartime
 #' @param include_grant TRUE/FALSE default TRUE
 #'
 #' @returns
 #' @export
 #'
-#' @examples annualised_heating_system_cost("heat_pump","new",125*150,"semi_detached",params,include_grant=T)
-annualised_heating_system_cost <- function(tech,installation="swap",heating_requirement,house_type,params,include_grant=T){
-
+#' @examples
+annualised_heating_system_cost <- function(tech,installation="swap",heating_requirement,house_type,construction_year,params,include_grant=FALSE){
+   #annualised_heating_system_cost("heat_pump","new",125*150,"semi_detached",2003,params,include_grant=T)
    stopifnot(tech %in% c("solid_fuel","gas","oil","heat_pump","electricity"))
    stopifnot(installation %in% c("swap","new"))
    #specify heating system size
    kW <- heating_system_size(heating_requirement)
    #house_type <- ifelse(q1=="Flat or apartment","apartment","house")
-   capex <- heating_system_capital_cost(tech,kW,house_type,installation,params,include_grant = include_grant)
+   capex <- heating_system_capital_cost(tech,kW,house_type,construction_year,installation,params,include_grant = include_grant)
    #tech,kW,house_type,installation = "swap", params, include_vat = TRUE,include_grant=TRUE
    #print(paste("capex=",capex))
    #if(include_grant & tech=="heat_pump") {grant <- heat_pump_grant(house_type,params)
@@ -168,9 +177,9 @@ annualised_heating_system_cost <- function(tech,installation="swap",heating_requ
 #' @returns TRUE/FALSE
 #' @export
 #'
-#' @examples is_eligible_fuel_allowance(70,30000,2)
+#' @examples
 is_eligible_fuel_allowance <- function(age, income,qi) {
-
+  #is_eligible_fuel_allowance(70,30000,2)
   stopifnot(qi %in% 1:9)
   if(!(qi %in% c(1:5))) return(FALSE)
   household_type <- ifelse(qi %in% c(1,4),"single","couple")
@@ -201,11 +210,11 @@ is_eligible_fuel_allowance <- function(age, income,qi) {
 #' @returns cost in euros
 #' @export
 #'
-#' @examples  retrofit_cost_model_esri(175,120,"semi_detached","Munster",120)
+#' @examples
 retrofit_cost_model_esri <- function(ber_old,ber_new, house_type,region="Munster",floor_area=100){
   #Kren et al use is_Dublin,is_apartment, floor_area and houe type as controls
   #area dependence nstorys*4*sqrt(ground_floor_area)
-
+  #retrofit_cost_model_esri(175,120,"semi_detached","Munster",120)
 
   if(ber_old <= ber_new) return(0)
   a_0 <- 29488
@@ -231,9 +240,9 @@ retrofit_cost_model_esri <- function(ber_old,ber_new, house_type,region="Munster
 #' @returns cost in euros
 #' @export
 #'
-#' @examples retrofit_cost_model_marginal(175,120,"semi_detached","Munster",100,params)
+#' @examples
 retrofit_cost_model_marginal <- function(ber_old,ber_new,house_type,qc2="Dublin",floor_area=100,params){
-  #
+  #retrofit_cost_model_marginal(175,120,"semi_detached","Munster",100,params)
   alpha <- params$ber_upgrade_marginal_cost_alpha
   alpha <- 0.667
   k_100 <- params$ber_upgrade_marginal_cost_k
@@ -257,9 +266,9 @@ retrofit_cost_model_marginal <- function(ber_old,ber_new,house_type,qc2="Dublin"
 #' @returns matrix
 #' @export
 #'
-#' @examples gen_upgrade_cost_matrix("semi_detached","Dublin",100,params,"marginal")
+#' @examples
 gen_upgrade_cost_matrix <- function(house_type,region="Dublin",floor_area=100,params,model="marginal",include_grant=FALSE){
-
+  #gen_upgrade_cost_matrix("semi_detached","Dublin",100,params,"marginal")
   stopifnot(house_type %in% c("detached","semi_detached","apartment","terraced"))
   stopifnot(model %in% c("marginal","esri"))
   df <- tidyr::expand_grid(ber_old=seq(600,5,by=-5), ber_new=seq(600,5,by=-5))
@@ -286,6 +295,7 @@ gen_upgrade_cost_matrix <- function(house_type,region="Dublin",floor_area=100,pa
 #' @param tech_old old tech
 #' @param tech_new new tech
 #' @param house_type house type in seai codes
+#' @param construction_year year,integer
 #' @param region region
 #' @param floor_area floor area of property in m2
 #' @param params params
@@ -294,9 +304,9 @@ gen_upgrade_cost_matrix <- function(house_type,region="Dublin",floor_area=100,pa
 #' @returns euros
 #' @export
 #'
-#' @examples heating_upgrade_tensor(175,120,tech_old="gas",tech_new = "heat_pump","detached","Dublin",100,params,include_grants=T)
-heating_upgrade_tensor <- function(ber_old,ber_new,tech_old,tech_new,house_type,region,floor_area,params,include_grants=TRUE){
-  #
+#' @examples
+heating_upgrade_tensor <- function(ber_old,ber_new,tech_old,tech_new,house_type,construction_year,region,floor_area,params,include_grants=TRUE){
+  #heating_upgrade_tensor(175,120,tech_old="gas",tech_new = "heat_pump","detached",2003,"Dublin",100,params,include_grants=T)
   stopifnot(tech_old %in% c("electricity","heat_pump","solid_fuel","gas","oil"))
   stopifnot(tech_new %in% c("electricity","heat_pump","solid_fuel","gas","oil"))
   stopifnot(house_type %in% c("apartment","terraced","semi_detached","detached"))
@@ -307,14 +317,14 @@ heating_upgrade_tensor <- function(ber_old,ber_new,tech_old,tech_new,house_type,
   installation_type <- ifelse(tech_old == tech_new,"swap","new")
   #old_annualised_cost <- heating_system_operating_cost(tech_old,ber_old*floor_area,params)
   #assume "status quo" capex cost
-  old_annualised_cost <- annualised_heating_system_cost(tech_old,installation="swap",ber_old*floor_area,house_type,params)
+  old_annualised_cost <- annualised_heating_system_cost(tech_old,installation="swap",ber_old*floor_area,house_type,construction_year,params)
   #ber upgrade cost including ber grants but excluding heat pump grants
   ber_upgrade_cost <- ifelse(ber_old==ber_new,0,retrofit_cost_model_marginal(ber_old,ber_new,house_type,region,floor_area,params)-
                                ifelse(include_grants,get_grant(ber_old,ber_new,construction_year,region,house_type,floor_area,is_fuel_allowance = F,is_heat_pump = F,params)$grant_value,0)) #
   #for now assume there is only one discount rate
   #infinite lifetime
   ber_upgrade_annualised_cost <- ber_upgrade_cost*params$delta. #
-  new_annualised_cost <- annualised_heating_system_cost(tech_new,installation = installation_type,ber_new*floor_area,house_type,params,include_grant=include_grants)
+  new_annualised_cost <- annualised_heating_system_cost(tech_new,installation = installation_type,ber_new*floor_area,house_type,construction_year,params,include_grant=include_grants)
   new_annualised_cost <- new_annualised_cost + ber_upgrade_annualised_cost
   c("old"=old_annualised_cost, "new"=new_annualised_cost, "loss_or_gain"=new_annualised_cost-old_annualised_cost)
   #
@@ -328,6 +338,7 @@ heating_upgrade_tensor <- function(ber_old,ber_new,tech_old,tech_new,house_type,
 #' @param ber_old old ber kWh/m2/year
 #' @param tech_old new ber kWh/m2/year
 #' @param house_type seai house type
+#' @param construction_year integer
 #' @param region region
 #' @param floor_area total floor area (m2)
 #' @param params current parameter values
@@ -335,22 +346,22 @@ heating_upgrade_tensor <- function(ber_old,ber_new,tech_old,tech_new,house_type,
 #' @returns
 #' @export
 #'
-#' @examples optimise_upgrade(ber_old=175,tech_old = "oil",house_type="detached",region="Munster",floor_area=100,params)
-optimise_upgrade <- function(ber_old,tech_old,house_type,region,floor_area,params){
-
+#' @examples
+optimise_upgrade <- function(ber_old,tech_old,house_type,construction_year,region,floor_area,params){
+  #optimise_upgrade(ber_old=175,tech_old = "oil",house_type="detached",2003,region="Munster",floor_area=100,params)
   df <- tibble::tibble()
 
   for(tech_new in c("heat_pump","oil","gas","electricity","solid_fuel")){
 
   fun <- function(ber_new){
 
-    heating_upgrade_tensor(ber_old,ber_new,tech_old,tech_new, house_type,region,floor_area,params)[[2]]
+    heating_upgrade_tensor(ber_old,ber_new,tech_old,tech_new, house_type,construction_year,region,floor_area,params)[[2]]
 
   }
 
    result <- optim(par=ber_old,fn=fun,lower=1,upper=ber_old,method="Brent")
    df <- df %>% dplyr::bind_rows(tibble::tibble(tech_new=tech_new, annualised_cost = result$value, ber_optimal=result$par))
-   df$annualised_cost_old = annualised_heating_system_cost(tech_old,installation="swap",ber_old*floor_area,house_type,params)
+   df$annualised_cost_old = annualised_heating_system_cost(tech_old,installation="swap",ber_old*floor_area,house_type,construction_year,params)
   }
 
   df <- df %>% dplyr::mutate(bill_savings = 100*(annualised_cost-annualised_cost_old)/annualised_cost_old)
@@ -370,7 +381,7 @@ optimise_upgrade <- function(ber_old,tech_old,house_type,region,floor_area,param
 #' @returns scheme
 #' @export
 #'
-#' @examples grant_eligibility(175,20,2015,is_fuel_allowance=F)
+#' @examples grant_eligibility(175,20,2015,is_fuel_allowance=FALSE)
 #'
 grant_eligibility <- function(ber_old, ber_new, construction_year, is_fuel_allowance = FALSE) {
   # Early return for fuel allowance eligibility
@@ -402,7 +413,7 @@ grant_eligibility <- function(ber_old, ber_new, construction_year, is_fuel_allow
 #' @returns list(scheme, grant)
 #' @export
 #'
-#' @examples  get_grant(ber_old=175,ber_new=100,construction_year = 2003,region,house_type,100, is_fuel_allowance=F,is_heat_pump=T,params)
+#' @examples  get_grant(ber_old=175,ber_new=100,construction_year = 2003,"Dublin","detached",100, is_fuel_allowance=FALSE,is_heat_pump=TRUE,scenario_params(sD,2025))
 get_grant <- function(ber_old,ber_new,construction_year,region,house_type = c("semi_detached", "detached", "apartment", "mid-terrace", "end-terrace"),floor_area = 100,is_fuel_allowance = FALSE,is_heat_pump = FALSE,params) {
 
   # Input validation with more informative messages

@@ -4,14 +4,14 @@
 \alias{impute_floor_area}
 \title{impute_floor_area}
 \usage{
-impute_floor_area(q1_0, q2_0, qc2_0, q5_0, q3_0)
+impute_floor_area(house_type, q2_0, region, q5_0, q3_0)
 }
 \arguments{
-\item{q1_0}{property type}
+\item{house_type}{property type}
 
 \item{q2_0}{number of storeys}
 
-\item{qc2_0}{region}
+\item{region}{region (qc2)}
 
 \item{q5_0}{year property built}
 
@@ -22,4 +22,7 @@ double, ground floor area
 }
 \description{
 impute a floor area stochastically based on survey characteristics
+}
+\examples{
+impute_floor_area("detached",3,"Dublin",2,4)
 }

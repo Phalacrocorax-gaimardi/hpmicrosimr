@@ -6,22 +6,25 @@
 \usage{
 gen_upgrade_cost_matrix(
   house_type,
-  qc2 = "Dublin",
+  region = "Dublin",
   floor_area = 100,
   params,
-  model = "marginal"
+  model = "marginal",
+  include_grant = FALSE
 )
 }
 \arguments{
 \item{house_type}{house or apartment}
 
-\item{qc2}{region}
+\item{region}{region}
 
 \item{floor_area}{total floor area in m2}
 
 \item{params}{parameters}
 
 \item{model}{current choice "marginal" or "esri"}
+
+\item{include_grant}{TRUE/FALSE}
 }
 \value{
 matrix

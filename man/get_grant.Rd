@@ -8,7 +8,7 @@ get_grant(
   ber_old,
   ber_new,
   construction_year,
-  qc2,
+  region,
   house_type = c("semi_detached", "detached", "apartment", "mid-terrace", "end-terrace"),
   floor_area = 100,
   is_fuel_allowance = FALSE,
@@ -23,7 +23,7 @@ get_grant(
 
 \item{construction_year}{year of construction, integer}
 
-\item{qc2}{region}
+\item{region}{region}
 
 \item{house_type}{seai house type (related to q1)}
 
@@ -40,4 +40,7 @@ list(scheme, grant)
 }
 \description{
 find the grant amount available from SEAI.
+}
+\examples{
+ get_grant(ber_old=175,ber_new=100,construction_year = 2003,"Dublin","detached",100, is_fuel_allowance=FALSE,is_heat_pump=TRUE,scenario_params(sD,2025))
 }

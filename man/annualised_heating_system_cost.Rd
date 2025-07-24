@@ -9,8 +9,9 @@ annualised_heating_system_cost(
   installation = "swap",
   heating_requirement,
   house_type,
+  construction_year,
   params,
-  include_grant = T
+  include_grant = FALSE
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ annualised_heating_system_cost(
 \item{heating_requirement}{inferred heating requirement}
 
 \item{house_type}{housing type (q1)}
+
+\item{construction_year}{year, integer}
 
 \item{params}{parameter values at yeartime}
 

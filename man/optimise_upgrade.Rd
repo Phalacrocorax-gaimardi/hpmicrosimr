@@ -4,7 +4,15 @@
 \alias{optimise_upgrade}
 \title{optimise_upgrade}
 \usage{
-optimise_upgrade(ber_old, tech_old, house_type, qc2, floor_area, params)
+optimise_upgrade(
+  ber_old,
+  tech_old,
+  house_type,
+  construction_year,
+  region,
+  floor_area,
+  params
+)
 }
 \arguments{
 \item{ber_old}{old ber kWh/m2/year}
@@ -13,12 +21,14 @@ optimise_upgrade(ber_old, tech_old, house_type, qc2, floor_area, params)
 
 \item{house_type}{seai house type}
 
-\item{qc2}{region}
+\item{construction_year}{integer}
+
+\item{region}{region}
 
 \item{floor_area}{total floor area (m2)}
 
 \item{params}{current parameter values}
 }
 \description{
-find the financially optimum ber upgrade
+find the financially optimum household ber upgrade
 }

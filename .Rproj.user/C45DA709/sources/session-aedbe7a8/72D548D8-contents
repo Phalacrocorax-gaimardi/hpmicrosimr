@@ -46,9 +46,9 @@ tech_params_fun <- function(){
 #' @return price per kWh in euros
 #' @export
 #'
-#' @examples night_discount_fun(sD,2027)
+#' @examples
 night_discount_fun <- function(sD,yeartime){
-
+  #night_discount_fun(sD,2027)
   values <- sD %>% dplyr::filter(stringr::str_detect(parameter,"night_rate_discount")) %>% dplyr::pull(value)
   approx(x=c(2015.5,2025.5,2035.5,2050.5), y=values,xout=yeartime,rule=2)$y %>% return()
 }
@@ -121,17 +121,18 @@ heat_pump_installation_grant <- function(sD, yeartime, q1,q5) {
 #' The fast version of seai_grant
 #'
 #' @param house_type house type
+#' @param construction_year year
 #' @param params  current parameters
 #'
 #' @return grant amount in euros
 #' @export
 #'
-#' @examples get_heat_pump_grant("apartment",params)
-heat_pump_grant <- function(house_type,params) {
+#' @examples heat_pump_grant("apartment",2003,scenario_params(sD,2025))
+heat_pump_grant <- function(house_type,construction_year,params) {
   # Return grant amount based on date and type
   stopifnot(house_type %in% c("detached","semi_detached","terraced","apartment"))
   hp_house_type <- ifelse(house_type=="apartment","apartment","house")
-  if (params$yeartime < params$hp_grant_introduction | params$yeartime > params$hp_grant_removal) {
+  if (params$yeartime < params$hp_grant_introduction | params$yeartime > params$hp_grant_removal | construction_year > 2020) {
     return(0)  # No grant before Q2 2018
   } else if (params$yeartime < params$hp_grant_increase) {
     # Original grant scheme: flat rates, same for all dwelling types

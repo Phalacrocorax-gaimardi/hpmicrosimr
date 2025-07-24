@@ -4,16 +4,28 @@
 \alias{annualised_capex}
 \title{annualised_heating_system_cost}
 \usage{
-annualised_capex(tech, kW, params, installation = "swap", include_grant = TRUE)
+annualised_capex(
+  tech,
+  kW,
+  house_type,
+  construction_year,
+  installation = "swap",
+  params,
+  include_grant = TRUE
+)
 }
 \arguments{
 \item{tech}{heating technology}
 
 \item{kW}{system capacity}
 
-\item{params}{parameters output from scenario_params()}
+\item{house_type}{seai house type}
+
+\item{construction_year}{year, integer}
 
 \item{installation}{"swap" or "new"}
+
+\item{params}{parameters output from scenario_params()}
 
 \item{include_grant}{TRUE/FALSE}
 }

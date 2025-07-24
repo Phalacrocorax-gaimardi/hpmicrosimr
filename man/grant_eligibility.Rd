@@ -24,5 +24,9 @@ grant_eligibility(
 scheme
 }
 \description{
-determines which home energy efficiency grant scheme a homeowner is eligible for
+utility to determine which home energy efficiency grant scheme a homeowner is eligible for
+}
+\examples{
+grant_eligibility(175,20,2015,is_fuel_allowance=FALSE)
+
 }

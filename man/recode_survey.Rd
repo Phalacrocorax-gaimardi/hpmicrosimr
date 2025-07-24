@@ -15,3 +15,6 @@ dataframe
 \description{
 recodes the input survey data for use in initialise_agents. The recoded features are BER, ground floor area, and gross household income.
 }
+\examples{
+recode_survey(hp_survey_oo)
+}

@@ -3,7 +3,7 @@
     "path": "C:/Users/Joe/pkgs/hpmicrosimr/DESCRIPTION",
     "project_path": "DESCRIPTION",
     "type": "dcf",
-    "hash": "0",
+    "hash": "2578051163",
     "contents": "",
     "dirty": false,
     "created": 1753185597567.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "10,15",
-        "scrollLine": "0"
+        "cursorPosition": "24,10",
+        "scrollLine": "7"
     },
     "folds": "",
-    "lastKnownWriteTime": 1753258539,
+    "lastKnownWriteTime": 1753340181,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1753258539927,
+    "last_content_update": 1753340181106,
     "read_only": false,
     "read_only_alternatives": []
 }

@@ -300,7 +300,7 @@ recode_survey <- function(hp_data_in){
 #' @examples impute_hh_income(hp_survey_oo)
 impute_hh_income <- function(hp_data_in){
 
-  zet_survey <- readxl::read_xlsx("inst/extdata/ZET_survey_2024_values.xlsx",sheet=1)
+  zet_survey <- readxl::read_xlsx(system.file("extdata","ZET_survey_2024_values.xlsx",package="hpmicrosimr"),sheet=1)
   #include car ownership as an indicator of income
   rf <- ranger::ranger(qh~qb+qc2+q1+qe+q3+q4+qf+q13+qg+q58+q59_2,zet_survey %>% dplyr::filter(qh != 12),num.trees=500,mtry=3, min.node.size = 1,sample.fraction = 0.8, splitrule = "variance",
                respect.unordered.factors = TRUE,replace=TRUE,max.depth = 1e+3,num.threads = 10)

@@ -14,10 +14,8 @@ recoded dataframe with heating tech columns
 }
 \description{
 this function recodes heating fuel types present in survey to oil,gas,electricity,heat_pump,solid_fuel. It also returns primary,secondary
-and tertiary fuel types if present. If these are not present, the fuel type is "none".
+and tertiary fuel types present. If these are not present, the fuel type is "none". recode_fuels also imputes the primary heating fuel type if this missing.
 }
 \details{
-recode fuels also imputes the primary heating fuel type if this missing.
-
-solar thermal is set to "none" if it is present. If solar thermal is
+solar thermal is set to "none" if it is present. If solar thermal is indicated as the primary fuel in the survey, then the secondary fuel is promoted.
 }

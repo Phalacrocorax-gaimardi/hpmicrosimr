@@ -15,5 +15,9 @@ gen_ber_rating(ber_score, g_rate = 1/100)
 double
 }
 \description{
-Stochastically generate a ber rating (kWh/m2/year) from ber score. G ratings are exponentially distributed aboyt 450kWh/m2/year.
+Stochastically generate a ber rating (kWh/m2/year) from a ber score. G ratings are exponentially distributed from 450kWh/m2/year with
+a default decay rate 0.01.
+}
+\examples{
+gen_ber_rating("B3")
 }
