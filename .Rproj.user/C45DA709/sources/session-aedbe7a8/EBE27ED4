@@ -1,0 +1,26 @@
+{
+    "id": "EBE27ED4",
+    "path": "C:/Users/Joe/pkgs/hpmicrosimr/R/finance.R",
+    "project_path": "R/finance.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1750934443141.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "338,0",
+        "scrollLine": "337"
+    },
+    "folds": "35|129|45|0|\n405|223|424|0|\n",
+    "lastKnownWriteTime": 1753339347,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1753339347270,
+    "read_only": false,
+    "read_only_alternatives": []
+}

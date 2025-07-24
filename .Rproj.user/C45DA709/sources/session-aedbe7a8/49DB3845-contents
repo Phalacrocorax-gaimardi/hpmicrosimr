@@ -1,0 +1,9 @@
+#' @title hp_questions
+#' @description list of questions corresponding to hp_survey_oo
+#' @format A data frame with 77 rows and 2 variables:
+#' \describe{
+#'   \item{\code{question_code}}{character survey question code}
+#'   \item{\code{question}}{character survey question}
+#'}
+#' @details DETAILS
+"hp_questions"

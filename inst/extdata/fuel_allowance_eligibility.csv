@@ -1,0 +1,7 @@
+﻿age_lower,age_upper,household,income_threshold
+0,65,single,25000
+0,65,couple,42000
+66,69,single,27000
+66,69,couple,42499
+70,100,single,27248
+70,100,couple,54496

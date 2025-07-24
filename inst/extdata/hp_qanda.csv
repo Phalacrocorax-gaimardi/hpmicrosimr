@@ -1,0 +1,462 @@
+question,question_code,response,response_code
+Gender,qa,Male,1
+Gender,qa,Female,2
+Gender,qa,Other,3
+Gender,qa,Prefer not to say,4
+Age,qb,18-24,1
+Age,qb,25-34,2
+Age,qb,35-44,3
+Age,qb,45-54,4
+Age,qb,55-64,5
+Age,qb,65+,6
+Age,qb,Refused,7
+County,qc1,Carlow,1
+County,qc1,Cavan,2
+County,qc1,Clare,3
+County,qc1,Cork,4
+County,qc1,Donegal,5
+County,qc1,Dublin,6
+County,qc1,Galway,7
+County,qc1,Kerry,8
+County,qc1,Kildare,9
+County,qc1,Kilkenny,10
+County,qc1,Laois,11
+County,qc1,Leitrim,12
+County,qc1,Limerick,13
+County,qc1,Longford,14
+County,qc1,Louth,15
+County,qc1,Mayo,16
+County,qc1,Meath,17
+County,qc1,Monaghan,18
+County,qc1,Offaly,19
+County,qc1,Roscommon,20
+County,qc1,Sligo,21
+County,qc1,Tipperary,22
+County,qc1,Waterford,23
+County,qc1,Westmeath,24
+County,qc1,Wexford,25
+County,qc1,Wicklow,26
+Region,qc2,Dublin,1
+Region,qc2,Rest of Leinster,2
+Region,qc2,Munster,3
+Region,qc2,Ulster/Connacht,4
+Work status,qe,Working full time - working 30 hours per week or more,1
+Work status,qe,Working part time - working between 8 and 29 hours per week,2
+Work status,qe,"Not working / temporarily unemployed / sick, but seeking work",3
+Work status,qe,Not working and not seeking work / Student,4
+Work status,qe,Retired on a state pension only,5
+Work status,qe,Retired with a private pension,6
+Work status,qe,"House person, housewife, househusband, etc.",7
+Education level,qf,No education/only basic education,1
+Education level,qf,Primary School Level,2
+Education level,qf,Lower Secondary (Junior Certificate / GCSE),3
+Education level,qf,Higher Secondary (Leaving Certificate / A-levels),4
+Education level,qf,Post Leaving Certificate (e.g. VEC),5
+Education level,qf,Third Level Non-Degree (e.g. Diploma),6
+Education level,qf,Third Level Degree,7
+Education level,qf,"Third Level Postgraduate Degree (e.g. Master, PhD)",8
+Education level,qf,Prefer not to say,9
+Property type,q1,Flat or apartment,1
+Property type,q1,Terraced house,2
+Property type,q1,Semi-detached house,3
+Property type,q1,Detached house,4
+Property type,q1,Other,5
+Stories in building,q2,One,1
+Stories in building,q2,Two,2
+Stories in building,q2,Three or more,3
+Number of property's bedrooms,q3,One,1
+Number of property's bedrooms,q3,Two,2
+Number of property's bedrooms,q3,Three,3
+Number of property's bedrooms,q3,Four,4
+Number of property's bedrooms,q3,Five or more,5
+Housing situation/tenure,q4,I live in a property that myself or family own outright,1
+Housing situation/tenure,q4,I live in a property that myself or family own with a mortgage,2
+Housing situation/tenure,q4,I live in a privately rented property,3
+Housing situation/tenure,q4,I live in a property rented from a local authority,4
+Housing situation/tenure,q4,Other,5
+Year property built,q5,Before 1976,1
+Year property built,q5,1976-1991,2
+Year property built,q5,1992-2004,3
+Year property built,q5,2005-2010,4
+Year property built,q5,2011-2021,5
+Year property built,q5,After 2021,6
+Year property built,q5,Don't know,7
+Building Energy Rating (BER) of property lived in,q6,A,1
+Building Energy Rating (BER) of property lived in,q6,A1,2
+Building Energy Rating (BER) of property lived in,q6,A2,3
+Building Energy Rating (BER) of property lived in,q6,A3,4
+Building Energy Rating (BER) of property lived in,q6,B,5
+Building Energy Rating (BER) of property lived in,q6,B1,6
+Building Energy Rating (BER) of property lived in,q6,B2,7
+Building Energy Rating (BER) of property lived in,q6,B3,8
+Building Energy Rating (BER) of property lived in,q6,C,9
+Building Energy Rating (BER) of property lived in,q6,C1,10
+Building Energy Rating (BER) of property lived in,q6,C2,11
+Building Energy Rating (BER) of property lived in,q6,C3,12
+Building Energy Rating (BER) of property lived in,q6,D,13
+Building Energy Rating (BER) of property lived in,q6,D1,14
+Building Energy Rating (BER) of property lived in,q6,D2,15
+Building Energy Rating (BER) of property lived in,q6,E,16
+Building Energy Rating (BER) of property lived in,q6,E1,17
+Building Energy Rating (BER) of property lived in,q6,E2,18
+Building Energy Rating (BER) of property lived in,q6,F,19
+Building Energy Rating (BER) of property lived in,q6,G,20
+Building Energy Rating (BER) of property lived in,q6,Exempt from BER rating,21
+Building Energy Rating (BER) of property lived in,q6,It does not have a BER rating,22
+Building Energy Rating (BER) of property lived in,q6,I don't know,23
+Age of main heating system,q7,Less than 1 year,1
+Age of main heating system,q7,1-2 years,2
+Age of main heating system,q7,3-5 years,3
+Age of main heating system,q7,6-10 years,4
+Age of main heating system,q7,11-20 years,5
+Age of main heating system,q7,More than 20 years,6
+Age of main heating system,q7,Don't know,7
+Whether upgraded heat insulation / which part of property upgraded - Never upgraded,q81,No,0
+Whether upgraded heat insulation / which part of property upgraded - Never upgraded,q81,Yes,1
+Whether upgraded heat insulation / which part of property upgraded - Attic insulation,q82,No,0
+Whether upgraded heat insulation / which part of property upgraded - Attic insulation,q82,Yes,1
+Whether upgraded heat insulation / which part of property upgraded - Cavity wall insulation,q83,No,0
+Whether upgraded heat insulation / which part of property upgraded - Cavity wall insulation,q83,Yes,1
+Whether upgraded heat insulation / which part of property upgraded - Internal Insulation (Dry Lining),q84,No,0
+Whether upgraded heat insulation / which part of property upgraded - Internal Insulation (Dry Lining),q84,Yes,1
+Whether upgraded heat insulation / which part of property upgraded - External Wall Insulation (The Wrap),q85,No,0
+Whether upgraded heat insulation / which part of property upgraded - External Wall Insulation (The Wrap),q85,Yes,1
+Whether upgraded heat insulation / which part of property upgraded - Windows replacement,q86,No,0
+Whether upgraded heat insulation / which part of property upgraded - Windows replacement,q86,Yes,1
+Whether upgraded heat insulation / which part of property upgraded - External doors replacement,q87,No,0
+Whether upgraded heat insulation / which part of property upgraded - External doors replacement,q87,Yes,1
+Whether upgraded heat insulation / which part of property upgraded - Floor insulation,q88,No,0
+Whether upgraded heat insulation / which part of property upgraded - Floor insulation,q88,Yes,1
+Whether upgraded heat insulation / which part of property upgraded - Don't know,q89,No,0
+Whether upgraded heat insulation / which part of property upgraded - Don't know,q89,Yes,1
+Estimate of amount spent insulating property lived in,q9,"Less than €2,000",1
+Estimate of amount spent insulating property lived in,q9,"€2,000 - €4,999",2
+Estimate of amount spent insulating property lived in,q9,"€5,000 - €9,999",3
+Estimate of amount spent insulating property lived in,q9,"€10,000-€24,999",4
+Estimate of amount spent insulating property lived in,q9,"€25,000-€39,999",5
+Estimate of amount spent insulating property lived in,q9,"€40,000-€79,999",6
+Estimate of amount spent insulating property lived in,q9,"€80,000 or more",7
+Estimate of amount spent insulating property lived in,q9,Don't know,8
+Whether anyone in household works primarily from home,q10,Yes,1
+Whether anyone in household works primarily from home,q10,No,2
+Primary source of heating in home,q11,Oil,1
+Primary source of heating in home,q11,Gas,2
+Primary source of heating in home,q11,Electricity,3
+Primary source of heating in home,q11,"Solid fuels (wood, coal, peat)",4
+Primary source of heating in home,q11,Solar thermal,5
+Primary source of heating in home,q11,Air source heat pump,6
+Primary source of heating in home,q11,Geothermal (Ground) source heat pump,7
+Primary source of heating in home,q11,None of the above,8
+Primary source of heating in home,q11,Don't know,9
+Whether use secondary source of heating in household - Oil,q121,No,0
+Whether use secondary source of heating in household - Oil,q121,Yes,1
+Whether use secondary source of heating in household - Gas,q122,No,0
+Whether use secondary source of heating in household - Gas,q122,Yes,1
+Whether use secondary source of heating in household - Electricity,q123,No,0
+Whether use secondary source of heating in household - Electricity,q123,Yes,1
+"Whether use secondary source of heating in household - Solid fuels (wood, coal, peat)",q124,No,0
+"Whether use secondary source of heating in household - Solid fuels (wood, coal, peat)",q124,Yes,1
+Whether use secondary source of heating in household - Solar thermal,q125,No,0
+Whether use secondary source of heating in household - Solar thermal,q125,Yes,1
+Whether use secondary source of heating in household - Air source heat pump,q126,No,0
+Whether use secondary source of heating in household - Air source heat pump,q126,Yes,1
+Whether use secondary source of heating in household - Geothermal (Ground) source heat pump,q127,No,0
+Whether use secondary source of heating in household - Geothermal (Ground) source heat pump,q127,Yes,1
+Whether use secondary source of heating in household - I do not use a secondary source of heating,q128,No,0
+Whether use secondary source of heating in household - I do not use a secondary source of heating,q128,Yes,1
+Whether use secondary source of heating in household - Don't know,q129,No,0
+Whether use secondary source of heating in household - Don't know,q129,Yes,1
+Amount spent heating home in 2023,q13,€0-€499,1
+Amount spent heating home in 2023,q13,€500-€749,2
+Amount spent heating home in 2023,q13,€750-€999,3
+Amount spent heating home in 2023,q13,€1000-€1249,4
+Amount spent heating home in 2023,q13,€1250-€1499,5
+Amount spent heating home in 2023,q13,€1500-€1749,6
+Amount spent heating home in 2023,q13,€1750-€1999,7
+Amount spent heating home in 2023,q13,€2000-€2249,8
+Amount spent heating home in 2023,q13,€2250-€2499,9
+Amount spent heating home in 2023,q13,€2500-€2749,10
+Amount spent heating home in 2023,q13,€2750-€2999,11
+Amount spent heating home in 2023,q13,€3000+,12
+Amount spent heating home in 2023,q13,Don't know,13
+Highest bi-monthly electricity bill in 2023,q14,€0-€99,1
+Highest bi-monthly electricity bill in 2023,q14,€100-€149,2
+Highest bi-monthly electricity bill in 2023,q14,€150-€199,3
+Highest bi-monthly electricity bill in 2023,q14,€200-€249,4
+Highest bi-monthly electricity bill in 2023,q14,€250-€299,5
+Highest bi-monthly electricity bill in 2023,q14,€300-€349,6
+Highest bi-monthly electricity bill in 2023,q14,€350-€399,7
+Highest bi-monthly electricity bill in 2023,q14,€400-€449,8
+Highest bi-monthly electricity bill in 2023,q14,€450-€499,9
+Highest bi-monthly electricity bill in 2023,q14,€500-€549,10
+Highest bi-monthly electricity bill in 2023,q14,€550-€599,11
+Highest bi-monthly electricity bill in 2023,q14,€600+,12
+Highest bi-monthly electricity bill in 2023,q14,Don't know,13
+Lowest bi-monthly electricity bill in 2023,q15,€0-€99,1
+Lowest bi-monthly electricity bill in 2023,q15,€100-€149,2
+Lowest bi-monthly electricity bill in 2023,q15,€150-€199,3
+Lowest bi-monthly electricity bill in 2023,q15,€200-€249,4
+Lowest bi-monthly electricity bill in 2023,q15,€250-€299,5
+Lowest bi-monthly electricity bill in 2023,q15,€300-€349,6
+Lowest bi-monthly electricity bill in 2023,q15,€350-€399,7
+Lowest bi-monthly electricity bill in 2023,q15,€400-€449,8
+Lowest bi-monthly electricity bill in 2023,q15,€450-€499,9
+Lowest bi-monthly electricity bill in 2023,q15,€500-€549,10
+Lowest bi-monthly electricity bill in 2023,q15,€550-€599,11
+Lowest bi-monthly electricity bill in 2023,q15,€600+,12
+Lowest bi-monthly electricity bill in 2023,q15,Don't know,13
+Litres of oil purchased in 2023,q16,1 to 999,1
+Litres of oil purchased in 2023,q16,"1,000 to 1,999",2
+Litres of oil purchased in 2023,q16,"2,000 to 2,999",3
+Litres of oil purchased in 2023,q16,"3,000 to 3,999",4
+Litres of oil purchased in 2023,q16,"4,000 to 4,999",5
+Litres of oil purchased in 2023,q16,"5,000+",6
+Litres of oil purchased in 2023,q16,Don't know,7
+Highest bi-monthly gas bill in 2023,q17,€0-€99,1
+Highest bi-monthly gas bill in 2023,q17,€100-€149,2
+Highest bi-monthly gas bill in 2023,q17,€150-€199,3
+Highest bi-monthly gas bill in 2023,q17,€200-€249,4
+Highest bi-monthly gas bill in 2023,q17,€250-€299,5
+Highest bi-monthly gas bill in 2023,q17,€300-€349,6
+Highest bi-monthly gas bill in 2023,q17,€350-€399,7
+Highest bi-monthly gas bill in 2023,q17,€400-€449,8
+Highest bi-monthly gas bill in 2023,q17,€450-€499,9
+Highest bi-monthly gas bill in 2023,q17,€500-€549,10
+Highest bi-monthly gas bill in 2023,q17,€550-€599,11
+Highest bi-monthly gas bill in 2023,q17,€600+,12
+Highest bi-monthly gas bill in 2023,q17,Don't know,13
+Lowest bi-monthly gas bill in 2023,q18,€0-€99,1
+Lowest bi-monthly gas bill in 2023,q18,€100-€149,2
+Lowest bi-monthly gas bill in 2023,q18,€150-€199,3
+Lowest bi-monthly gas bill in 2023,q18,€200-€249,4
+Lowest bi-monthly gas bill in 2023,q18,€250-€299,5
+Lowest bi-monthly gas bill in 2023,q18,€300-€349,6
+Lowest bi-monthly gas bill in 2023,q18,€350-€399,7
+Lowest bi-monthly gas bill in 2023,q18,€400-€449,8
+Lowest bi-monthly gas bill in 2023,q18,€450-€499,9
+Lowest bi-monthly gas bill in 2023,q18,€500-€549,10
+Lowest bi-monthly gas bill in 2023,q18,€550-€599,11
+Lowest bi-monthly gas bill in 2023,q18,€600+,12
+Lowest bi-monthly gas bill in 2023,q18,Don't know,13
+Spend on wood/coal/peat in 2023,q19,€0 - €99,1
+Spend on wood/coal/peat in 2023,q19,€100 - €199,2
+Spend on wood/coal/peat in 2023,q19,€200 - €299,3
+Spend on wood/coal/peat in 2023,q19,€300 - €399,4
+Spend on wood/coal/peat in 2023,q19,€400 - €499,5
+Spend on wood/coal/peat in 2023,q19,€500 - €599,6
+Spend on wood/coal/peat in 2023,q19,€600 - €799,7
+Spend on wood/coal/peat in 2023,q19,€800 - €499,8
+Spend on wood/coal/peat in 2023,q19,€1000+,9
+Spend on wood/coal/peat in 2023,q19,Don't know,10
+Number of months operating main heating system in typical year,q20,1 month,1
+Number of months operating main heating system in typical year,q20,2 months,2
+Number of months operating main heating system in typical year,q20,3 months,3
+Number of months operating main heating system in typical year,q20,4 months,4
+Number of months operating main heating system in typical year,q20,5 months,5
+Number of months operating main heating system in typical year,q20,6 months,6
+Number of months operating main heating system in typical year,q20,7 months,7
+Number of months operating main heating system in typical year,q20,8 months,8
+Number of months operating main heating system in typical year,q20,9 months,9
+Number of months operating main heating system in typical year,q20,10 months,10
+Number of months operating main heating system in typical year,q20,11 months,11
+Number of months operating main heating system in typical year,q20,12 months,12
+Number of months operating main heating system in typical year,q20,Do not operate our main heating system,13
+Number of months operating main heating system in typical year,q20,Don't know,14
+Average hours heating system runs each day during winter heating season,q21,1 - 2 hours,1
+Average hours heating system runs each day during winter heating season,q21,3 - 4 hours,2
+Average hours heating system runs each day during winter heating season,q21,5 - 6 hours,3
+Average hours heating system runs each day during winter heating season,q21,7 - 8 hours,4
+Average hours heating system runs each day during winter heating season,q21,9 - 10 hours,5
+Average hours heating system runs each day during winter heating season,q21,11 - 12 hours,6
+Average hours heating system runs each day during winter heating season,q21,13 - 23 hours,7
+Average hours heating system runs each day during winter heating season,q21,24 hours,8
+Average hours heating system runs each day during winter heating season,q21,Don't know,9
+When expecting to change / replace current home heating system,q22,Don't expect to change / replace current home heating system,1
+When expecting to change / replace current home heating system,q22,Within 1 year,2
+When expecting to change / replace current home heating system,q22,In 1-2 years time,3
+When expecting to change / replace current home heating system,q22,In 3-5 years time,4
+When expecting to change / replace current home heating system,q22,In 6-10 years times,5
+When expecting to change / replace current home heating system,q22,In more than 10 years time,6
+When expecting to change / replace current home heating system,q22,Don't know,7
+Fuel source likely to choose if changing / replacing current main heating system in future,q23,Oil,1
+Fuel source likely to choose if changing / replacing current main heating system in future,q23,Gas,2
+Fuel source likely to choose if changing / replacing current main heating system in future,q23,Electric heater (e.g. storage heater),3
+Fuel source likely to choose if changing / replacing current main heating system in future,q23,"Solid Fuel (Coal, Peat, Wood)",4
+Fuel source likely to choose if changing / replacing current main heating system in future,q23,"Heat Pump, e.g. electricity",5
+Fuel source likely to choose if changing / replacing current main heating system in future,q23,Other,6
+Fuel source likely to choose if changing / replacing current main heating system in future,q23,Don't know,7
+Perception of one's heating cost vs other peoples',q24,Higher than most,1
+Perception of one's heating cost vs other peoples',q24,Average,2
+Perception of one's heating cost vs other peoples',q24,Lower than most,3
+Perception of one's heating cost vs other peoples',q24,Do not know,4
+Grants received from SEAI - I have not received a SEAI grant,q2501,No,0
+Grants received from SEAI - I have not received a SEAI grant,q2501,Yes,1
+Grants received from SEAI - Attic insulation,q2502,No,0
+Grants received from SEAI - Attic insulation,q2502,Yes,1
+Grants received from SEAI - Cavity wall insulation,q2503,No,0
+Grants received from SEAI - Cavity wall insulation,q2503,Yes,1
+Grants received from SEAI - Internal Insulation (Dry Lining),q2504,No,0
+Grants received from SEAI - Internal Insulation (Dry Lining),q2504,Yes,1
+Grants received from SEAI - External Wall Insulation (The Wrap),q2505,No,0
+Grants received from SEAI - External Wall Insulation (The Wrap),q2505,Yes,1
+Grants received from SEAI - Windows replacement,q2506,No,0
+Grants received from SEAI - Windows replacement,q2506,Yes,1
+Grants received from SEAI - External doors replacement,q2507,No,0
+Grants received from SEAI - External doors replacement,q2507,Yes,1
+Grants received from SEAI - Floor insulation,q2508,No,0
+Grants received from SEAI - Floor insulation,q2508,Yes,1
+Grants received from SEAI - Other,q2509,No,0
+Grants received from SEAI - Other,q2509,Yes,1
+Grants received from SEAI - Don't know,q2510,No,0
+Grants received from SEAI - Don't know,q2510,Yes,1
+"Whether own or have already installed EV battery, PV panels, heat pump air source, or ground source heat pump - An Air Source Heat Pump",q263,No,0
+"Whether own or have already installed EV battery, PV panels, heat pump air source, or ground source heat pump - An Air Source Heat Pump",q263,Yes,1
+"Whether own or have already installed EV battery, PV panels, heat pump air source, or ground source heat pump - A Ground Source Heat pump",q264,No,0
+"Whether own or have already installed EV battery, PV panels, heat pump air source, or ground source heat pump - A Ground Source Heat pump",q264,Yes,1
+"Whether own or have already installed EV battery, PV panels, heat pump air source, or ground source heat pump - None of these",q265,No,0
+"Whether own or have already installed EV battery, PV panels, heat pump air source, or ground source heat pump - None of these",q265,Yes,1
+Year installed / purchased ZET - An Air Source Heat Pump,q26_1_3,Pre 2010,1
+Year installed / purchased ZET - An Air Source Heat Pump,q26_1_3,2010-2014,2
+Year installed / purchased ZET - An Air Source Heat Pump,q26_1_3,2015-2019,3
+Year installed / purchased ZET - An Air Source Heat Pump,q26_1_3,2020,4
+Year installed / purchased ZET - An Air Source Heat Pump,q26_1_3,2021,5
+Year installed / purchased ZET - An Air Source Heat Pump,q26_1_3,2022,6
+Year installed / purchased ZET - An Air Source Heat Pump,q26_1_3,2023,7
+Year installed / purchased ZET - An Air Source Heat Pump,q26_1_3,2024,8
+Year installed / purchased ZET - An Air Source Heat Pump,q26_1_3,Don't know,9
+Year installed / purchased ZET - A Ground Source Heat pump,q26_1_4,Pre 2010,1
+Year installed / purchased ZET - A Ground Source Heat pump,q26_1_4,2010-2014,2
+Year installed / purchased ZET - A Ground Source Heat pump,q26_1_4,2015-2019,3
+Year installed / purchased ZET - A Ground Source Heat pump,q26_1_4,2020,4
+Year installed / purchased ZET - A Ground Source Heat pump,q26_1_4,2021,5
+Year installed / purchased ZET - A Ground Source Heat pump,q26_1_4,2022,6
+Year installed / purchased ZET - A Ground Source Heat pump,q26_1_4,2023,7
+Year installed / purchased ZET - A Ground Source Heat pump,q26_1_4,2024,8
+Year installed / purchased ZET - A Ground Source Heat pump,q26_1_4,Don't know,9
+Initial cost including installation of technology - An Air Source Heat Pump,q26_2_1,"Less than €1,000",1
+Initial cost including installation of technology - An Air Source Heat Pump,q26_2_1,"€1,000 - €4,999",2
+Initial cost including installation of technology - An Air Source Heat Pump,q26_2_1,"€5,000 - €9,999",3
+Initial cost including installation of technology - An Air Source Heat Pump,q26_2_1,"€10,000 - €19,999",4
+Initial cost including installation of technology - An Air Source Heat Pump,q26_2_1,"€20,000 plus",5
+Initial cost including installation of technology - An Air Source Heat Pump,q26_2_1,Don't know,6
+Initial cost including installation of technology - A Ground Source Heat pump,q26_2_2,"Less than €1,000",1
+Initial cost including installation of technology - A Ground Source Heat pump,q26_2_2,"€1,000 - €4,999",2
+Initial cost including installation of technology - A Ground Source Heat pump,q26_2_2,"€5,000 - €9,999",3
+Initial cost including installation of technology - A Ground Source Heat pump,q26_2_2,"€10,000 - €19,999",4
+Initial cost including installation of technology - A Ground Source Heat pump,q26_2_2,"€20,000 plus",5
+Initial cost including installation of technology - A Ground Source Heat pump,q26_2_2,Don't know,6
+Satisfaction with home heating system,q27,Very dissatisfied,1
+Satisfaction with home heating system,q27,Dissatisfied,2
+Satisfaction with home heating system,q27,Neutral,3
+Satisfaction with home heating system,q27,Satisfied,4
+Satisfaction with home heating system,q27,Very satisfied,5
+Warmth of home last winter,q28,Very cold,1
+Warmth of home last winter,q28,Cold,2
+Warmth of home last winter,q28,Neutral,3
+Warmth of home last winter,q28,Warm,4
+Warmth of home last winter,q28,Always warm,5
+"Number of friends, work colleagues, neighbours, and relatives who one discusses / shares info about technologies with",q29,1,1
+"Number of friends, work colleagues, neighbours, and relatives who one discusses / shares info about technologies with",q29,2,2
+"Number of friends, work colleagues, neighbours, and relatives who one discusses / shares info about technologies with",q29,3,3
+"Number of friends, work colleagues, neighbours, and relatives who one discusses / shares info about technologies with",q29,4,4
+"Number of friends, work colleagues, neighbours, and relatives who one discusses / shares info about technologies with",q29,5,5
+"Number of friends, work colleagues, neighbours, and relatives who one discusses / shares info about technologies with",q29,6-9,6
+"Number of friends, work colleagues, neighbours, and relatives who one discusses / shares info about technologies with",q29,10-19,7
+"Number of friends, work colleagues, neighbours, and relatives who one discusses / shares info about technologies with",q29,20+,8
+"Number of friends, work colleagues, neighbours, and relatives who one discusses / shares info about technologies with",q29,None,9
+"Number of friends, work colleagues, neighbours, and relatives who one discusses / shares info about technologies with",q29,Don't know,10
+Environmental / consumption views / behaviours - I am concerned about environmental issues such as climate change,q30_1,Strongly disagree,1
+Environmental / consumption views / behaviours - I am concerned about environmental issues such as climate change,q30_1,Disagree,2
+Environmental / consumption views / behaviours - I am concerned about environmental issues such as climate change,q30_1,Neither,3
+Environmental / consumption views / behaviours - I am concerned about environmental issues such as climate change,q30_1,Agree,4
+Environmental / consumption views / behaviours - I am concerned about environmental issues such as climate change,q30_1,Strongly agree,5
+Environmental / consumption views / behaviours - I am concerned about environmental issues such as climate change,q30_1,Don't know,6
+Environmental / consumption views / behaviours - I expect energy prices to increase in the future,q30_2,Strongly disagree,1
+Environmental / consumption views / behaviours - I expect energy prices to increase in the future,q30_2,Disagree,2
+Environmental / consumption views / behaviours - I expect energy prices to increase in the future,q30_2,Neither,3
+Environmental / consumption views / behaviours - I expect energy prices to increase in the future,q30_2,Agree,4
+Environmental / consumption views / behaviours - I expect energy prices to increase in the future,q30_2,Strongly agree,5
+Environmental / consumption views / behaviours - I expect energy prices to increase in the future,q30_2,Don't know,6
+Environmental / consumption views / behaviours - Acting environmentally friendly is an important part of who I am,q30_3,Strongly disagree,1
+Environmental / consumption views / behaviours - Acting environmentally friendly is an important part of who I am,q30_3,Disagree,2
+Environmental / consumption views / behaviours - Acting environmentally friendly is an important part of who I am,q30_3,Neither,3
+Environmental / consumption views / behaviours - Acting environmentally friendly is an important part of who I am,q30_3,Agree,4
+Environmental / consumption views / behaviours - Acting environmentally friendly is an important part of who I am,q30_3,Strongly agree,5
+Environmental / consumption views / behaviours - Acting environmentally friendly is an important part of who I am,q30_3,Don't know,6
+"Environmental / consumption views / behaviours - I feel very bad if I lose something, even when it's not that important",q30_4,Strongly disagree,1
+"Environmental / consumption views / behaviours - I feel very bad if I lose something, even when it's not that important",q30_4,Disagree,2
+"Environmental / consumption views / behaviours - I feel very bad if I lose something, even when it's not that important",q30_4,Neither,3
+"Environmental / consumption views / behaviours - I feel very bad if I lose something, even when it's not that important",q30_4,Agree,4
+"Environmental / consumption views / behaviours - I feel very bad if I lose something, even when it's not that important",q30_4,Strongly agree,5
+"Environmental / consumption views / behaviours - I feel very bad if I lose something, even when it's not that important",q30_4,Don't know,6
+Environmental / consumption views / behaviours - I tend to keep old energy appliances around even after they are replaced or obsolete,q30_5,Strongly disagree,1
+Environmental / consumption views / behaviours - I tend to keep old energy appliances around even after they are replaced or obsolete,q30_5,Disagree,2
+Environmental / consumption views / behaviours - I tend to keep old energy appliances around even after they are replaced or obsolete,q30_5,Neither,3
+Environmental / consumption views / behaviours - I tend to keep old energy appliances around even after they are replaced or obsolete,q30_5,Agree,4
+Environmental / consumption views / behaviours - I tend to keep old energy appliances around even after they are replaced or obsolete,q30_5,Strongly agree,5
+Environmental / consumption views / behaviours - I tend to keep old energy appliances around even after they are replaced or obsolete,q30_5,Don't know,6
+Environmental / consumption views / behaviours - I get easily attached to material things,q30_6,Strongly disagree,1
+Environmental / consumption views / behaviours - I get easily attached to material things,q30_6,Disagree,2
+Environmental / consumption views / behaviours - I get easily attached to material things,q30_6,Neither,3
+Environmental / consumption views / behaviours - I get easily attached to material things,q30_6,Agree,4
+Environmental / consumption views / behaviours - I get easily attached to material things,q30_6,Strongly agree,5
+Environmental / consumption views / behaviours - I get easily attached to material things,q30_6,Don't know,6
+Technology views / behaviours,q36,I am usually one of the first people to try out a new technology,1
+Technology views / behaviours,q36,I am willing to try a new technology but generally wait until someone that I know first purchases and uses it,2
+Technology views / behaviours,q36,I tend to hold off trying a new technology until the majority of the people I know purchase and use it,3
+Technology views / behaviours,q36,I am generally one of the last people to buy a new technology,4
+Technology views / behaviours,q36,I generally prefer to use what I have in the past instead of purchasing a new technology,5
+Technology views / behaviours,q36,None of the above,6
+Willingness to take risks,q37,Completely unwilling,1
+Willingness to take risks,q37,Unwilling,2
+Willingness to take risks,q37,Undecided,3
+Willingness to take risks,q37,Willing,4
+Willingness to take risks,q37,Completely willing,5
+Willingness to give something up today in order to receive greater benefit from it in the future,q38,Completely unwilling,1
+Willingness to give something up today in order to receive greater benefit from it in the future,q38,Unwilling,2
+Willingness to give something up today in order to receive greater benefit from it in the future,q38,Undecided,3
+Willingness to give something up today in order to receive greater benefit from it in the future,q38,Willing,4
+Willingness to give something up today in order to receive greater benefit from it in the future,q38,Completely willing,5
+Rules that should be applied when distributing costs of measures to combat climate change,q39,Each household should pay the same amount irrespective of their share of energy consumption or income,1
+Rules that should be applied when distributing costs of measures to combat climate change,q39,The cost should be distributed in proportion of the energy consumption of individual households,2
+Rules that should be applied when distributing costs of measures to combat climate change,q39,The costs should be distributed in proportion to household income,3
+Rules that should be applied when distributing costs of measures to combat climate change,q39,High income households should pay a higher proportion of the total cost relative to their share of income,4
+Rules that should be applied when distributing costs of measures to combat climate change,q39,None of these,5
+Awareness of other people who use a heat pump in their home,q52,"No, none at all",1
+Awareness of other people who use a heat pump in their home,q52,"Yes, one other household",2
+Awareness of other people who use a heat pump in their home,q52,"Yes, two other households",3
+Awareness of other people who use a heat pump in their home,q52,"Yes, more than two other households",4
+Views on heat pumps - I will install a heat pump at my house,q53_5,Strongly disagree,1
+Views on heat pumps - I will install a heat pump at my house,q53_5,Disagree,2
+Views on heat pumps - I will install a heat pump at my house,q53_5,Neutral,3
+Views on heat pumps - I will install a heat pump at my house,q53_5,Agree,4
+Views on heat pumps - I will install a heat pump at my house,q53_5,Strongly agree,5
+Views on heat pumps - I will install a heat pump at my house,q53_5,Don't know,6
+Views on heat pumps - I will install a heat pump at my house,q53_5,Not applicable,7
+Area lived in,qg,"A rural area, village or small town with less than 1,500 people",1
+Area lived in,qg,"A town with between 1,500 and 50,000 people",2
+Area lived in,qg,On the suburbs of a large city or town (commuter belt),3
+Area lived in,qg,"A large town or city with more than 50,000 people",4
+Gross household annual income,qh,"Less than €15,000",1
+Gross household annual income,qh,"€15,000- €25,999",2
+Gross household annual income,qh,"€26,000- €35,999",3
+Gross household annual income,qh,"€36,000- €42,999",4
+Gross household annual income,qh,"€43,000- €50,999",5
+Gross household annual income,qh,"€51,000- €68,999",6
+Gross household annual income,qh,"€69,000- €88,999",7
+Gross household annual income,qh,"€89,000- €104,999",8
+Gross household annual income,qh,"€105,000- €142,999",9
+Gross household annual income,qh,"€143,000 - €260,999",10
+Gross household annual income,qh,"More than €260,999",11
+Gross household annual income,qh,Prefer not to say,12
+Household profile,qi,Single person household,1
+Household profile,qi,Couple with no children (pre-family),2
+Household profile,qi,Couple with grown up children no longer living at home,3
+Household profile,qi,One parent with children,4
+Household profile,qi,Couple with children,5
+Household profile,qi,"Extended family household (e.g. grandparents, relatives)",6
+Household profile,qi,Group household with multiple families or individuals,7
+Household profile,qi,None of these,8
+Household profile,qi,No answer,9
+Dependent children under 18,qj,Yes,1
+Dependent children under 18,qj,No,2

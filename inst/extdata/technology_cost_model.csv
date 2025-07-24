@@ -1,0 +1,11 @@
+﻿technology,installation,labour_cost,fixed_hours,kw_hours,fixed_tech_cost,kw_tech_cost,fixed_ancilliary_cost ,kw_ancilliary_cost,12kW,18kW,24kW
+oil,new,60,7,0.25,1000,75,600,30,3460,4180,4900
+gas,new,60,6,0.2,1100,55,500,25,3064,3616,4168
+heat pump,new,60,16,0.5,2000,500,1200,80,11480,15140,18800
+solid fuel,new,60,12,0.35,900,65,700,40,3832,4588,5344
+electricity,new,60,4,0.1,400,65,300,15,1972,2488,3004
+oil,swap,60,6,0.15,1000,75,200,10,2688,3252,3816
+gas,swap,60,5,0.12,1100,55,150,8,2392,2814,3235
+heat pump,swap,60,12,0.35,2000,500,700,40,10152,13518,16884
+solid fuel,swap,60,10,0.25,900,65,300,15,2940,3510,4080
+electricity,swap,60,3,0.08,400,65,100,5,1578,2026,2475

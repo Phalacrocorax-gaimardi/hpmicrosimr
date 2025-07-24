@@ -1,0 +1,26 @@
+{
+    "id": "053FCA8F",
+    "path": "C:/Users/Joe/pkgs/hpmicrosimr/inst/scratch.R",
+    "project_path": "inst/scratch.R",
+    "type": "r_source",
+    "hash": "866347980",
+    "contents": "",
+    "dirty": false,
+    "created": 1750947713091.0,
+    "source_on_save": false,
+    "relative_order": 10,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "65,38",
+        "scrollLine": "58"
+    },
+    "folds": "663|46|682|0|\n684|55|696|0|\n",
+    "lastKnownWriteTime": 1753274883,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1753274883616,
+    "read_only": false,
+    "read_only_alternatives": []
+}

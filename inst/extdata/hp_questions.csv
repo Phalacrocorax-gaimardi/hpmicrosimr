@@ -1,0 +1,94 @@
+question_code,question
+serial,Serial
+qa,Gender
+qb,Age
+actualage,Actual age
+qc1,County
+qc2,Region
+qe,Work status
+qf,Education level
+q1,Property type
+q2,Stories in building
+q3,Number of property's bedrooms
+q4,Housing situation/tenure
+q5,Year property built
+q6,Building Energy Rating (BER) of property lived in
+q7,Age of main heating system
+q81,Whether upgraded heat insulation / which part of property upgraded - Never upgraded
+q82,Whether upgraded heat insulation / which part of property upgraded - Attic insulation
+q83,Whether upgraded heat insulation / which part of property upgraded - Cavity wall insulation
+q84,Whether upgraded heat insulation / which part of property upgraded - Internal Insulation (Dry Lining)
+q85,Whether upgraded heat insulation / which part of property upgraded - External Wall Insulation (The Wrap)
+q86,Whether upgraded heat insulation / which part of property upgraded - Windows replacement
+q87,Whether upgraded heat insulation / which part of property upgraded - External doors replacement
+q88,Whether upgraded heat insulation / which part of property upgraded - Floor insulation
+q89,Whether upgraded heat insulation / which part of property upgraded - Don't know
+q9,Estimate of amount spent insulating property lived in
+q10,Whether anyone in household works primarily from home
+q11,Primary source of heating in home
+q121,Whether use secondary source of heating in household - Oil
+q122,Whether use secondary source of heating in household - Gas
+q123,Whether use secondary source of heating in household - Electricity
+q124,"Whether use secondary source of heating in household - Solid fuels (wood, coal, peat)"
+q125,Whether use secondary source of heating in household - Solar thermal
+q126,Whether use secondary source of heating in household - Air source heat pump
+q127,Whether use secondary source of heating in household - Geothermal (Ground) source heat pump
+q128,Whether use secondary source of heating in household - I do not use a secondary source of heating
+q129,Whether use secondary source of heating in household - Don't know
+q13,Amount spent heating home in 2023
+q13n,Amount spent heating home in 2023 : Numeric
+q14,Highest bi-monthly electricity bill in 2023
+q14n,Highest bi-monthly electricity bill in 2023 : Numeric
+q15,Lowest bi-monthly electricity bill in 2023
+q15n,Lowest bi-monthly electricity bill in 2023 : Numeric
+q16,Litres of oil purchased in 2023
+q16n,Litres of oil purchased in 2023 : Numeric
+q17,Highest bi-monthly gas bill in 2023
+q17n,Highest bi-monthly gas bill in 2023 : Numeric
+q18,Lowest bi-monthly gas bill in 2023
+q18n,Lowest bi-monthly gas bill in 2023 : Numeric
+q19,Spend on wood/coal/peat in 2023
+q19n,Spend on wood/coal/peat in 2023 : Numeric
+q20,Number of months operating main heating system in typical year
+q20n,Number of months operating main heating system in typical year : Numeric
+q21,Average hours heating system runs each day during winter heating season
+q21n,Average hours heating system runs each day during winter heating season : Numeric
+q22,When expecting to change / replace current home heating system
+q23,Fuel source likely to choose if changing / replacing current main heating system in future
+q24,Perception of one's heating cost vs other peoples'
+q2501,Grants received from SEAI - I have not received a SEAI grant
+q2502,Grants received from SEAI - Attic insulation
+q2503,Grants received from SEAI - Cavity wall insulation
+q2504,Grants received from SEAI - Internal Insulation (Dry Lining)
+q2505,Grants received from SEAI - External Wall Insulation (The Wrap)
+q2506,Grants received from SEAI - Windows replacement
+q2507,Grants received from SEAI - External doors replacement
+q2508,Grants received from SEAI - Floor insulation
+q2509,Grants received from SEAI - Other
+q2510,Grants received from SEAI - Don't know
+q263,"Whether own or have already installed EV battery, PV panels, heat pump air source, or ground source heat pump - An Air Source Heat Pump"
+q264,"Whether own or have already installed EV battery, PV panels, heat pump air source, or ground source heat pump - A Ground Source Heat pump"
+q265,"Whether own or have already installed EV battery, PV panels, heat pump air source, or ground source heat pump - None of these"
+q26_1_3,Year installed / purchased ZET - An Air Source Heat Pump
+q26_1_4,Year installed / purchased ZET - A Ground Source Heat pump
+q26_2_1,Initial cost including installation of technology - An Air Source Heat Pump
+q26_2_2,Initial cost including installation of technology - A Ground Source Heat pump
+q27,Satisfaction with home heating system
+q28,Warmth of home last winter
+q29,"Number of friends, work colleagues, neighbours, and relatives who one discusses / shares info about technologies with"
+q30_1,Environmental / consumption views / behaviours - I am concerned about environmental issues such as climate change
+q30_2,Environmental / consumption views / behaviours - I expect energy prices to increase in the future
+q30_3,Environmental / consumption views / behaviours - Acting environmentally friendly is an important part of who I am
+q30_4,"Environmental / consumption views / behaviours - I feel very bad if I lose something, even when it's not that important"
+q30_5,Environmental / consumption views / behaviours - I tend to keep old energy appliances around even after they are replaced or obsolete
+q30_6,Environmental / consumption views / behaviours - I get easily attached to material things
+q36,Technology views / behaviours
+q37,Willingness to take risks
+q38,Willingness to give something up today in order to receive greater benefit from it in the future
+q39,Rules that should be applied when distributing costs of measures to combat climate change
+q52,Awareness of other people who use a heat pump in their home
+q53_5,Views on heat pumps - I will install a heat pump at my house
+qg,Area lived in
+qh,Gross household annual income
+qi,Household profile
+qj,Dependent children under 18

@@ -1,0 +1,879 @@
+###############################################
+# ground floor area and BER rating imputation
+##############################################
+
+
+
+library(csodata)
+library(data.table)
+library(tidyverse)
+library(lubridate)
+library(pvbessmicrosimr)
+
+
+zet_survey <- readxl::read_xlsx("~/Policy/SurveyDataAndAnalysis/Data/ZET_survey_2024_values.xlsx",sheet=1)
+zet_survey_lab <- readxl::read_xlsx("~/Policy/SurveyDataAndAnalysis/Data/ZET_survey_2024_data_labels.xlsx",sheet=1)
+pv_questions <- read_csv("~/Policy/SurveyDataAndAnalysis/Analysis/Preferences/PV/pv_questions.csv")
+qanda <- read_csv("~/Policy/SurveyDataAndAnalysis/Data/ZET_survey_2024_qanda.csv")
+pv_qanda <- qanda %>% filter(question_code %in% pv_questions$question_code)
+
+
+cso_search_toc("Housing")
+beds_f2063 <- cso_get_data("F2063") %>% as_tibble()
+#write_csv(beds_f2063,"~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/f2063.csv")
+beds <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/f2063.csv")
+names(beds) <- c("statistic", "rooms","bedrooms","year","type","admin","value")
+
+
+beds <- beds %>% select(-statistic) %>% filter(rooms=="All households") %>% select(-rooms)
+#beds %>% filter(admin == "Ireland", str_detect(statistic,"Average"))
+#beds %>% select(admin) %>% distinct() %>% write_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/cso_admin.csv")
+#beds %>% select(bedrooms) %>% distinct() %>% write_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/cso_bedrooms.csv")
+#beds %>% select(bedrooms) %>% distinct() %>% write_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/cso_bedrooms.csv")
+#beds %>% select(year) %>% distinct() %>% write_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/cso_construct_year.csv")
+
+
+#beds %>% ungroup() %>% select(type) %>% distinct() %>% write_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/cso_type.csv")
+
+cso_dict1 <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/cso_admin.csv")
+cso_dict2 <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/cso_type.csv")
+cso_dict3 <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/cso_bedrooms.csv")
+cso_dict4 <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/cso_construct_year.csv")
+
+
+beds <- beds %>% inner_join(cso_dict1) %>% inner_join(cso_dict2) %>% select(-admin) %>% inner_join(cso_dict3) %>% inner_join(cso_dict4)
+#beds <- beds %>% group_by(statistic,county,q1) %>% summarise(value=sum(value))
+#
+beds <- beds %>% inner_join(regions)
+beds <- beds %>% group_by(qc2,q1,q3,q5,) %>% summarise(value=sum(value))
+bed_weights <- beds %>% group_by(qc2,q1,q3,q5) %>% summarise(count=sum(value),.groups="drop") %>% group_by(qc2,q1,q5) %>% mutate(weight=count/sum(count))
+write_csv(bed_weights,"~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/bedroom_weights.csv")
+#beds <- beds %>% group_by(county,q1) %>% summarise(bedrooms=weighted.mean(bedrooms,value))
+#beds <- beds %>% pivot_wider(names_from=q3,values_from=value)
+
+#beds <- beds %>% filter(statistic == "Average Number of Bedrooms per Household") %>% select(-statistic)
+#beds <- beds %>% ungroup() %>% select(-statistic) %>% rename("bedrooms"=value)
+#beds_data <- beds %>% ungroup() %>% pivot_wider(names_from="q1",values_from=value) %>% select(-statistic)
+
+ber <- data.table::fread("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/BERPublicSearch/BERPublicsearch.txt")
+#ber vs reason for ber
+ber0 <- ber %>% tibble::as_tibble() %>% dplyr::select(BerRating,PurposeOfRating) %>% dplyr::group_by(PurposeOfRating) %>% dplyr::summarise(mean_ber=mean(BerRating))
+#
+
+ber1 <- ber %>% dplyr::select(CountyName,DwellingTypeDescr,Year_of_Construction,BerRating,FloorArea,`GroundFloorArea(sq m)`,GroundFloorArea,FirstFloorArea,NoStoreys) %>% tibble::as_tibble()
+ber1$house_id <- 1:dim(ber1)[1]
+
+recode_year_construct <- function(year){
+
+  case_when(year < 1976~1,year >= 1976 & year <= 1991~2,year > 1991 & year < 2005 ~3,
+            year >= 2005 & year <= 2010~4,
+            year>=2011 & year <= 2021~5, year> 2021~6)
+
+}
+
+recode_storeys <- function(storeys){
+
+  case_when(storeys <= 3~storeys, storeys>=3~3)
+}
+
+ber1 <- ber1 %>% mutate(q5=recode_year_construct(Year_of_Construction),q2=recode_storeys(NoStoreys))
+ber1 <- ber1 %>% select(house_id,CountyName,DwellingTypeDescr,BerRating,q2,q5,GroundFloorArea) %>% filter(GroundFloorArea > 0 & GroundFloorArea < 400)
+
+#ber1 %>% ggplot(aes(FloorArea,GroundFloorArea)) + geom_point(size=0.1)
+
+#ber1 %>% select(CountyName) %>% distinct() %>% write_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/BERPublicSearch/ber_admin.csv")
+#ber1 %>% select(DwellingTypeDescr) %>% distinct() %>% write_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/BERPublicSearch/ber_type.csv")
+
+ber_dict1 <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/BERPublicSearch/ber_admin.csv")
+ber_dict2 <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/BERPublicSearch/ber_type.csv")
+#q2 is number of stories 1,2 more than 2
+ber1 <- ber1 %>% inner_join(ber_dict1) %>% inner_join(ber_dict2) %>% select(house_id,county,BerRating,q1,q2,q5,GroundFloorArea)
+#ber_floor <- ber1 %>% group_by(county,q1) %>% summarise(GroundFloorArea=mean(GroundFloorArea))
+#ber_floor %>% pivot_wider(names_from="q1", values_from=GroundFloorArea)
+
+#test <- ber_floor %>% inner_join(beds)
+
+regions <- zet_survey_lab %>% select(qc1,qc2) %>% distinct() %>% rename("county"=qc1)
+beds <- beds %>% inner_join(regions)
+
+ber1 <- ber1 %>% inner_join(regions) %>% select(-county)
+ber1 <- ber1 %>% filter(GroundFloorArea > 0, GroundFloorArea < 400)
+
+#ber1$q1 <- as.factor(ber1$q1)
+#ber1$NoStoreys <- as.factor(ber1$NoStoreys)
+#ber1$qc2 <- as.factor(ber1$qc2)
+
+#lm(log(GroundFloorArea)~q1+NoStoreys+qc2,ber1) %>% summary()
+#area_mod <- glm(GroundFloorArea~q1+NoStoreys+qc2,ber1,family=Gamma(link="log")) #%>% summary()
+#
+
+#ber1 %>% group_by(county,q1,q5) %>% reframe(quantile=c("0%","25%","50%","75%","100%"), quantile(GroundFloorArea) )
+
+######################
+# impute number of bedrooms in BER dataset
+# this is done using a mixture model and EM algorithm
+# we know the mixture weight from CSO data
+# survey data shows no significant correlation between stories and bedrooms
+#####################
+
+
+library(mixtools)
+library(data.table)
+library(lpSolve)
+library(tidyverse)
+library(data.table)
+
+ber1 <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/BERPublicSearch/ber1.csv")
+bed_weights <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/CSO_2022/bedroom_weights.csv")
+
+impute_bedrooms_simple <- function(data, weights){
+
+  #simple methods based on quantiles
+  weights_cum <- cumsum(weights)
+  areas <- quantile(data,probs=c(0,weights_cum))
+  assignment <- case_when(data >= areas[1] & data <= areas[2]~1, data > areas[2] & data <= areas[3]~2,
+                          data > areas[3] & data <= areas[4]~3,
+                          data > areas[4] & data <= areas[5]~4,
+                          data > areas[5] & data <= areas[6]~5)
+
+}
+
+impute_bedrooms <- function(data, weights, maxiter=5000){
+  # Example data and weights
+  N <- length(weights)
+
+  # Log-transform the data
+  log_data <- log(data)
+
+  #initial means
+  kmeans_result <- kmeans(log_data,centers=5)
+  initial_mu <- kmeans_result$centers
+  initial_vars <- aggregate(log_data,by=list(kmeans_result$cluster), FUN=var)$x
+  # Fit the mixture model using EM
+  fit <- normalmixEM(log_data, mu=initial_mu, sigma=sqrt(initial_vars),lambda = weights, k = N,epsilon=1e-6,maxit=maxiter)
+
+  # Extract the estimated parameters
+  means_estimated <- fit$mu
+  #print(exp(means))
+  sds_estimated <- fit$sigma
+  weights_estimate <- fit$lambda
+  #Calculate posterior probabilities
+  posterior_probs <- fit$posterior
+
+  # Initialize assignments
+  component_assignments <- rep(NA, length(data))
+
+  # Assign data points to components while respecting the known weights
+  # Step 1: Sort data points by their posterior probabilities for each component
+  sorted_indices <- lapply(1:N, function(i) order(posterior_probs[, i], decreasing = TRUE))
+
+  # Step 2: Assign data points to components based on the known weights
+  assigned <- rep(FALSE, length(data))  # Track which data points have been assigned
+  for (i in 1:N) {
+    # Number of points to assign to component i
+    n_points <- round(weights[i] * length(data))
+
+    # Assign the top n_points data points with the highest posterior probability for component i
+    top_indices <- sorted_indices[[i]][!assigned[sorted_indices[[i]]]][1:n_points]
+    component_assignments[top_indices] <- i
+    assigned[top_indices] <- TRUE
+  }
+
+  # Handle any remaining unassigned data points (due to rounding)
+  if (any(is.na(component_assignments))) {
+    unassigned_indices <- which(is.na(component_assignments))
+    for (idx in unassigned_indices) {
+      # Assign to the component with the highest posterior probability
+      component_assignments[idx] <- which.max(posterior_probs[idx, ])
+    }
+  }
+
+  # Print results
+  component_assignments %>% return()
+
+}
+#
+# Custom EM algorithm for Gaussian Mixture Model with fixed weights
+# this constrains the means to be increasing function of bedrooms using isotonic regression
+# a constraint that fixes the component membershipbased on cso weights is also imposed
+impute_bedrooms_fixed_weights <- function(data, weights, max_iter = 1000, tol = 1e-14) {
+  # Number of components
+  k <- length(weights)
+  # Number of data points
+  n <- length(data)
+  log_data <- log(data)
+  kmeans_result <- kmeans(log_data,centers=5)
+  means <- kmeans_result$centers %>% as.vector()
+  sigmas <- aggregate(log_data,by=list(kmeans_result$cluster), FUN=var)$x %>% sqrt()
+
+  # Initialize log-likelihood for convergence check
+  log_likelihood <- -Inf
+
+  # EM algorithm
+  for (iter in 1:max_iter) {
+    ### E-step: Compute responsibilities
+    # Matrix to store responsibilities (n x k)
+    responsibilities <- matrix(0, nrow = n, ncol = k)
+
+    for (j in 1:k) {
+      # Compute the density of each component
+      responsibilities[, j] <- weights[j] * dnorm(log_data, mean = means[j], sd = sigmas[j])
+    }
+
+    # Normalize responsibilities so they sum to 1 for each data point
+    # Add a small constant to avoid division by zero
+    responsibilities <- responsibilities / (rowSums(responsibilities) + .Machine$double.eps)
+
+    ### M-step: Update means and sigmas (weights are fixed)
+    for (j in 1:k) {
+      # Update means
+      means[j] <- sum(responsibilities[, j] * log_data) / sum(responsibilities[, j])
+
+      # Enforce increasing means using isotonic regression
+      means <- gpava(seq_along(means), means, ties="secondary")$x
+      # Update sigmas
+      sigmas[j] <- sqrt(sum(responsibilities[, j] * (log_data - means[j])^2) / sum(responsibilities[, j]))
+    }
+
+    ### Check for convergence
+    # Compute log-likelihood
+    current_log_likelihood <- sum(log(rowSums(responsibilities) + .Machine$double.eps))
+
+    # Check if the change in log-likelihood is below the tolerance
+    if (abs(current_log_likelihood - log_likelihood) < tol) {
+      cat("Converged at iteration", iter, "\n")
+      break
+    }
+    # Update log-likelihood
+    log_likelihood <- current_log_likelihood
+  }
+
+  #relabel
+  #sorted_order <- order(means)
+  #means <- means[sorted_order]
+  #sigmas <- sigmas[sorted_order]
+
+  ### Assign data points to components while respecting the fixed weights
+  # Calculate the target number of assignments for each component
+  component_sizes <- round(weights * n)
+  posterior_probs <- responsibilities
+
+
+  # Decision variable: Flattened binary assignment matrix (n*k)
+  objective <- as.vector(t(posterior_probs))  # Maximize total probability
+
+  # Constraint 1: Each observation must be assigned to one component
+  row_constraints <- matrix(0, nrow = n, ncol = n * k)
+  for (i in 1:n) {
+    row_constraints[i, ((i - 1) * k + 1):(i * k)] <- 1
+  }
+
+  # Constraint 2: Component sizes must match given membership constraints
+  col_constraints <- matrix(0, nrow = k, ncol = n * k)
+  for (j in 1:k) {
+    col_constraints[j, seq(j, n * k, by = k)] <- 1
+  }
+
+  # Combine constraints
+  constraint_matrix <- rbind(row_constraints, col_constraints)
+  rhs <- c(rep(1, n), component_sizes)  # Right-hand side values
+  direction <- c(rep("=", n), rep("=", k))  # Constraint directions
+
+  # Solve the integer program
+  solution <- lp("max", objective, constraint_matrix, direction, rhs, all.bin = TRUE)
+
+  # Extract class assignments
+  assignments <- matrix(solution$solution, nrow = n, byrow = TRUE) %>% apply(1, which.max)
+  # Check results
+  table(assignments)
+
+  # Return the estimated parameters and assignments
+  list(
+    means = means,
+    sigmas = sigmas,
+    assignments = assignments,
+    log_likelihood = log_likelihood
+  )
+}
+
+test <- impute_bedrooms_fixed_weights(data,weights)$assignment
+
+test %>% table()
+
+ber_impute <- ber1 %>% filter(GroundFloorArea > 25)
+
+#function tests
+test_impute <- ber_impute %>% filter(qc2=="Munster",q1=="Semi-detached house", q5==4,q2==2)
+data <- test_impute$GroundFloorArea
+weights <- filter(bed_weights,qc2=="Munster",q1=="Semi-detached house",q5==4) %>% pull(weight)
+test_impute$bedrooms <- impute_bedrooms_fixed_weights(data,weights)$assignment
+test_impute %>% group_by(bedrooms) %>% summarise(median_area=median(GroundFloorArea))
+
+
+test <- impute_bedrooms(data,weights)
+ber1 <- ber1 %>% filter(q2 > 0)
+ber_impute %>% group_by(qc2,q1,q2,q5) %>% mutate(bedrooms=impute_bedrooms(GroundFloorArea,weights=filter(bed_weights,qc2==qc2,q1==q1,q5==q5) %>% pull(weight)))
+
+
+#only consider most common combinations of features i.e. more than 200
+#
+ber1 <- ber1 %>% filter(GroundFloorArea > 20)
+ber_impute <- ber1 %>% group_by(qc2,q1,q2,q5) %>% filter(n() >= 200, q2 > 0)
+
+# Convert ber_impute to a data.table
+ber_impute_dt <- as.data.table(ber_impute)
+bed_weights_dt <- as.data.table(bed_weights)
+
+# Perform the operation using data.table
+ber_imputed <- ber_impute_dt[,bedrooms := impute_bedrooms_simple(GroundFloorArea,
+                                                                 weights = bed_weights_dt[qc2 == .BY$qc2 & q1 == .BY$q1 & q5 == .BY$q5, weight]),
+                             by = .(qc2, q1, q2, q5)]
+
+ber_imputed <- ber_imputed %>% as_tibble()
+ber_imputed <- ber_imputed %>% filter(q2 !=0) %>% drop_na()
+
+ber_imputed %>% drop_na() %>% ggplot(aes(factor(bedrooms),GroundFloorArea)) + geom_boxplot() + facet_wrap(.~factor(q2))
+
+
+#####################################################
+# predicting ber and floor areas using simplest models
+#####################################################
+
+ber_imputed <- ber_imputed %>% filter(BerRating < 1000, BerRating > 0)
+ber_imputed <- ber_imputed %>% rename("q3"=bedrooms)
+#
+ber_imputed$q1 <- factor(ber_imputed$q1)
+ber_imputed$q2 <- factor(ber_imputed$q2)
+ber_imputed$q5 <- factor(ber_imputed$q5)
+ber_imputed$qc2 <- factor(ber_imputed$qc2)
+ber_imputed$q3 <- factor(ber_imputed$q3)
+
+
+#predict ber rating on
+
+fit_ber <- lm(log_ber~q1+q2+qc2+q5+q3,ber_imputed)
+fit_area <- lm(log(GroundFloorArea)~q1+q2+qc2+q5+q3,ber_imputed)
+
+summary(fit_ber)$r.squared
+summary(fit_area)$r.squared
+
+ber_imputed <- ber_imputed %>% mutate(log_ber=log(BerRating))
+ber_imputed$log_ber_imputed <- fitted(fit_ber)
+
+sample_index <- sample(1:nrow(ber_imputed), size = 0.8 * nrow(ber_imputed))
+train_data <- ber_imputed[sample_index, ]
+test_data <- ber_imputed[-sample_index, ]
+
+fit_ber <- lm(log_ber~q1+q2+qc2+q5+bedrooms,train_data)
+in_sample_r2 <- summary(fit_ber)$r.squared
+cat("In-sample R²:", in_sample_r2, "\n")
+
+predictions <- predict(fit_ber, newdata = test_data)
+
+# Calculate out-of-sample R²
+ss_total <- sum((test_data$log_ber - mean(test_data$log_ber))^2)
+ss_residual <- sum((test_data$log_ber - predictions)^2)
+out_of_sample_r2 <- 1 - (ss_residual / ss_total)
+cat("Out-of-sample R²:", out_of_sample_r2, "\n")
+
+# Compare the two R² values
+cat("In-sample R²:", in_sample_r2, "\n")
+cat("Out-of-sample R²:", out_of_sample_r2, "\n")
+
+#look at categorical confusion matrix
+# Convert ber_imputed to a data.table (only need to do this once)
+setDT(ber_imputed)
+
+ber_imputed <- ber_imputed[, `:=`(q6 = get_ber_score(BerRating),
+                                  q6_imputed = get_ber_score(exp(log_ber_imputed)))] %>% as_tibble()
+library(data.table)
+
+
+# Define the get_ber_score function using data.table
+get_ber_score <- function(ber_rating) {
+  ber_ratings_table[min_rating < ber_rating & max_rating >= ber_rating, code]
+}
+get_ber_score <- Vectorize(get_ber_score)
+
+ber_ratings_table_dt <- setDT(ber_ratings_table)
+get_ber_score <- function(ber_ratings) {
+  # Ensure input table is a data.table
+  if (!data.table::is.data.table(ber_ratings_table_dt)) {
+    ber_ratings_table <- data.table::as.data.table(ber_ratings_table)
+  }
+
+  # Perform non-equi join to find matching BER code
+  result <- ber_ratings_table_dt[ber_rating,
+                              on = .(min_rating < ber_rating, max_rating >= ber_rating),
+                              nomatch = NA,
+                              code]
+
+  return(result)
+}
+
+
+# Apply the function efficiently
+#
+cm <- table(ber_imputed$q6,ber_imputed$q6_imputed)
+zeroes <- rep(0,15)
+
+psych::cohen.kappa(cm)$weighted.kappa #0.77!
+
+
+#cross-validate
+library(caret)
+train_control <- trainControl(method = "cv", number = 5)
+ber_model_cv <- train(log(BerRating) ~ q1+q2+qc2+q5+bedrooms,
+                      data = ber_imputed,
+                      method = "lm",
+                      trControl = train_control)
+print(ber_model_cv)
+#
+area_model_cv <- train(log(GroundFloorArea) ~ q1+q2+qc2+q5,
+                       data = ber_imputed,
+                       method = "lm",
+                       trControl = train_control)
+print(area_model_cv)
+
+########################################
+#impute ground floor areas in Pv_survey
+##########################################
+
+survey <- zet_survey %>% select(qc2,q1,q2,q3,q5,q6) #inclide ber q6
+survey$ID <- 1:nrow(survey)
+#relabel qc2
+survey <- survey %>% inner_join(pv_qanda %>% filter(question_code=="qc2") %>% rename("qc2"=response_code) %>% select(-question,-question_code))
+survey <- survey %>% select(-qc2) %>% rename("qc2"=response)
+#relabel q1
+survey <- survey %>% inner_join(pv_qanda %>% filter(question_code=="q1") %>% rename("q1"=response_code) %>% select(-question,-question_code))
+survey <- survey %>% select(-q1) %>% rename("q1"=response)
+#relabel q6
+survey <- survey %>% inner_join(pv_qanda %>% filter(question_code=="q6") %>% rename("q6"=response_code) %>% select(-question,-question_code))
+survey <- survey %>% select(-q6) %>% rename("q6"=response)
+
+survey <- survey %>% mutate_all(as.factor)
+#remove "dont knows" from assuming house age in 1,2 or 3
+survey <- survey %>% mutate(q5=ifelse(q5==7,sample(c(1,2,3),1),q5))
+survey$q5 <- as.factor(survey$q5)
+
+survey$ber_imputed <- predict(fit_ber,newdata = survey) %>% exp()
+ratings_table <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/BERPublicSearch/ratings_table.csv")
+
+get_ber_score <- function(ber_rating){
+
+  ratings_table %>% filter(ber_rating > min_rating, ber_rating <= max_rating) %>% pull(code)
+
+}
+get_ber_score <- Vectorize(get_ber_score)
+
+library(data.table)
+
+# Convert ratings_table to a data.table (only need to do this once)
+ratings_table <- ber_ratings_table %>% filter(!(code %in% c("A","B","C","D","E")))
+setDT(ratings_table)
+
+get_ber_score <- function(ber_rating) {
+  ratings_table[min_rating < ber_rating & max_rating >= ber_rating, code]
+}
+
+
+
+kappas <- tibble()
+for(shift in seq(-20,65,by=2)){
+  survey <- survey %>% rowwise() %>% mutate(q6_imputed = get_ber_score(max(ber_imputed-shift,1)))
+
+  survey_test <- survey
+  survey_test$q6 <- as.character(survey_test$q6)
+  survey_test <- survey_test %>% filter(!(q6 %in% c("I don't know","Exempt from BER rating","It does not have a BER rating")))
+  #main categories only
+  survey_test <- survey_test %>% mutate(q6=substr(q6,1,1),q6_imputed=substr(q6_imputed,1,1))
+
+  cm <- table(survey_test$q6,survey_test$q6_imputed)
+  zeroes <- rep(0,7)
+  if(dim(cm)[2] ==6) cm <- cbind(cm,zeroes)
+  colnames(cm) <- rownames(cm)
+  kappas <- kappas %>% bind_rows(tibble(shift=shift,kappa=psych::cohen.kappa(cm)$weighted.kappa))
+}
+
+kappas %>% ggplot(aes(shift,kappa))+geom_point() + geom_line()
+
+########################
+# random forest
+#######################
+library(ranger)
+rf <- ranger(log_ber~q1+q2+qc2+q5+q3,ber_imputed,num.trees=500,mtry=3, min.node.size = 1,sample.fraction = 0.8, splitrule = "variance",
+             respect.unordered.factors = TRUE,replace=TRUE,max.depth = 1e+3,num.threads = 10)
+rf$r.squared
+#fit_ber <- lm(log_ber~q1+q2+qc2+q5+q3,ber_imputed)
+
+preds <- predictions(rf)
+#preds <- fitted(fit_ber)
+
+#ber_imputed$q6_imputed <- get_ber_score(exp(preds))
+ber_imputed$q6_imputed <- get_ber_score(preds)
+
+
+cm <- table(ber_imputed$q6,ber_imputed$q6_imputed)
+#cm <- table(substr(ber_imputed$q6,1,1),substr(ber_imputed$q6_imputed,1,1))
+psych::cohen.kappa(cm)$weighted.kappa
+
+zeroes <- rep(0,15)
+cm <- cbind(zeroes,cm)
+cm <- cbind(cm,zeroes)
+colnames(cm) <- rownames(cm)
+#if(dim(cm)[2] != 7) cm <- add_zero_row_to_matrix(cm)
+
+psych::cohen.kappa(cm)$weighted.kappa
+
+
+sample_index <- sample(1:nrow(ber_imputed), size = 0.8 * nrow(ber_imputed))
+train_data <- ber_imputed[sample_index, ]
+test_data <- ber_imputed[-sample_index, ]
+
+fit_ber <- ranger(log_ber~q1+q2+qc2+q5+q3,train_data,num.trees=100)
+in_sample_r2 <- fit_ber$r.squared
+cat("In-sample R²:", in_sample_r2, "\n")
+
+predictions <- predict(fit_ber, data= test_data)$predictions
+## Calculate out-of-sample R²
+ss_total <- sum((test_data$log_ber - mean(test_data$log_ber))^2)
+ss_residual <- sum((test_data$log_ber - predictions)^2)
+out_of_sample_r2 <- 1 - (ss_residual / ss_total)
+cat("Out-of-sample R²:", out_of_sample_r2, "\n")
+
+# Compare the two R² values
+cat("In-sample R²:", in_sample_r2, "\n")
+cat("Out-of-sample R²:", out_of_sample_r2, "\n")
+
+###################
+# create mu's table
+###################
+ber_imputed <- ber_imputed %>% rename("q3"=bedrooms)
+fit_ber <- lm(log_ber~q1+q2+qc2+q5+q3,ber_imputed)
+fit_area <- lm(log(GroundFloorArea)~q1+q2+qc2+q5+q3,ber_imputed)
+
+ber_summary <- ber_imputed
+ber_summary$mu <- fitted(fit_area)
+
+ber_summary <- ber_summary %>% group_by(q1,q2,qc2,q5,q3) %>% summarise(mean_mu = mean(mu), .groups = "drop")
+
+ber_summary$sigma <- summary(fit_ber)$sigma
+
+area_summary <- ber_imputed %>%
+  mutate(mu = predict(fit_area)) %>%
+  group_by(q1,q2,qc2,q5,q3) %>%
+  summarise(mu = mean(mu), .groups = "drop")
+
+area_summary$sigma <- summary(fit_area)$sigma
+
+#write_csv(area_summary,"~/Policy/CAMG/SolarPVReport/PVBESS_calibrater/ber_model_parameters.csv")
+
+#write_csv(area_summary,"~/Policy/CAMG/SolarPVReport/PVBESS_calibrater/area_model_parameters.csv")
+
+gen_floorarea <- function(q10,q20,qc20,q50,q30){
+
+  mu <- area_summary %>% ungroup() %>% filter(q1==q10,q2==q20,qc2==qc20,q5==q50,q3==q30) %>% pull(mu)
+  sigma <- area_summary %>% filter(q1==q10,q2==q20,qc2==qc20,q5==q50,q3==q30) %>% pull(sigma)
+  exp(rnorm(1,mean=mu,sd=sigma))
+
+}
+
+area_summary <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_calibrater/area_model_parameters.csv")
+
+gen_ber <- function(q1_0,q2_0,qc2_0,q5_0,q3_0){
+
+  mu <- area_summary %>% ungroup() %>% filter(q1==q1_0,q2==q2_0,qc2==qc2_0,q5==q5_0,q3==q3_0) %>% pull(mu)
+  sigma <- ber_summary %>% filter(q1==q1_0,q2==q2_0,qc2==qc2_0,q5==q5_0,q3==q3_0) %>% pull(sigma)
+  exp(rnorm(1,mean=mu,sd=sigma))
+
+}
+
+
+#impute missing electricity bills
+pv_survey_oo <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_calibrater/pv_survey_oo.csv")
+#
+test <- pv_survey_oo %>% select(q14,q15,qc2,q1,q2,q3,q4,q5,q6,q10,qg,qh,qi,qj)
+
+test <- test %>% filter(q14 !=13, q15 !=13) #, qi != 8, qi != 9)
+test  <- test %>% mutate(across(qc2:qj, as.factor))
+#what are predictors of q14?
+lm(log(q14)~qi,test) %>% summary()
+
+test %>% group_by(qi) %>% summarise(log_mean=mean(log(q14)), log_sd =sd(log(q14)))
+
+#
+test <- test %>% inner_join(bill_values %>% rename("q14"=response_code) %>% rename("highest_bill"=bill))
+test <- test %>% inner_join(bill_values %>% rename("q15"=response_code) %>% rename("lowest_bill"=bill))
+test <- test %>% mutate(across(highest_bill:lowest_bill, as.numeric))
+fit_q14 <- lm(log(highest_bill)~lowest_bill,data=filter(test, q15 <= q14))
+summary(fit_q14)
+fit_q15 <- lm(log(lowest_bill)~highest_bill,data=filter(test, q14 <= q15))
+summary(fit_q15)
+
+########
+# ber_recodings
+############
+zet_survey <- readxl::read_xlsx("~/Policy/SurveyDataAndAnalysis/Data/ZET_survey_2024_values.xlsx",sheet=1)
+zet_survey_lab <- readxl::read_xlsx("~/Policy/SurveyDataAndAnalysis/Data/ZET_survey_2024_data_labels.xlsx",sheet=1)
+
+ber_codings <- tibble(respone=zet_survey_lab$q6
+
+################################
+# primary and secondary heating
+#################################
+
+test0 <- hp_survey_oo %>% mutate(primary_heating = recode_fuels(q11), secondary_heat = case_when(q121==1~"oil",q122==1~"gas",q123==3~"electricity",q124==1~"solid fuels",q128==1~"none"))
+
+
+###############################
+# impute missing income levels
+#############################
+
+#use full survey to impute income leve, including car ownership
+questions <- read_csv("~/Policy/SurveyDataAndAnalysis/Data/ZET_survey_2024_questions.csv")
+
+library(ranger)
+rf <- ranger(qh~qb+qc2+q1+qe+q3+q4+qf+q13+qg+q58+q59_2,zet_survey %>% filter(qh != 12),num.trees=500,mtry=3, min.node.size = 1,sample.fraction = 0.8, splitrule = "variance",
+             respect.unordered.factors = TRUE,replace=TRUE,max.depth = 1e+3,num.threads = 10)
+rf$r.squared
+
+
+preds <- predictions(rf)
+
+test <- zet_survey %>% filter(qh != 12) %>% select(qh)
+test$pred <- preds
+test %>% ggplot(aes(qh,pred)) + geom_point()
+
+#preds <- fitted(fit_ber)
+qh_impute <- predict(rf, data = zet_survey %>% filter(qh == 12) %>% select(-qh))
+qh_impute$predictions %>% round() %>% median()
+
+#ber_imputed$q6_imputed <- get_ber_score(exp(preds))
+ber_imputed$q6_imputed <- get_ber_score(preds)
+
+
+cm <- table(ber_imputed$q6,ber_imputed$q6_imputed)
+#cm <- table(substr(ber_imputed$q6,1,1),substr(ber_imputed$q6_imputed,1,1))
+psych::cohen.kappa(cm)$weighted.kappa
+
+
+##################################################
+# upgrade cost model
+###################################################
+
+retrofit_cost <- function(ber_old,ber_new, a){
+  #Kren et al use is_Dublin,is_apartment, floor_area and houe type as controls
+  #area dependence nstorys*4*sqrt(ground_floor_area)
+  #100m2 house : use geometric scaling
+  #dependecnce on ber_new 0- high BER requiresmore expensive materials
+  #cost <- ifelse(ber_old > ber_new,a[1]*(ber_old-ber_new)^a[2],0) #*(1+0.25*(120-ber_new)/120),0)
+  #cost <- ifelse(ber_old > ber_new,a[1]*(1/ber_new^a[2]-1/ber_old^a[2]),0) #*(1+0.25*(120-ber_new)/120),0)
+  #cost <- ifelse(ber_old > ber_new,a[1]+ a[2]*(ber_old-ber_new) + a[3]*(ber_old-ber_new)^2,0) #*(1+0.25*(120-ber_new)/120),0)
+  #cost <-  ifelse(ber_old > ber_new,a[1]+ a[2]*(exp(-a[3]*ber_old)-exp(-a[3]*ber_new)),0) #*(1+0.25*(120-ber_new)/120),0)
+  #cost <-  ifelse(ber_old > ber_new,a[1] + a[2]*(log((ber_old+a[3])/(ber_new+a[3]))),0) #*(1+0.25*(120-ber_new)/120),0)
+  #cost <-  ifelse(ber_old > ber_new,a[1]+ a[2]*(ber_old-ber_new) + a[3]*(ber_old^2-ber_new^2),0) #+ a[3]*log((ber_old+a[5])/(ber_new+a[5])),0) #*(1+0.25*(120-ber_new)/120),0)
+  #marginal cost model
+  logcost <-  ifelse(ber_old > ber_new, a[1]+a[2]*(ber_old-ber_new) + a[3]*(ber_old-ber_new)^2,0) #+ a[3]*log((ber_old+a[5])/(ber_new+a[5])),0) #*(1+0.25*(120-ber_new)/120),0)
+
+  #ensure cost is zero when ber_new=ber_old (within 20kWh/m2/year)
+  #cost <- cost*tanh(0.05*(ber_old-ber_new))
+  exp(logcost)
+  #marginal cost of ber upgrades depends on ber_old
+
+}
+
+retrofit_cost_simple <- function(ber_old,ber_new,area){
+  #Kren et al use is_Dublin,is_apartment, floor_area and houe type as controls
+  #area dependence nstorys*4*sqrt(ground_floor_area)
+  #100m2 house : use geometric scaling
+  #dependecnce on ber_new 0- high BER requiresmore expensive materials
+  ifelse(ber_old > ber_new,1.5*area*(ber_old-ber_new),0)
+  #a[3]*(ber_old-ber_new)^a[4])
+  #a[1]*(ber_old-ber_new)^(a[2]+a[3]*(ber_old-220)^2)
+  #a[1]*(1-exp(-a[2]*(ber_old-ber_new)^a[3]))
+  #a_0 and a_1 depend on is_apartment
+  #exp(log_cost)
+
+}
+
+a <- c(10,0,0)
+sapply(seq(120,500), function(x) retrofit_cost(x,120,a)) %>% plot()
+
+
+df <- expand_grid(ber_old=seq(5,500,by=5),ber_new=seq(5,500,by=5))
+
+df <- df %>% mutate(cost=retrofit_cost(ber_old,ber_new,a))
+#df <- df %>% mutate(cost=retrofit_cost_simple(ber_old,ber_new,100))
+df2 <- df %>% filter(cost > 0) %>% mutate(unit_cost = cost/(ber_old-ber_new)/100)
+df2 %>% ggplot(aes(ber_old,ber_new,fill =unit_cost))+geom_tile()
+df2$unit_cost %>% median()
+df <- df %>% rowwise() %>% mutate(ber_old_score=get_ber_score(ber_old),ber_new_score=get_ber_score(ber_new))
+#df <- df %>% mutate(gain=ber_old-ber_new) %>% filter(gain > 0) %>% group_by(ber_old_score,ber_new_score) %>% summarise(gain=round(mean(gain)),gain_median=median(gain))
+
+#df_wide <- df %>% ungroup() %>% pivot_wider(id_cols=ber_old_score,values_from=gain_median,names_from=ber_new_score)
+#write_csv(df_wide,"C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/upgrade_efficiency_gain_matrix.csv")
+
+#df <- df %>% mutate(cost = replace(cost,ber_old < ber_new,NA))
+
+#esri_estimates <- esri_estimates %>% inner_join(df %>% ungroup() %>% filter(ber_new_score %in% c("B1","B2")) %>% group_by(ber_old_score) %>% summarise(gain=mean(gain)))
+#esri_estimates %>% mutate(cost_per_kwhm2=cost_esri/gain/100)
+
+df <- df %>% group_by(ber_old_score,ber_new_score) %>% summarise(cost=round(mean(cost)))
+df_wide <- df %>% ungroup() %>% pivot_wider(id_cols=ber_old_score,values_from=cost,names_from=ber_new_score)
+#kren et al
+
+#up to B* (B1, B2)
+df1 <- df %>% filter(ber_new_score %in% c("B2","B1")) %>% group_by(ber_old_score) %>% summarise(cost=mean(cost))
+esri_estimates <- tibble(ber_old_score = c("C1","C2","C3","D1","D2","E1","E2","F","G"), cost_esri = 1000*c(28.9,28.3,28.3,28.9,29.9,31.7,34.8,38.9,43.5))
+df1 <- df1 %>% inner_join(esri_estimates)
+
+df1 %>% ggplot() + geom_point(aes(ber_old_score,cost),colour="red") +  geom_point(aes(ber_old_score,cost_esri),colour="green")+theme_minimal()
+
+
+cost_fun_opt <- function(a){
+
+  df <- expand_grid(ber_old=seq(10,500,by=10),ber_new=seq(10,500,by=10))
+
+  df <- df %>% mutate(cost=retrofit_cost(ber_old,ber_new,a))
+  df <- df %>% mutate(cost = replace(cost,ber_old < ber_new,NA))
+
+  df <- df %>% rowwise() %>% mutate(ber_old_score=get_ber_score(ber_old),ber_new_score=get_ber_score(ber_new))
+
+  df <- df %>% group_by(ber_old_score,ber_new_score) %>% summarise(cost=round(mean(cost)))
+  df1 <- df %>% filter(ber_new_score %in% c("B2","B1")) %>% group_by(ber_old_score) %>% summarise(cost=mean(cost))
+  df1 <- df1 %>% inner_join(esri_estimates) %>% mutate(msq=(cost-cost_esri)^2)
+
+  df1$msq %>% sum()
+
+
+}
+
+a <- c(10,0.1,0.001)
+cost_fun_opt( a)
+result <- optim(par= a,cost_fun_opt)
+
+a <- result$par
+
+
+effic <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/costs_per_unit_efficiency_gain.xlsx",sheet="claude")
+effic <- effic %>% pivot_longer(values_to="cost",names_to="ber_new_score",cols=-ber_old_score)
+test <- ber_ratings_table %>% as_tibble() %>% mutate(mean_rating=0.5*(min_rating+pmin(550,max_rating))) %>% filter(!(code %in% c("A","B","C","D","E")))
+test <- test %>% select(code,mean_rating)
+effic <- effic %>% inner_join(test %>% rename("ber_old_score"=code)) %>% rename("ber_old"=mean_rating)
+effic <- effic %>% inner_join(test %>% rename("ber_new_score"=code)) %>% rename("ber_new"=mean_rating)
+effic <- effic %>% filter(ber_old > ber_new)
+# data frame df with columns: x_init, y_final, cost_per_kWhm2
+
+cost_model <- function(par, ber_old, ber_new) {
+  k <- par[1]
+  alpha <- par[2]
+  #beta <- par[3]
+  #gamma <- par[4]
+  k/(1-alpha) * (ber_old^(1-alpha)-ber_new^(1-alpha))/(ber_old-ber_new)
+}
+
+effic <- drop_na(effic)
+effic$cost <- as.numeric(effic$cost)
+
+obj_fun <- function(par, data) {
+  with(data, sum((cost - cost_model(par, ber_old, ber_new))^2))
+}
+
+obj_fun <- function(par, data) {
+  effic %>% mutate(error=cost-cost_model(par,ber_old,ber_new))
+  data$error %>% sum()
+}
+
+# initial parameter guesses
+par_init <- c(k=1, alpha=0.1)
+
+obj_fun(par_init,effic)
+
+fit <- optim(par_init, obj_fun, data = effic)
+fit$par  # fitted parameters
+
+effic <-effic %>% mutate(cost_fit = cost_model(fit$par,ber_old,ber_new))
+
+#
+oss_grant_wide <- data.frame(
+  measure = c(
+    "attic_insulation",
+    "rafter_insulation",
+    "cavity_wall_insulation",
+    "internal_wall_insulation",
+    "external_wall_insulation",
+    "windows",
+    "external_doors",
+    "floor_insulation",
+    "mechanical_ventilation",
+    "airtightness",
+    "heat_pump",
+    "heat_pump_central_heating",
+    "heating_controls",
+    "home_energy_assessment",
+    "project_management",
+    "heat_pump_bonus"
+  ),
+  detached = c(
+    1500, 3000, 1700, 4500, 8000,
+    4000, 1600, 3500, 1500, 1000,
+    6500, 2000, 700, 350, 2000, 2000
+  ),
+  semi_detached = c(
+    1300, 3000, 1200, 3500, 6000,
+    3000, 1200, 3500, 1500, 1000,
+    6500, 2000, 700, 350, 1600, 2000
+  ),
+  mid_terrace = c(
+    1200, 2000, 800, 2000, 3500,
+    1800, 1800, 3500, 1500, 1000,
+    6500, 2000, 700, 350, 1200, 2000
+  ),
+  apartment = c(
+    800, 1500, 700, 1500, 3000,
+    1500, 800, 3500, 1500, 1000,
+    4500, 1000, 700, 350, 800, 2000
+  ),
+  check.names = FALSE,
+  stringsAsFactors = FALSE
+)
+
+oss_grant_wide
+
+oss_grant_long <- oss_grant_wide %>% pivot_longer(cols=-measure,names_to="house_type",values_to= "grant")
+#
+#
+oss_grant_long %>% filter(measure != "rafter_insulation", !str_detect(measure,"heat_pump")) %>% group_by(house_type) %>% summarise(max_grant=sum(grant))
+
+
+individual_grant_wide <- data.frame(
+  measure = c(
+    "attic_insulation",
+    "cavity_wall_insulation",
+    "internal_wall_insulation",
+    "external_wall_insulation",
+    "heat_pump",
+    "heating_controls",
+    "home_energy_assessment"
+  ),
+  detached = c(1500, 1700, 4500, 8000, 6500, 700,  250),
+  semi_detached = c(1300, 1200, 3500, 6000, 6500, 700, 250),
+  mid_terrace = c(1200, 800, 2000, 3500, 6500, 700, 250),
+  apartment = c(800, 700, 1500, 3000, 4500, 700, 250),
+  stringsAsFactors = FALSE
+)
+
+# Display the table
+print(individual_grant_wide)
+
+individual_grant_long <- individual_grant_wide %>% pivot_longer(cols=-measure,names_to="house_type",values_to= "grant")
+individual_grant_long %>% filter(!str_detect(measure,"heat_pump")) %>% group_by(house_type) %>% summarise(max_grant=sum(grant))
+
+#no heat pump
+individual_grant_long <- individual_grant_long %>% rename("building_type"=house_type)
+oss_grant_long <- oss_grant_long %>% rename("building_type"=house_type)
+
+oss_grant_long$scheme <- "OSS"
+individual_grant_long$scheme <- "BetterEnergyHomes"
+seai_grants <- individual_grant_long %>% bind_rows(oss_grant_long)
+#write_csv(seai_grants,"C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/seai_grants.csv")

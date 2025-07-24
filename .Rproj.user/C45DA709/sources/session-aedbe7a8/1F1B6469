@@ -1,0 +1,27 @@
+{
+    "id": "1F1B6469",
+    "path": "C:/Users/Joe/pkgs/hpmicrosimr/inst/checks.R",
+    "project_path": "inst/checks.R",
+    "type": "r_source",
+    "hash": "837285177",
+    "contents": "",
+    "dirty": false,
+    "created": 1751544571030.0,
+    "source_on_save": false,
+    "relative_order": 10,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "17,0",
+        "scrollLine": "7"
+    },
+    "folds": "32|96|47|0|\n",
+    "lastKnownWriteTime": 1753266995,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1753266995543,
+    "read_only": false,
+    "read_only_alternatives": []
+}
