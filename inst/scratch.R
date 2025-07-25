@@ -301,7 +301,47 @@ test <- impute_bedrooms_fixed_weights(data,weights)$assignment
 test %>% table()
 
 ber_impute <- ber1 %>% filter(GroundFloorArea > 25)
+#
+ber %>% dplyr::group_by(Year_of_Construction) %>% dplyr::summarise(mean_ber=median(BerRating)) %>% filter(Year_of_Construction %in% 1960:2024) %>% ggplot(aes(Year_of_Construction,mean_ber))+geom_point()
+#median BER of housing stock
+library(dplyr)
+library(purrr)
 
+# Define your range of years (e.g., 1900 to 2020)
+ber <- ber %>% filter(Year_of_Construction <=2025)
+year_range <- sort(unique(ber$Year_of_Construction))
+
+# Compute cumulative median BER up to each year Y
+ber_stock <- map_dfr(year_range, function(Y) {
+  ber %>%
+    filter(!is.na(BerRating), !is.na(Year_of_Construction), Year_of_Construction <= Y) %>%
+    summarise(
+      year = Y,
+      median_ber_stock = median(BerRating),
+      n = n()
+    )
+})
+#
+#ber_stock %>% filter(year >= 1960) %>% ggplot(aes(year,median_ber))+geom_line()
+#
+ber_cons <- ber %>% group_by(Year_of_Construction) %>% dplyr::summarise(median_ber=median(BerRating)) %>% rename("year"=Year_of_Construction)
+
+ber_stock <- ber_stock %>% inner_join(ber_cons)
+ber_stock_long <- ber_stock %>% select(-n) %>% pivot_longer(names_to="variable",values_to="median_ber", cols = -year)
+#total housing srtock
+g1 <- ber_stock %>% filter(year >= 1960) %>% ggplot(aes(year,n))+geom_point() + theme_minimal()
+g2 <- ber_stock_long %>% filter(year >= 1960) %>% ggplot(aes(year,median_ber,colour=variable))+geom_point() + theme_minimal() + scale_colour_canva(palette = "Sunny and calm")
+library(patchwork)
+g1/g2
+#
+#graph2ppt(g1/g2,"~/Policy/CAMG/EED/ResearchOutputs/housing_stock_ber.ppt")
+
+#construction year sample for recode_construction_year
+ber_year <- ber1 %>% select(Year_of_Construction,BerRating) %>% rename("construction_year"=Year_of_Construction)
+ber_year <- ber_year %>% filter(construction_year <= 2024) %>% arrange(construction_year)
+write_csv(sample_n(ber_year,size=1e+5) %>% arrange(construction_year),"inst/extdata/sample_construction_years.csv")
+
+ber_stock %>% filter(year >= 1960) %>% ggplot(aes(year,median_ber,colour=variable))+geom_point()
 #function tests
 test_impute <- ber_impute %>% filter(qc2=="Munster",q1=="Semi-detached house", q5==4,q2==2)
 data <- test_impute$GroundFloorArea
@@ -877,3 +917,29 @@ oss_grant_long$scheme <- "OSS"
 individual_grant_long$scheme <- "BetterEnergyHomes"
 seai_grants <- individual_grant_long %>% bind_rows(oss_grant_long)
 #write_csv(seai_grants,"C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/seai_grants.csv")
+
+
+###############################
+# weibull heating system failures
+################################
+
+lifetimes <- 1:50
+beta <- 2
+expected_q <- function(q) DiscreteWeibull::Edweibull(q, beta = beta)
+
+weibull_params <- tibble()
+# Define expected value of the DW distribution
+# Define function to find mean given q
+for(beta in seq(1,4,by=0.5))
+for(lifetime in 5:45){
+
+# Root-finding to match lambda
+f_obj <- function(q) expected_q(q) - lifetime
+
+sol <- uniroot(f_obj, interval = c(0.000001, 0.999999999))
+df <- tibble(lifetime=lifetime,beta=beta)
+df$q <- sol$root
+weibull_params <- weibull_params %>% bind_rows(df)
+}
+write_csv(weibull_params,"inst/extdata/weibull_params_csv")
+

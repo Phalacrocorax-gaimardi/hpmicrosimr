@@ -3,7 +3,7 @@
     "path": "C:/Users/Joe/pkgs/hpmicrosimr/inst/scratch.R",
     "project_path": "inst/scratch.R",
     "type": "r_source",
-    "hash": "866347980",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1750947713091.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "65,38",
-        "scrollLine": "58"
+        "cursorPosition": "944,0",
+        "scrollLine": "931"
     },
-    "folds": "663|46|682|0|\n684|55|696|0|\n",
-    "lastKnownWriteTime": 1753274883,
+    "folds": "140|57|193|0|\n198|88|296|0|\n703|46|722|0|\n724|55|736|0|\n",
+    "lastKnownWriteTime": 1753442599,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1753274883616,
+    "last_content_update": 1753442599547,
     "read_only": false,
     "read_only_alternatives": []
 }

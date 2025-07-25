@@ -1,0 +1,12 @@
+#' @title weibull_params
+#' @description canned values of weibull distribution parameters for heating system failures corresponding to mean system lifetime
+#' \eqn{\frac{\beta}{q} \left( \frac{t}{q} \right)^{\beta - 1} e^{- \left( \frac{t}{q} \right)^{\beta}}, \quad t > 0}.
+
+#' @format A data frame with 287 rows and 3 variables:
+#' \describe{
+#'   \item{\code{lifetime}}{double technology expected lifetime in whole years.values 5..45}
+#'   \item{\code{beta}}{double shape parameter (values 1,1.5,..,4)}
+#'   \item{\code{q}}{double scale parameter}
+#'}
+#' @details computed in scratch.R
+"weibull_params"

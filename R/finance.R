@@ -413,7 +413,7 @@ grant_eligibility <- function(ber_old, ber_new, construction_year, is_fuel_allow
 #' @returns list(scheme, grant)
 #' @export
 #'
-#' @examples  get_grant(ber_old=175,ber_new=100,construction_year = 2003,"Dublin","detached",100, is_fuel_allowance=FALSE,is_heat_pump=TRUE,scenario_params(sD,2025))
+#' @examples  get_grant(175,100,2003,"Dublin","detached",100, FALSE,TRUE,scenario_params(sD,2025))
 get_grant <- function(ber_old,ber_new,construction_year,region,house_type = c("semi_detached", "detached", "apartment", "mid-terrace", "end-terrace"),floor_area = 100,is_fuel_allowance = FALSE,is_heat_pump = FALSE,params) {
 
   # Input validation with more informative messages

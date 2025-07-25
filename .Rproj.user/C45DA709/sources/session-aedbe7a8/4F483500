@@ -3,7 +3,7 @@
     "path": "C:/Users/Joe/pkgs/hpmicrosimr/R/abm.R",
     "project_path": "R/abm.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "2063890213",
     "contents": "",
     "dirty": false,
     "created": 1750948103651.0,
@@ -13,15 +13,15 @@
         "tempName": "Untitled2",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "98,35",
-        "scrollLine": "87"
+        "cursorPosition": "135,28",
+        "scrollLine": "128"
     },
-    "folds": "21|41|77|0|\n89|37|95|0|\n114|51|128|0|\n",
-    "lastKnownWriteTime": 1753340073,
+    "folds": "",
+    "lastKnownWriteTime": 1753465949,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1753340208412,
+    "last_content_update": 1753465949776,
     "read_only": false,
     "read_only_alternatives": []
 }

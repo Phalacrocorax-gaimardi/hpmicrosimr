@@ -42,5 +42,5 @@ list(scheme, grant)
 find the grant amount available from SEAI.
 }
 \examples{
- get_grant(ber_old=175,ber_new=100,construction_year = 2003,"Dublin","detached",100, is_fuel_allowance=FALSE,is_heat_pump=TRUE,scenario_params(sD,2025))
+ get_grant(175,100,2003,"Dublin","detached",100, FALSE,TRUE,scenario_params(sD,2025))
 }

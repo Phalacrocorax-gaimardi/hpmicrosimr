@@ -29,14 +29,21 @@ scenario_params <- function(sD,yeartime){
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="heating_controller_cost", value=  dplyr::filter(sD, parameter=="heating_controller_cost")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="installer_overhead",  value=dplyr::filter(sD, parameter=="overhead")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="installer_profit_margin", value=  dplyr::filter(sD, parameter=="installer_profit_margin")$value))
-  #system lifetimes
+  #system lifetimes and weibull shape parameter
   for(tech in technologies){
     scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(tech,"_system_lifetime",sep=""), value=  dplyr::filter(sD, parameter==paste(tech,"_system_lifetime",sep=""))$value))
-  }
+    scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(tech,"_system_beta",sep=""), value=  dplyr::filter(sD, parameter==paste(tech,"_system_beta",sep=""))$value))
+
+    }
   #system efficiencies
-  for(tech in technologies){
+  for(tech in c("solid_fuel","electricity")){
     scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(tech,"_system_efficiency",sep=""), value=  dplyr::filter(sD, parameter==paste(tech,"_system_efficiency",sep=""))$value))
   }
+  for(tech in c("oil","gas"))
+    scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(tech,"system_efficiency",sep="_"), value=boiler_efficiency_fun(sD,yeartime)  ))
+
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="heat_pump_system_efficiency", value=heat_pump_cop_fun(sD,yeartime)  ))
+
   #system maintenance
   for(tech in technologies){
     scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(tech,"_system_maintenance",sep=""), value=  dplyr::filter(sD, parameter==paste(tech,"_system_maintenance",sep=""))$value))
@@ -115,16 +122,26 @@ fast_params <- function(params_long){
 initialise_agents <- function(sD,yeartime,cal_run){
 
   #initialise to 2015
-  #params <- scenario_params(sD,yeartime)
+  params <- scenario_params(sD,yeartime)
+  #only has dimenions 861??
   agents <- hp_model_weights_oo %>% dplyr::filter(calibration_run==cal_run) %>% dplyr::select(-calibration_run)
   #retain minimal set of features minimial set for imputing missing data
   hp_surv <- hp_survey_oo %>% dplyr::select(serial,qc2,q1,q2,q3,q5,q6,q11,qh,qb,qe,q4,qf,q7,q13,q121,q122,q123,q124,q125,q126,q127,q128,q129,)
-  hp_surv <- recode_survey(hp_surv)
-  #select minimal feature set
-  hp_surv <- hp_surv %>% dplyr::select(serial,qc2,q1,q2,q3,q5,q11,q6,ber,ground_floor_area,income,primary_heat,secondary_heat1,secondary_heat2)
-  #agents <- agents %>% dplyr::inner_join(pv_survey_oo %>% dplyr::select(ID,housecode,region,q1))
-  agents <- agents %>% dplyr::inner_join(hp_surv,by="serial")
+  hp_surv <- recode_survey(hp_surv,params)
 
+  #select minimal feature set
+  hp_surv <- hp_surv %>% dplyr::select(serial,qc2,q1,q2,construction_year,ber,ground_floor_area,income,primary_heat,heating_install_year,secondary_heat1,secondary_heat2)
+
+  #if heating_install_year is later than yeartime look at earlier heating system installation, assuming the same technology was used,
+  #unless it is a heat pump.
+  hp_surv <- hp_surv %>% dplyr::rowwise() %>% dplyr::mutate(heating_install_year = ifelse(heating_install_year <= yeartime, heating_install_year,
+                      prior_install_year(heating_install_year,ifelse(primary_heat != "heat_pump",primary_heat,sample(c("oil","gas"),1)),initial_year=yeartime,params)))
+
+  #agents <- agents %>% dplyr::inner_join(pv_survey_oo %>% dplyr::select(ID,housecode,region,q1))
+  agents <- agents %>% dplyr::inner_join(hp_surv,by="serial")  #some agents are missing!
+  agents <- agents %>% dplyr::rename("region"=qc2,"house_type"=q1)
+  #remove houses built after 2015
+  agents <- agents %>% dplyr::filter(construction_year <= 2015)
   return(agents %>% dplyr::ungroup())
 }
 

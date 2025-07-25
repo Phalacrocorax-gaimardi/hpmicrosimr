@@ -1,7 +1,7 @@
 Package: hpmicrosimr
 Type: Package
-Title: This package simulates the uptake of heat pumps and energy efficiency upgrades by Irish households.
-Version: 0.0.1
+Title: This package simulates the uptake of heat pumps and energy efficiency upgrades by Irish households
+Version: 0.0.2
 Authors@R: c(
     person("Joseph", "Wheatley", email = "joe.wheatley@ucd.ie", role = c("aut", "cre")),
     person("Na", "Li", email = "na.li1@ucd.ie", role = c("aut")))
@@ -14,15 +14,12 @@ Imports:
     dplyr,
     magrittr,
     tibble,
-    data.table,
     tidyr,
-    tidygraph,
     stringr,
-    foreach,
-    doParallel,
     ranger,
     rlang,
-    readxl
+    readxl,
+    DiscreteWeibull
 RoxygenNote: 7.3.1
 Depends: 
     R (>= 2.10)

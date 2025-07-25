@@ -18,14 +18,14 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-hpmicrosimr is an agent-based model framework describing home energy efficiency and heating technology system upgrades by 901 owner-occupier households from 2015. 
+*hpmicrosimr* is an agent-based model framework describing home energy efficiency and heating technology system upgrades by 901 owner-occupier households. The model is initialised in, say, 2015 and can run to 2050.
 
-This is an early development version of hpmicrosimr. So far the only functionality is the financial returns (bill savings) and the initialiser. The household investment decision involves a possible BER upgrade from BER_old -> BER_new and a possible technology shift from tech_old -> tech_new. hpmicrosimr calculates the financial return tensor, including the effect of grants if applicable.
+This is an early development version of *hpmicrosimr*. The main functionality is the household financial return (bill savings). There is also an initialiser. The household investment decision involves a possible BER upgrade from BER_old -> BER_new and a possible technology shift from tech_old -> tech_new. *hpmicrosimr* calculates the full financial return tensor, and determines the optimum system, including the effect of applicable grants applicable.
 
 
 ## Installation
 
-You can install the development version of hpmicrosimr like so:
+The latest development version of *hpmicrosimr* can be installed as follows:
 
 ``` r
 remotes::install_github("https://github.com/Phalacrocorax-gaimardi/hpmicrosimr")
@@ -33,7 +33,7 @@ remotes::install_github("https://github.com/Phalacrocorax-gaimardi/hpmicrosimr")
 
 ## Example
 
-A Munster household heats their detached 2003 house with a C2 BER score with a oil boiler as their primary heating source. We would like to know their financially optimal upgrade path before applying behavioural correction factors such as risk aversion, hassle, present bias etc.
+A detached house in Munster with 100m2 floor area is heated using an oil boiler in 2026. The house was built in 2003 house and has a C2 BER score. There may be secondary heating sources. At present *hpmicrosimr* ignores any secondary and tertiary heat sources. We would like to know their financially optimal upgrade path before applying behavioural correction factors such as risk aversion, hassle, present bias etc.
 
 First load in the technical and cost parameters for 2026. Heating system technology costs are assumed to be fixed (apart from labour).
 
@@ -44,4 +44,4 @@ tech_params <- tech_params_fun()
 optimise_upgrade(ber_old=180,tech_old = "oil",house_type="detached",2003,region="Munster",floor_area=100,params)
 ```
 
-The optimum upgrade in this case is to a B1 with a switch to a Heat Pump. However, replacing their oil boiler is a close second.
+The optimum upgrade in this case is to a B1 with a switch to a Heat Pump. However, replacing their oil boiler is a close second. 

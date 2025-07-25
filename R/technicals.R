@@ -14,6 +14,8 @@
 #energy_prices <- gas_prices %>% bind_rows(oil_prices,wood_prices,electricity_prices)
 #survey_income_ranges <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/income_values.csv")
 #fuel_allowance_eligibility <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/fuel_allowance_eligibility.csv")
+#sample_construction_years <- readr::read_csv("inst/extdata/sample_construction_years.csv")
+#weibull_params <- readr::read_csv("inst/extdata/weibull_params.csv")
 
 #' get_ber_score
 #'
@@ -37,8 +39,6 @@ get_ber_score <- function(ber_rating) {
   codes <- ber_ratings_table$code[match_idx]
   codes[which.max(nchar(codes))]
 }
-
-
 
 
 #' gen_ber_rating
@@ -238,12 +238,13 @@ recode_construction_year <- function(q5,house_type_region){
 #' recodes the input survey data for use in initialise_agents. The recoded features are BER, ground floor area, and gross household income.
 #'
 #' @param hp_data_in input survey e.g. hp_survey_oo
+#' @param params parameter values
 #'
 #' @returns dataframe
 #' @export
 #'
-#' @examples recode_survey(hp_survey_oo)
-recode_survey <- function(hp_data_in){
+#' @examples recode_survey(hp_survey_oo,scenario_params(sD,2015))
+recode_survey <- function(hp_data_in,params){
 
 
   hp_data_out <- hp_data_in
@@ -274,10 +275,13 @@ recode_survey <- function(hp_data_in){
 
   #recode income
   if("qh" %in% codes) hp_data_out <- impute_hh_income(hp_data_out)
-  #
-
+  #recode construction year to year value
+  if("q5" %in% codes) hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(construction_year=recode_construction_year(q5))
+  #heating system installation year
+  if("q7" %in% codes) {hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(heating_install_year = 2025-heating_system_age(q7,primary_heat,params))}
   #hp_data_out <- hp_data_out %>% dplyr::rowwise() %>%  dplyr::mutate(heating_requirment=ber*ground_floor_area*q2)
-
+  #if heating installation is before construction year then set heating installation to construction year
+  hp_data_out <- hp_data_out %>% dplyr::mutate(heating_install_year =ifelse(heating_install_year < construction_year,construction_year,heating_install_year))
   hp_data_out %>% return()
 }
 
@@ -322,5 +326,128 @@ impute_hh_income <- function(hp_data_in){
 
   hp_data_out %>% dplyr::select(-upper,-lower,-qh_imputed) %>% return()
 }
+
+
+#' heating_system_age
+#'
+#' heating system age based on survey response and mean system lifetime based on a geometric failure distribution p(1-p)^t.
+#' This should be replaced by a more realistic discrete weibull distribution.
+#'
+#' @param q7 survey system age
+#' @param tech technology
+#' @param params current parameters
+#'
+#' @returns
+#' @export
+#'
+#' @examples heating_system_age(6,"oil",scenario_params(sD,2015))
+heating_system_age <- function(q7,tech,params){
+
+  l <- list(1,2,c(3,5),c(6,10),c(11,20),c(21,50),c(5,50))[[q7]]
+  if(length(l)==1) return(l)
+  beta0 <- params[[paste(tech,"system_beta",sep="_")]]
+  q_fit <- weibull_params %>% dplyr::filter(beta==beta0,lifetime==params[[paste(tech,"system_lifetime",sep="_")]]) %>% dplyr::pull(q)
+  pmf_vals <- DiscreteWeibull::ddweibull(l[1]:l[2], q = q_fit, beta = beta0)
+  # conditional probabilities
+  cond_probs <- pmf_vals / sum(pmf_vals)
+  sample(l[1]:l[2],1,prob=cond_probs)
+}
+
+#' prior_install_year
+#'
+#' samples the likely year of installation given that the system was replaced in failure_year
+#'
+#' based on the posterior probability that heating system was installed in year T1 given that it failed in year T2 using
+#' a non-uniform prior that the system was installed in 2015 or before. This ensures that initial_agents() has heating systems installed before the initial year.
+#'
+#' @param failure_year year of system replacement
+#' @param tech technology
+#' @param initial_year default 2015
+#' @param params scenario design
+#'
+#' @returns year
+#' @export
+#'
+#' @examples  prior_install_year(2020,"gas",initial_year=2015,scenario_params(sD,2015))
+prior_install_year <- function(failure_year,tech, initial_year = 2015, params){
+
+    t_vec= 1970:2015
+    a_vec <- failure_year - t_vec
+    a_vec[a_vec < 1] <- NA  # age must be >= 1
+
+    beta0 <- params[[paste(tech,"system_beta",sep="_")]]
+    q_fit <- weibull_params %>% dplyr::filter(beta==beta0,lifetime==params[[paste(tech,"system_lifetime",sep="_")]]) %>% dplyr::pull(q)
+
+
+    likelihood <- DiscreteWeibull::ddweibull(a_vec, q = q_fit, beta = beta0)
+
+    uniform_prior <- rep(1,length(t_vec))
+
+    posterior_unnorm <- likelihood * uniform_prior
+    posterior <- posterior_unnorm / sum(posterior_unnorm, na.rm = TRUE)
+
+   # data.frame(Install_Year = T1_vec, Age = a_vec, Posterior = posterior)
+    sample(t_vec,1,prob=posterior)
+  }
+
+
+
+
+
+
+#heating_system_age <- Vectorize(heating_system_age)
+
+#' recode_construction_year
+#'
+#' assign a construction year
+#'
+#' @param q5 survey response code for construction year. q5=7 is "don't know"
+#'
+#' @returns
+#' @export
+#'
+#' @examples recode_construction_year(1)
+recode_construction_year <- function(q5){
+  #assume don't knows were buildt between
+  l <- list(c(1750,1975),c(1976,1991),c(1992,2004),c(2005,2010),c(2011,2021),c(2021,2024),c(1750,2010))[[q5]]
+  year_sample <- sample_construction_years %>% dplyr::filter(construction_year <= l[2], construction_year >= l[1]) %>% dplyr::pull(construction_year)
+  sample(year_sample,1)
+}
+
+
+#' boiler_efficiency_fun
+#'
+#' efficiency of oil and gas boilers. there was a sharp improvement with the introduction of condensing boilers
+#'
+#' @param sD scenario
+#' @param yeartime decimal time
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+boiler_efficiency_fun <- function(sD,yeartime){
+  #night_discount_fun(sD,2027)
+  values <- sD %>% dplyr::filter(stringr::str_detect(parameter,"boiler_efficiency")) %>% dplyr::pull(value)
+  approx(x=c(2005.5,2010.5,2015.5), y=values,xout=yeartime,rule=2)$y %>% return()
+}
+
+#' heat_pump_cop_fun
+#'
+#' real-world heat pump performance coefficient
+#'
+#' @param sD scenario design
+#' @param yeartime decimal year
+#'
+#' @returns
+#' @export
+#'
+#' @examples heat_pump_cop_fun(sD,2013)
+heat_pump_cop_fun <- function(sD,yeartime){
+  #night_discount_fun(sD,2027)
+  values <- sD %>% dplyr::filter(stringr::str_detect(parameter,"heat_pump_cop")) %>% dplyr::pull(value)
+  approx(x=c(2010.5,2020.5), y=values,xout=yeartime,rule=2)$y %>% return()
+}
+
 
 
