@@ -1,7 +1,7 @@
 Package: hpmicrosimr
 Type: Package
 Title: This package simulates the uptake of heat pumps and energy efficiency upgrades by Irish households
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: c(
     person("Joseph", "Wheatley", email = "joe.wheatley@ucd.ie", role = c("aut", "cre")),
     person("Na", "Li", email = "na.li1@ucd.ie", role = c("aut")))
