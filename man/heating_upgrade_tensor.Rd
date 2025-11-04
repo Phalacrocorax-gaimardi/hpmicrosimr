@@ -8,13 +8,16 @@ heating_upgrade_tensor(
   ber_old,
   ber_new,
   tech_old,
+  installation_time,
   tech_new,
   house_type,
   construction_year,
   region,
   floor_area,
   params,
-  include_grants = TRUE
+  upgrade_heat = FALSE,
+  include_grants = TRUE,
+  is_fuel_allowance = FALSE
 )
 }
 \arguments{
@@ -23,6 +26,8 @@ heating_upgrade_tensor(
 \item{ber_new}{new ber double}
 
 \item{tech_old}{old tech}
+
+\item{installation_time}{time of installation of current system (for estimate of old operating cost only)}
 
 \item{tech_new}{new tech}
 
@@ -36,11 +41,37 @@ heating_upgrade_tensor(
 
 \item{params}{params}
 
+\item{upgrade_heat}{TRUE if current heating system is upgraded}
+
 \item{include_grants}{TRUE/FALSE}
+
+\item{is_fuel_allowance}{TRUE/FALSE}
 }
 \value{
-euros
+list
 }
 \description{
 calculates an element of the heating system upgrade cost tensor (ber_old,tech_old) -> (ber_new,tech_new)
+}
+\details{
+optionally, the current (old) heating system can be retained
+
+the effects of all grants can be excluded
+
+used with optimise_upgrade to determine the optimal upgrade path
+}
+\examples{
+
+params <- scenario_params(sD,2016)
+heating_upgrade_tensor(200,50,"oil",2003,"heat_pump","semi_detached",2005,"Dublin",120,params,TRUE,TRUE,FALSE)
+
+heating_upgrade_tensor(200,100,"oil",2003,"heat_pump","semi_detached",1990,"Dublin",120,params,TRUE,TRUE,FALSE)
+
+heating_upgrade_tensor(200,100,"gas",2015,"gas","semi_detached",1990,"Dublin",120,params,TRUE,TRUE,FALSE)
+
+heating_upgrade_tensor(200,100,"gas",2015,"gas","semi_detached",1990,"Dublin",120,params,FALSE,TRUE,TRUE)
+
+heating_upgrade_tensor(200,100,"gas",2015,"gas","semi_detached",1990,"Dublin",120,params,TRUE,TRUE,TRUE)
+
+
 }

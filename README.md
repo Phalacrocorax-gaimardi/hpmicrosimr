@@ -55,21 +55,16 @@ loss ratings A1, A2 etc.
 library(hpmicrosimr)
 params <- scenario_params(sD,2026)
 tech_params <- tech_params_fun()
-optimise_upgrade(ber_old=180,tech_old = "oil",house_type="detached",2003,region="Munster",floor_area=100,params)
-#> # A tibble: 5 × 5
-#>   tech_new    annualised_cost ber_optimal annualised_cost_old bill_savings
-#>   <chr>                 <dbl>       <dbl>               <dbl>        <dbl>
-#> 1 heat_pump             1540.        77.7               2756.        -44.1
-#> 2 oil                   1615.        77.7               2756.        -41.4
-#> 3 gas                   1802.        67.9               2756.        -34.6
-#> 4 electricity           2369.        19.8               2756.        -14.1
-#> 5 solid_fuel            1756.        67.9               2756.        -36.3
+#optimise_upgrade(ber_old=180,tech_old = "oil",house_type="detached",2003,region="Munster",floor_area=100,params, is_fuel_allowance=FALSE)
 ```
 
 The optimum upgrade in this case is to a B1 with a switch to a Heat
 Pump. However, replacing their oil boiler is a close second. Note that
 this calculation assumes no change in the heating comfort level demanded
-by households.
+by households. This assuming is relaxed during the calibration stage
+when behavioural parameters are introduced.
+
+### Financial return examples
 
 Familiarity with three high-level functions needed to run *hpmicrosimr*:
 the initialiser *initial_agents()*, the updater *update_agents()* and
@@ -109,19 +104,33 @@ initialise_agents(sD,2015, cal_run=sample(1:100,1))
 #> Joining with `by = join_by(q1)`
 #> Joining with `by = join_by(serial)`
 #> Joining with `by = join_by(qh)`
-#> # A tibble: 796 × 15
-#>    serial w_q52 w_q13 w_theta region  house_type    q2 construction_year   ber ground_floor_area income primary_heat heating_install_year
-#>     <dbl> <dbl> <dbl>   <dbl> <chr>   <chr>      <dbl>             <dbl> <dbl>             <dbl>  <dbl> <chr>                       <dbl>
-#>  1     71 0.639 0.976   1.17  Ulster… detached       2              2004 149.               85.1 78249. oil                          2010
-#>  2     72 1.07  1.07    0.937 Dublin  semi_deta…     2              2003 119.               74.0 90743. gas                          2005
-#>  3     74 1.52  1.07    0.665 Dublin  terraced       2              1972 199.               63.4 71771. gas                          2011
-#>  4     75 1.19  1.24   -0.179 Dublin  apartment      2              2009  47.5              73.2 31211. gas                          2008
-#>  5     77 1.37  1.49    0.140 Munster detached       2              1994 141.              129.  33831. gas                          2015
-#>  6     79 1.34  1.38    0.785 Munster detached       2              1999 214.               75.7 71575. oil                          1999
-#>  7     81 1.08  1.08    1.22  Munster detached       1              2003 309.              137.  87390. oil                          2004
-#>  8     82 1.00  0.897   1.04  Ulster… detached       1              2008 159.               85.0 41574. solid_fuel                   1986
-#>  9     84 1.04  1.16    0.462 Rest o… semi_deta…     2              1995 173.               84.6 26816. gas                          2005
-#> 10     87 0.420 1.25    1.93  Rest o… detached       2              1985 349.              104.  27690. oil                          2003
-#> # ℹ 786 more rows
-#> # ℹ 2 more variables: secondary_heat1 <chr>, secondary_heat2 <chr>
+#> # A tibble: 789 × 21
+#>    serial w_q52 w_q13 w_theta region    house_type    q2 construction_year   ber
+#>    <chr>  <dbl> <dbl>   <dbl> <chr>     <chr>      <dbl>             <dbl> <dbl>
+#>  1 71     0.857 0.987  1.12   Ulster/C… detached       2              2004 147. 
+#>  2 72     1.16  1.07   0.910  Dublin    semi_deta…     2              1997 108. 
+#>  3 74     1.29  0.902  0.725  Dublin    terraced       2              1960 188. 
+#>  4 75     1.18  1.25  -0.203  Dublin    apartment      2              2007  28.4
+#>  5 77     1.28  1.41   0.0941 Munster   detached       2              1998 129. 
+#>  6 79     1.19  1.29   0.746  Munster   detached       2              1998 326. 
+#>  7 81     1.08  1.31   1.21   Munster   detached       1              2004 136. 
+#>  8 82     0.976 0.931  1.06   Ulster/C… detached       1              2006  75.1
+#>  9 84     1.03  1.40   0.525  Rest of … semi_deta…     2              2000 183. 
+#> 10 87     0     1.15   1.87   Rest of … detached       2              1989 105. 
+#> # ℹ 779 more rows
+#> # ℹ 12 more variables: floor_area <dbl>, primary_heat <chr>,
+#> #   heating_install_time <dbl>, secondary_heat1 <chr>, secondary_heat2 <chr>,
+#> #   income <dbl>, fuel_allowance <lgl>, kW <dbl>, q52 <dbl>, annual_cost <dbl>,
+#> #   heat_pump_grant <dbl>, upgrade_grant <dbl>
+```
+
+## Example: Updater
+
+*update_agents* is the core function that advances the system by one
+time step
+
+``` r
+library(hpmicrosimr)
+help("update_agents")
+#> starting httpd help server ... done
 ```

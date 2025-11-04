@@ -8,7 +8,8 @@ grant_eligibility(
   ber_old,
   ber_new,
   construction_year,
-  is_fuel_allowance = FALSE
+  is_fuel_allowance = FALSE,
+  params
 )
 }
 \arguments{
@@ -19,14 +20,23 @@ grant_eligibility(
 \item{construction_year}{construction year(integer)}
 
 \item{is_fuel_allowance}{fuel allowance qualification from  (boolean)}
+
+\item{params}{used for yeartime to determine grant availability}
 }
 \value{
-scheme
+scheme one of "None", "WarmerHomes", "OSS", "BetterEner
 }
 \description{
-utility to determine which home energy efficiency grant scheme a homeowner is eligible for
+utility to determine which home energy efficiency grant scheme a homeowner is or was eligible
 }
 \examples{
-grant_eligibility(175,20,2015,is_fuel_allowance=FALSE)
+
+grant_eligibility(175,20,2005,is_fuel_allowance=FALSE,scenario_params(sD,2026))
+#no grants before 2015
+grant_eligibility(175,20,1990,is_fuel_allowance=TRUE,scenario_params(sD,2005))
+#warmer homes
+grant_eligibility(175,20,2005,is_fuel_allowance=TRUE,scenario_params(sD,2026))
+#newer house
+grant_eligibility(175,175,2000,is_fuel_allowance=TRUE,scenario_params(sD,2026))
 
 }

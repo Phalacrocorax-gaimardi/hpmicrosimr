@@ -3,20 +3,20 @@
 \docType{data}
 \name{energy_prices}
 \alias{energy_prices}
-\title{DATASET_TITLE}
+\title{energy_prices}
 \format{
 A data frame with 50 rows and 3 variables:
 \describe{
-  \item{\code{year}}{double COLUMN_DESCRIPTION}
-  \item{\code{price}}{double COLUMN_DESCRIPTION}
-  \item{\code{fuel}}{character COLUMN_DESCRIPTION} 
+  \item{\code{year}}{double year}
+  \item{\code{price}}{double price in euros}
+  \item{\code{fuel}}{character fuel type}
 }
 }
 \usage{
 energy_prices
 }
 \description{
-DATASET_DESCRIPTION
+historical retails energy prices Ireland
 }
 \details{
 DETAILS

@@ -30,5 +30,16 @@ retrofit_cost_model_marginal(
 cost in euros
 }
 \description{
-retrofit fit cost model based on marginal cost function k/ber^$alpha$. Default fit is based on cost matrix in ber_upgrade_cost_matrix
+A retrofit fit cost model based a power law dependence of marginal upgrade cost on BER
+on marginal cost function
+\deqn{\frac{k}{BER^\alpha}}
+so that the cost of upgrade from \eqn{BER_{old}} to \eqn{BER_{new}} is
+\deqn{\frac{k}{1-\alpha}\left(BER_{old}^{1-\alpha}-BER_{new}^{1-\alpha}\right)}
+The parameters \eqn{k} and \eqn{\alpha} are set in \emph{params}
+}
+\details{
+Default fit is based on cost matrix in ber_upgrade_cost_matrix. Assumes a square root dependence of cost on floor area (economy of scale)
+}
+\examples{
+ retrofit_cost_model_marginal(200,100,"semi_detached","Dublin",100,scenario_params(sD,2026))
 }

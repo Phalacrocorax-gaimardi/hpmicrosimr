@@ -1,5 +1,5 @@
 #' @title ber table
-#' @description ber codes from bers
+#' @description energy rating ranges from BER scores. A1 is assumed to be 10-25.
 #' @format A data frame with 20 rows and 3 variables:
 #' \describe{
 #'   \item{\code{code}}{character code}

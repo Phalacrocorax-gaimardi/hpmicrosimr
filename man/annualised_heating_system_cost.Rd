@@ -6,18 +6,21 @@
 \usage{
 annualised_heating_system_cost(
   tech,
-  installation = "swap",
+  installation_time,
+  installation_type = "swap",
   heating_requirement,
   house_type,
   construction_year,
-  params,
-  include_grant = FALSE
+  grant_type,
+  params
 )
 }
 \arguments{
 \item{tech}{heating technology}
 
-\item{installation}{new or swap}
+\item{installation_time}{time heating system installed}
+
+\item{installation_type}{new or swap}
 
 \item{heating_requirement}{inferred heating requirement}
 
@@ -25,10 +28,10 @@ annualised_heating_system_cost(
 
 \item{construction_year}{year, integer}
 
-\item{params}{parameter values at yeartime}
+\item{grant_type}{one of "OSS","BetterEnergyHomes", "None"}
 
-\item{include_grant}{TRUE/FALSE default TRUE}
+\item{params}{parameter values at yeartime}
 }
 \description{
-annualised_heating_system_cost
+annualised heating cost equal to the sum of annualised capital cost and operating cost
 }

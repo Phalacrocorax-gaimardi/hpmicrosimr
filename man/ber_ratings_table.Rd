@@ -16,7 +16,7 @@ A data frame with 20 rows and 3 variables:
 ber_ratings_table
 }
 \description{
-ber codes from bers
+energy rating ranges from BER scores. A1 is assumed to be 10-25.
 }
 \details{
 DETAILS

@@ -7,12 +7,12 @@
 heating_system_capital_cost(
   tech,
   kW,
+  installation_type = "swap",
   house_type,
   construction_year,
-  installation = "swap",
+  grant_type,
   params,
-  include_vat = TRUE,
-  include_grant = FALSE
+  include_vat = TRUE
 )
 }
 \arguments{
@@ -20,17 +20,17 @@ heating_system_capital_cost(
 
 \item{kW}{system capacity}
 
-\item{house_type}{seai house type}
+\item{installation_type}{"new" or "swap"}
 
-\item{construction_year}{year of construction, integer}
+\item{house_type}{for grant}
 
-\item{installation}{"new" or "swap"}
+\item{construction_year}{for grant eligibility}
 
-\item{params}{current cost parameters output from scenario_params}
+\item{grant_type}{choose "None" to exclude grant}
+
+\item{params}{scenario params}
 
 \item{include_vat}{TRUE/FALSE}
-
-\item{include_grant}{TRUE/FALSE}
 }
 \value{
 euro cost
@@ -39,7 +39,16 @@ euro cost
 cost of a new heating system. Includes VAT using the "two-thirds" rule.
 }
 \details{
-The current version of this function assumed that ancilliary costs are halved if the same technology is being replaced.
+The installation time is params$yeartime.
 
-The heat pump grant is included where eligible by default.
+The current version of this function assumed that ancilliary costs are halved if the technology is unchanged - "swap" vs "new".
+}
+\examples{
+heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"BetterEnergyHomes",scenario_params(sD,2026),include_vat = TRUE)
+#
+heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"WarmerHomes",scenario_params(sD,2026),include_vat = TRUE)
+#
+heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"OSS",scenario_params(sD,2026),include_vat = TRUE)
+
+heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"BetterEnergyHomes",scenario_params(sD,2019),include_vat = TRUE)
 }

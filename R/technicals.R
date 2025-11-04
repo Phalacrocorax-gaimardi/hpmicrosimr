@@ -1,4 +1,4 @@
-#ber_ratings_table <- read_csv("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/BERPublicSearch/ratings_table.csv")
+#ber_ratings_table <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/ber_ratings_table.csv")
 #hp_qanda <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/hp_qanda.csv")
 #hp_survey_oo <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/hp_survey_oo.csv")
 #hp_questions <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/hp_questions.csv")
@@ -16,6 +16,8 @@
 #fuel_allowance_eligibility <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/fuel_allowance_eligibility.csv")
 #sample_construction_years <- readr::read_csv("inst/extdata/sample_construction_years.csv")
 #weibull_params <- readr::read_csv("inst/extdata/weibull_params.csv")
+#tech_failure_params <- readr::read_csv("inst/extdata/tech_failure_parameters.csv")
+#seai_grants_average <- readr::read_csv("inst/extdata/seai_grants_averaged.csv")
 
 #' get_ber_score
 #'
@@ -271,17 +273,21 @@ recode_survey <- function(hp_data_in,params){
   hp_data_out <- hp_data_out %>% dplyr::mutate(q6_b=recode_ber(q6))
   #hp_new <- hp_new %>% mutate(q6=gen_ber_rating(q6))
   hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(ber=ifelse(!is.na(q6_b),gen_ber_rating(q6_b),impute_ber(q1,q2,qc2,q5,q3)))
-  hp_data_out <- hp_data_out %>% dplyr::rowwise() %>%  dplyr::mutate(ground_floor_area=impute_floor_area(q1,q2,qc2,q5,q3)) %>% dplyr::select(-q6_b)
+  #total floor area replaces ground floor area
+  hp_data_out <- hp_data_out %>% dplyr::rowwise() %>%  dplyr::mutate(floor_area=q2*impute_floor_area(q1,q2,qc2,q5,q3)) %>% dplyr::select(-q6_b)
 
   #recode income
   if("qh" %in% codes) hp_data_out <- impute_hh_income(hp_data_out)
   #recode construction year to year value
   if("q5" %in% codes) hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(construction_year=recode_construction_year(q5))
   #heating system installation year
-  if("q7" %in% codes) {hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(heating_install_year = 2025-heating_system_age(q7,primary_heat,params))}
+  if("q7" %in% codes) {hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(heating_install_time = 2025-heating_system_age(q7,primary_heat,params))}
   #hp_data_out <- hp_data_out %>% dplyr::rowwise() %>%  dplyr::mutate(heating_requirment=ber*ground_floor_area*q2)
   #if heating installation is before construction year then set heating installation to construction year
-  hp_data_out <- hp_data_out %>% dplyr::mutate(heating_install_year =ifelse(heating_install_year < construction_year,construction_year,heating_install_year))
+  hp_data_out <- hp_data_out %>% dplyr::mutate(heating_install_time =ifelse(heating_install_time < construction_year,construction_year,heating_install_time))
+  #check fuel allowance eligibility
+  hp_data_out <- hp_data_out %>% dplyr::mutate(fuel_allowance = is_eligible_fuel_allowance(actualage,income,qi))
+
   hp_data_out %>% return()
 }
 
@@ -391,10 +397,6 @@ prior_install_year <- function(failure_year,tech, initial_year = 2015, params){
   }
 
 
-
-
-
-
 #heating_system_age <- Vectorize(heating_system_age)
 
 #' recode_construction_year
@@ -415,39 +417,217 @@ recode_construction_year <- function(q5){
 }
 
 
-#' boiler_efficiency_fun
+#' heating_system_efficiency
 #'
-#' efficiency of oil and gas boilers. there was a sharp improvement with the introduction of condensing boilers
+#' efficiency of heating system technology as a function of installtion time.
 #'
-#' @param sD scenario
-#' @param yeartime decimal time
+#' there was a sharp improvement in oil and gas tech with the introduction of condensing boilers
+#'
+#' @param tech heating technology
+#' @param install_time decimal time
 #'
 #' @returns
+#' @export
+#'
+#' @examples  heating_system_efficiency("heat_pump",2003)
+heating_system_efficiency <- function(tech, install_time) {
+
+  switch(tech,
+         "electricity" = {
+           return(tech_params[["electricity_efficiency"]])
+         },
+
+         "solid_fuel" = {
+           return(tech_params[["solid_fuel_efficiency"]])
+         },
+
+         "heat_pump" = {
+           values <- c(tech_params[["heat_pump_cop_2010"]],tech_params[["heat_pump_cop_2020"]])
+           return(approx(x = c(2010.5, 2020.5), y = values, xout = install_time, rule = 2)$y)
+         },
+
+         "oil" = ,
+         "gas" = {
+           values <- c(tech_params[["boiler_efficiency_2005"]],tech_params[["boiler_efficiency_2010"]],tech_params[["boiler_efficiency_2015"]])
+           return(approx(x = c(2005.5, 2010.5, 2015.5), y = values, xout = install_time, rule = 2)$y)
+         },
+
+         stop("Unknown technology type: ", tech)
+  )
+}
+
+
+#' roundr
+#'
+#' stochastic round
+#'
+#' @param x real number to be rounded up or down
+#'
+#' @return integer
+#' @export
+#'
+#' @examples replicate(1000,roundr(1.8)) %>% table()
+roundr <- function(x){
+  x1 <- trunc(x)
+  weights = c(1+x1-x,x-x1)
+  return(sample(c(x1,x1+1),size=1,prob=weights))
+}
+
+#' weibull_failure
+#'
+#' stochastic function that returns FALSE is the heating system did not fail during an nbservation period.
+#' Use in update_agents() to model failure and replacement of heating systems according to a weibull failure model
+#'
+#' @param t0 installation date
+#' @param t1 start of observation period
+#' @param t2 end of observation period
+#' @param tech heating technology
+#'
+#' @returns did it fail? TRUE/FALSE
+#' @export
+#'
+#' @examples replicate(1000,weibull_failure(2010,2015,2016,"oil")) %>% table()
+weibull_failure <- function(t0,t1, t2, tech) {
+
+  t1 <- t1 - t0
+  t2 <- t2 - t0
+
+  beta <- tech_params[[paste(tech,"system_beta",sep="_")]]
+  lifetime <- tech_params[[paste(tech,"system_lifetime",sep="_")]]
+  q <- lifetime/gamma(1+1/beta)
+
+
+  s1 <- exp(- (t1 / q)^beta)
+  s2 <- exp(- (t2 / q)^beta)
+
+  fail_prob <- (s1 - s2) / s1  # Conditional probability
+  sample(c(FALSE,TRUE),1,prob=c(1-fail_prob,fail_prob))
+}
+
+weibull_failure <- Vectorize(weibull_failure)
+
+
+
+#' expected_residual_lifetime_num
+#'
+#' the expected remaining lifetime of a heating system given its age
+#'
+#'
+#' @param tech technology
+#' @param system_age system age
+#'
+#' @returns
+#' @export
+#'
+#' @examples expected_residual_lifetime_num("heat_pump",20)
+expected_residual_lifetime_num <- function(tech, system_age) {
+  beta <- tech_params[[paste(tech, "system_beta", sep = "_")]]
+  lifetime <- tech_params[[paste(tech, "system_lifetime", sep = "_")]]
+  q <- lifetime / gamma(1 + 1 / beta)
+
+  f <- function(tau) exp(-((system_age + tau) / q)^beta + (system_age / q)^beta)
+
+
+  integrate(f, lower = 1e-6, upper = 200)$value
+}
+
+
+#' expected_residual_lifetime
+#'
+#' expected residual lifetime of heating system contingent upon current system age
+#'
+#' @param tech heating tech
+#' @param system_age age in years
+#'
+#' @returns residual lifetime in years
+#' @export
+#'
+#' @examples expected_residual_lifetime("heat_pump",15)
+expected_residual_lifetime <- function(tech,system_age) {
+
+  beta <- tech_params[[paste(tech, "system_beta", sep = "_")]]
+  lifetime <- tech_params[[paste(tech, "system_lifetime", sep = "_")]]
+  lambda <- lifetime / gamma(1 + 1 / beta)
+
+  z <- (system_age / lambda)^beta
+  lambda / beta * exp(z) * gamma(1 / beta) * pgamma(z, shape = 1 / beta, lower.tail = FALSE)
+}
+#
+
+#' eac_weibull
+#'
+#' eac_weibull calculates the unit cost expected equivalent annual cost (or capital reduction factor CRF) when the asset survival function is
+#' \deqn{S(t) = \exp\Big[-\Big(\frac{t}{\lambda}\Big)^{\beta}\Big]}
+#' i.e. a Weibull distribution and the continuous time discount rate is r.
+#'
+#'
+#' @param lifetime mean system lifetime
+#' @param beta weibull shape parameter (usually > 1)
+#' @param system_age vector of system ages
+#' @param r continuous time discount rate
+#'
+#' @returns vector of annualised costs assumi
 #' @export
 #'
 #' @examples
-boiler_efficiency_fun <- function(sD,yeartime){
-  #night_discount_fun(sD,2027)
-  values <- sD %>% dplyr::filter(stringr::str_detect(parameter,"boiler_efficiency")) %>% dplyr::pull(value)
-  approx(x=c(2005.5,2010.5,2015.5), y=values,xout=yeartime,rule=2)$y %>% return()
+eac_weibull <- function(lifetime, beta, system_age,r) {
+
+  upper<- 1000
+  lambda <- lifetime / gamma(1 + 1 / beta)
+
+  # CRF for a new system
+  denom0 <- integrate(function(u) exp(-r*u) * exp(-(u/lambda)^beta), 0, upper, rel.tol = 1e-8)$value
+  crf <- 1 / denom0
+
+  # Remaining PV at each age t
+  #remaining <- sapply(system_age, function(tt) {
+  #  denom_t <- integrate(function(u) exp(-r*u) * exp(-((tt+u)/lambda)^beta), 0, upper, rel.tol = 1e-8)$value
+  #  crf * denom_t
+  #})
+
+  # Exact annualised cost per year: integrate over each year
+  annualised <- sapply(system_age, function(tt) {
+    integrate(function(u) exp(-r*u) * exp(-((tt+u)/lambda)^beta), 0, 1, rel.tol = 1e-8)$value* crf
+  })
+
+  return(annualised)
 }
 
-#' heat_pump_cop_fun
+#' erv_weibull
 #'
-#' real-world heat pump performance coefficient
+#' The expected residual value of an asset with Weibull survival function
+#' \deqn{S(t) = \exp\Big[-\Big(\frac{t}{\lambda}\Big)^{\beta}\Big]}
+#' conditional on its current age.
 #'
-#' @param sD scenario design
-#' @param yeartime decimal year
+#' The continuous time discount rate is related to the annual rate \eqn{\delta} by
+#' \deqn{r=log(1+\delta)}
 #'
-#' @returns
+#'
+#' @param lifetime mean system lifetime
+#' @param beta weibull shape parameter (usually > 1)
+#' @param system_age vector of system ages
+#' @param r discount rate
+#'
+#' @returns vector of ervs
 #' @export
 #'
-#' @examples heat_pump_cop_fun(sD,2013)
-heat_pump_cop_fun <- function(sD,yeartime){
-  #night_discount_fun(sD,2027)
-  values <- sD %>% dplyr::filter(stringr::str_detect(parameter,"heat_pump_cop")) %>% dplyr::pull(value)
-  approx(x=c(2010.5,2020.5), y=values,xout=yeartime,rule=2)$y %>% return()
-}
+#' @examples
+erv_weibull <- function(lifetime, beta, system_age,r) {
 
+  upper<- 1000
+  lambda <- lifetime / gamma(1 + 1 / beta)
+
+  # CRF for a new system
+  denom0 <- integrate(function(u) exp(-r*u) * exp(-(u/lambda)^beta), 0, upper, rel.tol = 1e-8)$value
+  crf <- 1 / denom0
+
+  # Remaining PV at each age t
+  remaining <- sapply(system_age, function(tt) {
+    denom_t <- integrate(function(u) exp(-r*u) * exp(-((tt+u)/lambda)^beta), 0, upper, rel.tol = 1e-8)$value
+    crf * denom_t
+  })
+
+  return(remaining)
+}
 
 

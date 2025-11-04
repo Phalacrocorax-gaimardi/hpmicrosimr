@@ -7,17 +7,23 @@
 optimise_upgrade(
   ber_old,
   tech_old,
+  installation_time,
   house_type,
   construction_year,
   region,
   floor_area,
-  params
+  params,
+  upgrade_heat = TRUE,
+  is_fuel_allowance,
+  include_grants = TRUE
 )
 }
 \arguments{
 \item{ber_old}{old ber kWh/m2/year}
 
 \item{tech_old}{new ber kWh/m2/year}
+
+\item{installation_time}{year of installation of old (current) tech}
 
 \item{house_type}{seai house type}
 
@@ -28,7 +34,40 @@ optimise_upgrade(
 \item{floor_area}{total floor area (m2)}
 
 \item{params}{current parameter values}
+
+\item{upgrade_heat}{if TRUE then upgrade the current heating system}
+
+\item{is_fuel_allowance}{TRUE/FALSE}
+
+\item{include_grants}{defaults to TRUE}
+}
+\value{
+a
 }
 \description{
-find the financially optimum household ber upgrade
+optimise_upgrade finds the financially optimum household energy upgrade
+}
+\details{
+The potential new heating technologies (tech_new) considered are current tech and heat pump for all grant types.
+
+The
+
+If fuel allowance is TRUE and the hosuehold qualifies for WarmerHomes then it is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard
+
+All grant_types apart from WarmerHomes requires BER optimisation
+}
+\examples{
+
+params <- scenario_params(sD,2026)
+
+optimise_upgrade(200,"gas",2010,"detached",2010,"Dublin",210,params,TRUE,FALSE,TRUE)
+
+optimise_upgrade(200,"oil",2010,"detached",2010,"Dublin",210,params,TRUE,FALSE,TRUE)
+
+optimise_upgrade(200,"heat_pump",2010,"detached",2010,"Dublin",210,params,TRUE,FALSE,TRUE)
+
+#WarmerHomes
+optimise_upgrade(200,"gas",2010,"detached",2005,"Dublin",100,params,is_fuel_allowance=TRUE)
+
+
 }

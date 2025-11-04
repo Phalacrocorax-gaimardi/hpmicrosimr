@@ -7,11 +7,12 @@
 annualised_capex(
   tech,
   kW,
+  installation_time,
+  installation_type,
   house_type,
   construction_year,
-  installation = "swap",
-  params,
-  include_grant = TRUE
+  grant_type,
+  params
 )
 }
 \arguments{
@@ -19,19 +20,28 @@ annualised_capex(
 
 \item{kW}{system capacity}
 
+\item{installation_time}{time of installation - different from params$yeartime}
+
+\item{installation_type}{"new" or "swap"}
+
 \item{house_type}{seai house type}
 
 \item{construction_year}{year, integer}
 
-\item{installation}{"swap" or "new"}
+\item{grant_type}{grant type}
 
-\item{params}{parameters output from scenario_params()}
-
-\item{include_grant}{TRUE/FALSE}
+\item{params}{time of interest or current time}
 }
 \value{
 euro amount
 }
 \description{
-annualised capex for heating system installation. used a calibration discount rate from params
+equivalent annualised cost of a home heating system.
+}
+\details{
+this function uses a capital reduction factor with with a technology specific
+Weibull survival function discount rate set from calibration (params$delta.).
+
+The annualised capex falls when the system age exceeds the expected lifetime. This corresponds
+to the intuition that older systems that continue to operate are "free".
 }

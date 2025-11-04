@@ -4,7 +4,7 @@
 \alias{initialise_agents}
 \title{initialise_agents}
 \usage{
-initialise_agents(sD, yeartime, cal_run)
+initialise_agents(sD, yeartime = 2015, cal_run)
 }
 \arguments{
 \item{sD}{scenario (usable_roof_fraction only)}
@@ -18,7 +18,4 @@ a dataframe with columns
 }
 \description{
 creates the agent initial state including model weights, stochastically imputed ground floor areas
-}
-\examples{
-initialise_agents(sD,2015,10)
 }

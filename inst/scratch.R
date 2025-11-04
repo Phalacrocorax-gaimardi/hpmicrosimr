@@ -916,7 +916,8 @@ oss_grant_long <- oss_grant_long %>% rename("building_type"=house_type)
 oss_grant_long$scheme <- "OSS"
 individual_grant_long$scheme <- "BetterEnergyHomes"
 seai_grants <- individual_grant_long %>% bind_rows(oss_grant_long)
-#write_csv(seai_grants,"C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/seai_grants.csv")
+seai_grants <- seai_grants %>% dplyr::mutate(building_type = replace(building_type,building_type=="mid_terrace","terraced"))
+#readr::write_csv(seai_grants,"C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/seai_grants.csv")
 
 
 ###############################
@@ -941,5 +942,55 @@ df <- tibble(lifetime=lifetime,beta=beta)
 df$q <- sol$root
 weibull_params <- weibull_params %>% bind_rows(df)
 }
-write_csv(weibull_params,"inst/extdata/weibull_params_csv")
+#write_csv(weibull_params,"inst/extdata/weibull_params.csv")
+
+##################
+# recide seai_grants
+################
+
+
+seai_grants_average <- seai_grants %>% dplyr::group_by(building_type,scheme) %>% dplyr::mutate(measure=replace(measure, stringr::str_detect(measure,"attic|rafter"),"roof"))
+seai_grants_average <- seai_grants_average  %>% dplyr::group_by(building_type,scheme) %>% dplyr::mutate(measure=replace(measure, stringr::str_detect(measure,"wall"),"wall"))
+seai_grants_average <- seai_grants_average  %>% dplyr::group_by(building_type,scheme,measure) %>% dplyr::summarise(grant=mean(grant))
+#readr::write_csv(seai_grants_average,"inst/extdata/seai_grants_averaged.csv")
+
+
+###############################
+# heat pumps artificial society
+###############################
+
+#pv_society_oo
+zet_survey_lab <- readxl::read_xlsx("~/Policy/SurveyDataAndAnalysis/Data/ZET_survey_2024_data_labels.xlsx",sheet=1)
+#zet_survey <- readxl::read_xlsx("~/Policy/SurveyDataAndAnalysis/Data/ZET_survey_2024_values.xlsx",sheet=1)
+
+zet1 <- zet_survey_lab %>% dplyr::filter(serial %in% hp_survey_oo$serial)
+#zet1$ID <- 1:nrow(zet1)
+society_codes <- c("serial","qb","qa","qc2","qd","qf","qg","q29")
+zet1 <- zet1 %>% dplyr::select(all_of(society_codes))
+names(zet1) <- c("serial","age","gender","region","class","education","area_type","degree")
+recode_degree <- function(char){
+
+ dplyr::case_when(char==1~1,char=="10-19"~15,char=="2"~2,char=="20+"~25,char=="3"~3,char=="4"~4,char=="5"~5,char=="Don't know"~NA,char=="None"~0)
+}
+recode_eduation <- function(n){
+
+ hp_qanda %>% filter(question_code == "qf")
+  n_new <- case_when( n %in% c(1:4,9)~1, !(n %in% c(1:4,9))~n-3)
+  return(n_new)
+}
+recode_income <- function(n){
+
+hp_qanda %>% filter(question_code == "qh")
+  n_new <- case_when( n %in% c(1:2)~1, n %in% 3:4~2, n %in% 5:6~3, n %in% 7:8~4, n %in% 9:11~5, n==12~6)
+  return(n_new)
+}
+
+zet1 <- zet1 %>% dplyr::mutate(degree=recode_degree(degree))
+#pv_survey <- zet_survey %>% dplyr::select(pv_questions$question_code)
+hp_society_oo <- zet1
+
+hp_society_oo %>% dplyr::filter(degree != 0) %>% dplyr::pull(degree) %>% table() %>% sum()
+hp_society_oo %>% dplyr::filter(degree != 0) %>% dplyr::pull(degree) %>% table()/372
+
+load("C:/Users/Joe/pkgs/pvbessmicrosimr/data/homophily.rda")
 

@@ -10,7 +10,7 @@ tech_params_fun()
 long form dataframe containing tech parameter names and values
 }
 \description{
-utility function to generate tech_params environment object. This can be modified through tech_cost_params dataframe,
+utility function to generate tech_params environment object. The model can be adjusted by modifying the tech_cost_params dataframe,
 loaded by this function. tech_params_fun does not have an argument at present because costs are assumed to be fixed. In future
 a sD, yeartime argument may be added.
 }

@@ -32,3 +32,8 @@ matrix
 \description{
 generates an implied BER upgrade for given cost model params and house_type, region and floor area
 }
+\examples{
+
+#gen_upgrade_cost_matrix("semi_detached","Dublin",100,params,model="marginal",FALSE)
+
+}

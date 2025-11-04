@@ -4,15 +4,26 @@
 \alias{heating_system_operating_cost}
 \title{heating_system_operating cost}
 \usage{
-heating_system_operating_cost(tech, heating_requirement, params)
+heating_system_operating_cost(
+  tech,
+  installation_time,
+  heating_requirement,
+  params
+)
 }
 \arguments{
 \item{tech}{heating technology}
+
+\item{installation_time}{heating installation year}
 
 \item{heating_requirement}{annual heating requirement in kWh}
 
 \item{params}{current parameters}
 }
 \description{
-cost based annual fuel consumption inferred from kWh heating_requirement. Also includes an annual maintenance cost.
+Annual operational cost based on current fuel price, annual fuel consumption inferred from kWh heating_requirement,
+and heating system efficiency based on installation year.
+}
+\details{
+Also includes an annual maintenance cost.
 }

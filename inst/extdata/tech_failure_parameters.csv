@@ -1,0 +1,11 @@
+category,variable,parameter,value,unit
+technical,oil boiler lifetime,oil_system_lifetime,17,years
+technical,gas boiler lifetime,gas_system_lifetime,12,years
+technical,heat pump lifetime,heat_pump_system_lifetime,17,years
+technical,electric lifetime,electricity_system_lifetime,12,years
+technical,solid fuel lifetime,solid_fuel_system_lifetime,25,years
+technical,oil boiler shape parameter,oil_system_beta,2.5,unitless
+technical,gas ber shape parameter,gas_system_beta,2.5,unitless
+technical,electric heating shape parameter,electricity_system_beta,1.5,unitless
+technical, heat pump shape parameter,heat_pump_system_beta,3,unitless
+technical,solid fuel system shape parameter,solid_fuel_system_beta,2.00,unitless

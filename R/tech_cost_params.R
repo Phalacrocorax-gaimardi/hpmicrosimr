@@ -1,15 +1,19 @@
-#' @title DATASET_TITLE
-#' @description DATASET_DESCRIPTION
-#' @format A data frame with 10 rows and 8 variables:
+#' @title tech_cost_params
+#' @description heating technology cost installatioj parameters
+#' @format A data frame with 10 rows and 12 variables:
 #' \describe{
-#'   \item{\code{technology}}{character COLUMN_DESCRIPTION}
-#'   \item{\code{installation}}{character COLUMN_DESCRIPTION}
-#'   \item{\code{fixed_hours}}{double COLUMN_DESCRIPTION}
-#'   \item{\code{kw_hours}}{double COLUMN_DESCRIPTION}
-#'   \item{\code{fixed_tech_cost}}{double COLUMN_DESCRIPTION}
-#'   \item{\code{kw_tech_cost}}{double COLUMN_DESCRIPTION}
-#'   \item{\code{fixed_ancilliary_cost}}{double COLUMN_DESCRIPTION}
-#'   \item{\code{kw_ancilliary_cost}}{double COLUMN_DESCRIPTION} 
+#'   \item{\code{technology}}{character heating tech}
+#'   \item{\code{installation}}{character "new" or "swap"}
+#'   \item{\code{labour_cost}}{double euros per hour}
+#'   \item{\code{fixed_hours}}{double base labour hours}
+#'   \item{\code{kw_hours}}{double labour hours per kW installed capacity}
+#'   \item{\code{fixed_tech_cost}}{double base tech cost}
+#'   \item{\code{kw_tech_cost}}{double base tech cost per kW installed capacity}
+#'   \item{\code{fixed_ancilliary_cost}}{double base ancilliary works cost}
+#'   \item{\code{kw_ancilliary_cost}}{double ancilliary works cost per kW capacity}
+#'   \item{\code{12kW}}{double implied cost of 12kW system }
+#'   \item{\code{18kW}}{double implied cost of 18KW system}
+#'   \item{\code{24kW}}{double implied cost of 24kW system}
 #'}
 #' @details DETAILS
 "tech_cost_params"

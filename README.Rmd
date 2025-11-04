@@ -41,10 +41,13 @@ First load in the technical and cost scenario parameters for 2026 *params*. A se
 library(hpmicrosimr)
 params <- scenario_params(sD,2026)
 tech_params <- tech_params_fun()
-optimise_upgrade(ber_old=180,tech_old = "oil",house_type="detached",2003,region="Munster",floor_area=100,params)
+#optimise_upgrade(ber_old=180,tech_old = "oil",house_type="detached",2003,region="Munster",floor_area=100,params, is_fuel_allowance=FALSE)
 ```
 
-The optimum upgrade in this case is to a B1 with a switch to a Heat Pump. However, replacing their oil boiler is a close second. Note that this calculation assumes no change in the heating comfort level demanded by households.
+The optimum upgrade in this case is to a B1 with a switch to a Heat Pump. However, replacing their oil boiler is a close second. Note that this calculation assumes no change in the heating comfort level demanded by households. This assuming is relaxed during the calibration stage when behavioural parameters are introduced.
+
+
+### Financial return examples
 
 Familiarity with three high-level functions needed to run *hpmicrosimr*: the initialiser *initial_agents()*, the updater *update_agents()* and *run_abm()*. 
 
@@ -61,3 +64,12 @@ The initial state contains all data needed to evaluate the annual bill savings f
 library(hpmicrosimr)
 initialise_agents(sD,2015, cal_run=sample(1:100,1))
 ```
+
+## Example: Updater
+
+*update_agents* is the core function that advances the system by one time step
+```{r updater}, paged.print=T}
+library(hpmicrosimr)
+help("update_agents")
+```
+
