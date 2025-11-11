@@ -36,12 +36,13 @@ optimise_heat(
 data frame (2 or 1 rows)
 }
 \description{
-find the financially optimum household heating system replacement. Choose between current system and installing a heat pump.
+Find the financially optimum household heating system replacement with no BER upgrade. The choice is between replacing current system or installing a heat pump.
 }
 \details{
-if current system is a heat pump, choose between a heat pump swap or reversion to gas.
+Ff current system is a heat pump, choose between a heat pump swap or reversion to gas.
 }
 \examples{
-optimise_heat(236,"oil",2000,"terraced",1980,"Munster",90,scenario_params(sD,2017))
+params <- scenario_params(sD,2017)
+optimise_heat(200,"oil",2000,"terraced",1980,"Munster",90,params)
 
 }

@@ -7,8 +7,10 @@
 heating_system_operating_cost(
   tech,
   installation_time,
-  heating_requirement,
-  params
+  ber,
+  floor_area,
+  params,
+  include_rebound = T
 )
 }
 \arguments{
@@ -16,9 +18,13 @@ heating_system_operating_cost(
 
 \item{installation_time}{heating installation year}
 
-\item{heating_requirement}{annual heating requirement in kWh}
+\item{ber}{annual heating requirement in kWh}
+
+\item{floor_area}{floor area in m2}
 
 \item{params}{current parameters}
+
+\item{include_rebound}{defaults to TRUE}
 }
 \description{
 Annual operational cost based on current fuel price, annual fuel consumption inferred from kWh heating_requirement,
@@ -26,4 +32,12 @@ and heating system efficiency based on installation year.
 }
 \details{
 Also includes an annual maintenance cost.
+}
+\examples{
+params <- scenario_params(sD,2026)
+heating_system_operating_cost("oil",2003,200,100,params)
+
+heating_system_operating_cost("oil",2003,200,100,params,include_rebound=FALSE)
+
+
 }

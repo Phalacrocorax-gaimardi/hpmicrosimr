@@ -47,7 +47,8 @@ excludes WarmerHomes by assumoing is_fuel_allowance=F
 diagnostic function not used by other functions
 }
 \examples{
+params <- scenario_params(sD,2026)
+heat_pump_upgrade_savings(200,"gas",2000,"detached",1990,"Munster",120,params,include_grants=TRUE)
 
-heat_pump_upgrade_savings(200,"gas",2000,"detached",1990,"Munster",120,scenario_params(sD,2026),include_grants=TRUE)
 
 }

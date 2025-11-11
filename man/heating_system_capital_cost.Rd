@@ -7,7 +7,7 @@
 heating_system_capital_cost(
   tech,
   kW,
-  installation_type = "swap",
+  installation_type = "new",
   house_type,
   construction_year,
   grant_type,
@@ -44,8 +44,11 @@ The installation time is params$yeartime.
 The current version of this function assumed that ancilliary costs are halved if the technology is unchanged - "swap" vs "new".
 }
 \examples{
-heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"BetterEnergyHomes",scenario_params(sD,2026),include_vat = TRUE)
+params <- scenario_params(sD,2026)
+heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"BetterEnergyHomes",params)
 #
+heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"None",params)
+
 heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"WarmerHomes",scenario_params(sD,2026),include_vat = TRUE)
 #
 heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"OSS",scenario_params(sD,2026),include_vat = TRUE)

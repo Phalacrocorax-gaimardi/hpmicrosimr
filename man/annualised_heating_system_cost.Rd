@@ -8,11 +8,13 @@ annualised_heating_system_cost(
   tech,
   installation_time,
   installation_type = "swap",
-  heating_requirement,
+  ber,
+  floor_area,
   house_type,
   construction_year,
   grant_type,
-  params
+  params,
+  include_rebound = FALSE
 )
 }
 \arguments{
@@ -22,7 +24,9 @@ annualised_heating_system_cost(
 
 \item{installation_type}{new or swap}
 
-\item{heating_requirement}{inferred heating requirement}
+\item{ber}{energy rating}
+
+\item{floor_area}{TFA}
 
 \item{house_type}{housing type (q1)}
 
@@ -31,7 +35,17 @@ annualised_heating_system_cost(
 \item{grant_type}{one of "OSS","BetterEnergyHomes", "None"}
 
 \item{params}{parameter values at yeartime}
+
+\item{include_rebound}{default FALSE}
 }
 \description{
 annualised heating cost equal to the sum of annualised capital cost and operating cost
+}
+\examples{
+params <- scenario_params(sD,2025)
+# theoretical cost without rebound
+annualised_heating_system_cost("heat_pump",2010,"new",200,100,"semi_detached",1997,grant_type="None",scenario_params(sD,2025))
+# actual cost with rebound
+annualised_heating_system_cost("heat_pump",2010,"new",200,100,"semi_detached",1997,grant_type="BetterEnergyHomes",scenario_params(sD,2025))
+
 }

@@ -63,12 +63,12 @@ used with optimise_upgrade to determine the optimal upgrade path
 \examples{
 
 params <- scenario_params(sD,2016)
-heating_upgrade_tensor(200,50,"oil",2003,"heat_pump","semi_detached",2005,"Dublin",120,params,TRUE,TRUE,FALSE)
+heating_upgrade_tensor(200,50,"oil",2003,"heat_pump","semi_detached",2005,"Dublin",120,params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_grants=FALSE)
 
 heating_upgrade_tensor(200,100,"oil",2003,"heat_pump","semi_detached",1990,"Dublin",120,params,TRUE,TRUE,FALSE)
 
-heating_upgrade_tensor(200,100,"gas",2015,"gas","semi_detached",1990,"Dublin",120,params,TRUE,TRUE,FALSE)
-
+heating_upgrade_tensor(200,200,"gas",2015,"heat_pump","semi_detached",1990,"Dublin",120,params,upgrade_heat = TRUE,is_fuel_allowance=FALSE,include_grants=FALSE)
+heating_upgrade_tensor(200,200,"gas",2015,"heat_pump","semi_detached",1990,"Dublin",120,params,upgrade_heat = TRUE,is_fuel_allowance=FALSE,include_grants=TRUE)
 heating_upgrade_tensor(200,100,"gas",2015,"gas","semi_detached",1990,"Dublin",120,params,FALSE,TRUE,TRUE)
 
 heating_upgrade_tensor(200,100,"gas",2015,"gas","semi_detached",1990,"Dublin",120,params,TRUE,TRUE,TRUE)

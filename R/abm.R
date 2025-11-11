@@ -56,6 +56,10 @@ scenario_params <- function(sD,yeartime){
   #night rate vs day rate
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="night_rate_discount", value =  night_discount_fun(sD,yeartime)))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="night_rate_usage_factor",  value=dplyr::filter(sD, parameter=="night_rate_usage_factor")$value))
+  #space heating
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="q_passive",  value=dplyr::filter(sD, parameter=="q_passive")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="q_hotwater",  value=dplyr::filter(sD, parameter=="q_hotwater")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="q_lighting",  value=dplyr::filter(sD, parameter=="q_lighting")$value))
 
 
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="overhead",  value=dplyr::filter(sD, parameter=="overhead")$value))
@@ -82,6 +86,7 @@ scenario_params <- function(sD,yeartime){
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="lambda.", value =  dplyr::filter(sD, parameter=="lambda.")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="p.", value =  dplyr::filter(sD, parameter=="p.")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="delta.", value =  dplyr::filter(sD, parameter=="delta.")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="r.", value =  dplyr::filter(sD, parameter=="r.")$value)) #rebound
 
 
   #return(scen)
@@ -123,12 +128,12 @@ fast_params <- function(params_long){
 #' @export
 #'
 #' @examples
-#initialise_agents(sD,2015,10)
+#' initialise_agents(sD,2015,10)
 initialise_agents <- function(sD,yeartime=2015,cal_run){
 
   #initialise to 2015
   params <- scenario_params(sD,yeartime)
-  #only has dimenions 861??
+  #only has dimensions 861??
   agents <- hp_model_weights_oo %>% dplyr::filter(calibration_run==cal_run) %>% dplyr::select(-calibration_run)
   #retain minimal set of features minimial set for imputing missing data
   hp_surv <- hp_survey_oo %>% dplyr::select(serial,qc2,q1,q2,q3,q5,q6,q11,qh,qb,qe,q4,qf,q7,q13,q121,q122,q123,q124,q125,q126,q127,q128,q129,actualage,qi)
@@ -152,7 +157,7 @@ initialise_agents <- function(sD,yeartime=2015,cal_run){
   agents$q52 <- 1 #assume that nobody knows a heat pump owner
   agents$serial <- as.character(agents$serial)
   agents <- agents %>% dplyr::rowwise() %>% dplyr::mutate(annual_cost = annualised_heating_system_cost(primary_heat,
-                                      heating_install_time,"new",ber*floor_area,house_type,construction_year,"None",params))
+                                      heating_install_time,"new",ber,floor_area,house_type,construction_year,"None",params))
   agents$heat_pump_grant <- 0
   agents$upgrade_grant <- 0
 

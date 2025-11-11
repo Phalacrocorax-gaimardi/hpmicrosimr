@@ -36,7 +36,7 @@ annualised_capex(
 euro amount
 }
 \description{
-equivalent annualised cost of a home heating system.
+Current equivalent annualised cost of a home heating system installed at installation_time.
 }
 \details{
 this function uses a capital reduction factor with with a technology specific
@@ -44,4 +44,10 @@ Weibull survival function discount rate set from calibration (params$delta.).
 
 The annualised capex falls when the system age exceeds the expected lifetime. This corresponds
 to the intuition that older systems that continue to operate are "free".
+}
+\examples{
+ sapply(2010:2040, function(y) annualised_capex("heat_pump",18,2010,"swap","detached",2003,"WarmerHomes",scenario_params(sD,y)))
+params <- scenario_params(sD,2026)
+annualised_capex("heat_pump",18,params$yeartime,"new","detached",2003,"None",params)
+annualised_capex("heat_pump",18,params$yeartime,"new","detached",2003,"BetterEnergyHomes",params)
 }

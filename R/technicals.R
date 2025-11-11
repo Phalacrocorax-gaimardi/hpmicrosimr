@@ -631,3 +631,34 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
 }
 
 
+#' heating_requirement
+#'
+#' This function calculates the annual space heating requirement from ber rating and floor area. A rebound effect is include.
+#'
+#' The ber rating includes contributions from hot water heating and lighting. Standard of these components are removed. For A rated
+#' houses space heating energy rating is set to 15.
+#'
+#' @param ber quoted ber rating
+#' @param floor_area floor area
+#' @param rebound rebound parameter default 0.5
+#' @param params parameters
+#'
+#' @returns heating requirement in kWh/m2/year
+#' @export
+#'
+#' @examples
+#' params <- scenario_params(sD,2025)
+#' heating_requirement(100,200,1,params)
+#'
+#' heating_requirement(100,200,0.5,params)
+heating_requirement <- function(ber,floor_area,rebound=0.5,params) {
+
+  offset <- params$q_passive +params$q_hotwater+params$q_lighting
+  ber_heat <- pmax(params$q_passive,ber-params$q_hotwater-params$q_lighting) #minimum heating requirement and DHW/Lighting
+  #rebound
+  ber_heat <- ifelse(ber_heat == params$q_passive, ber_heat, params$q_passive + rebound*(ber_heat-params$q_passive))
+
+  ber_heat*floor_area %>% return()
+}
+
+
