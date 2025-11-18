@@ -12,6 +12,7 @@ efficiency_grant(
   house_type,
   floor_area = 100,
   is_fuel_allowance = FALSE,
+  cost_model = "logistic",
   params,
   randomise = FALSE
 )
@@ -31,9 +32,11 @@ efficiency_grant(
 
 \item{is_fuel_allowance}{TRUE/FALSE}
 
+\item{cost_model}{defaut logistic}
+
 \item{params}{parameters}
 
-\item{randomise}{whether to assign grant elements randomly or not. For testing set to FALSE}
+\item{randomise}{whether to assign grant elements randomly or not. Default TRUE, for testing set to FALSE}
 }
 \value{
 list(scheme, grant)
@@ -44,6 +47,10 @@ find the grant amount available from SEAI for energy efficiency upgrades. This f
 \examples{
 
 params <- scenario_params(sD,2025)
-efficiency_grant(200,105,2003,"Dublin","detached",100, FALSE,params,randomise=TRUE)
+efficiency_grant(200,105,2003,"Dublin","detached",100, FALSE,"logistic",params,randomise=TRUE)
+
+efficiency_grant(200,95,2003,"Dublin","detached",100, FALSE,"logistic",params,randomise=TRUE)
+
+efficiency_grant(200,200,2003,"Dublin","detached",100, FALSE,"logistic",params,randomise=FALSE)
 
 }

@@ -20,5 +20,7 @@ a dataframe with columns
 creates the agent initial state including model weights, stochastically imputed ground floor areas
 }
 \examples{
-initialise_agents(sD,2015,10)
+
+initialise_agents(sD,2015,10) \%>\% system.time()
+
 }

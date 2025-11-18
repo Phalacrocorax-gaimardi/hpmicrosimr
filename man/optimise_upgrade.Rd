@@ -12,9 +12,10 @@ optimise_upgrade(
   construction_year,
   region,
   floor_area,
+  cost_model = "logistic",
   params,
   upgrade_heat = TRUE,
-  is_fuel_allowance,
+  is_fuel_allowance = FALSE,
   include_grants = TRUE
 )
 }
@@ -33,6 +34,8 @@ optimise_upgrade(
 
 \item{floor_area}{total floor area (m2)}
 
+\item{cost_model}{efficiency upgrade cost model - one of "logistic", "power" or "esri"}
+
 \item{params}{current parameter values}
 
 \item{upgrade_heat}{if TRUE then upgrade the current heating system}
@@ -50,9 +53,9 @@ optimise_upgrade finds the financially optimum household energy upgrade
 \details{
 The potential new heating technologies (tech_new) considered are current tech and heat pump for all grant types.
 
-The
+The household also considers retaining their current heating system.
 
-If fuel allowance is TRUE and the hosuehold qualifies for WarmerHomes then it is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard
+If fuel allowance is TRUE and the houseehold qualifies for WarmerHomes then it is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard
 
 All grant_types apart from WarmerHomes requires BER optimisation
 }
@@ -60,14 +63,14 @@ All grant_types apart from WarmerHomes requires BER optimisation
 
 params <- scenario_params(sD,2026)
 
-optimise_upgrade(200,"gas",2010,"detached",2010,"Dublin",210,params,TRUE,FALSE,TRUE)
+optimise_upgrade(200,"gas",2010,"detached",2010,"Dublin",210,"logistic",params,TRUE,FALSE,TRUE)
 
-optimise_upgrade(200,"oil",2010,"detached",2010,"Dublin",210,params,TRUE,FALSE,TRUE)
+optimise_upgrade(200,"oil",2010,"detached",2010,"Dublin",210,"logistic",params,TRUE,FALSE,TRUE)
 
-optimise_upgrade(200,"heat_pump",2010,"detached",2010,"Dublin",210,params,TRUE,FALSE,TRUE)
+optimise_upgrade(200,"gas",2010,"detached",2005,"Dublin",100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE)
 
 #WarmerHomes
-optimise_upgrade(200,"gas",2010,"detached",2005,"Dublin",100,params,is_fuel_allowance=TRUE)
+optimise_upgrade(200,"gas",2010,"detached",2005,"Dublin",100,"logistic",params,is_fuel_allowance=TRUE)
 
 
 }

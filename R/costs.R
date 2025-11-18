@@ -71,10 +71,13 @@ night_discount_fun <- function(sD,yeartime){
 #' @return euros
 #' @export
 #'
-#' @examples labour_cost_fun(sD,2018.7)
+#' @examples
+#'
+#' labour_cost_fun(sD,2018.7)
+#'
 labour_cost_fun <- function(sD,yeartime){
   #
-  values <- sD %>% dplyr::filter(stringr::str_detect(parameter,"labour_cost")) %>% dplyr::pull(value)
+  values <- sD %>% dplyr::filter(stringr::str_detect(parameter,"labour_cost_20")) %>% dplyr::pull(value)
   cost <- approx(c(2005.5,2015.5,2025.5,2035.5,2050.5), y=values,xout=yeartime,rule=2)$y
   return(cost)
 }

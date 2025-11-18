@@ -18,5 +18,7 @@ euros
 heating engineer labour cost per hour
 }
 \examples{
+
 labour_cost_fun(sD,2018.7)
+
 }

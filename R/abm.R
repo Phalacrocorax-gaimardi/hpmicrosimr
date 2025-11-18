@@ -61,6 +61,10 @@ scenario_params <- function(sD,yeartime){
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="q_hotwater",  value=dplyr::filter(sD, parameter=="q_hotwater")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="q_lighting",  value=dplyr::filter(sD, parameter=="q_lighting")$value))
 
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="present_bias_threshold",  value=dplyr::filter(sD, parameter=="present_bias_threshold")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="rebound_threshold",  value=dplyr::filter(sD, parameter=="rebound_threshold")$value))
+
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_labour_cost_share",  value=dplyr::filter(sD, parameter=="ber_upgrade_labour_cost_share")$value))
 
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="overhead",  value=dplyr::filter(sD, parameter=="overhead")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="overhead",  value=dplyr::filter(sD, parameter=="vat_service")$value))
@@ -82,6 +86,8 @@ scenario_params <- function(sD,yeartime){
   #ber upgrade cost model parameters
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_marginal_cost_k",  value=dplyr::filter(sD, parameter=="ber_upgrade_marginal_cost_k")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_marginal_cost_alpha",  value=dplyr::filter(sD, parameter=="ber_upgrade_marginal_cost_alpha")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_marginal_cost_c0",  value=dplyr::filter(sD, parameter=="ber_upgrade_marginal_cost_c0")$value))
+
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="beta.", value =  dplyr::filter(sD, parameter=="beta.")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="lambda.", value =  dplyr::filter(sD, parameter=="lambda.")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="p.", value =  dplyr::filter(sD, parameter=="p.")$value))
@@ -128,7 +134,9 @@ fast_params <- function(params_long){
 #' @export
 #'
 #' @examples
-#' initialise_agents(sD,2015,10)
+#'
+#' initialise_agents(sD,2015,10) %>% system.time()
+#'
 initialise_agents <- function(sD,yeartime=2015,cal_run){
 
   #initialise to 2015
@@ -156,6 +164,7 @@ initialise_agents <- function(sD,yeartime=2015,cal_run){
   agents <- agents %>% dplyr::mutate(kW=heating_system_size(ber*floor_area))
   agents$q52 <- 1 #assume that nobody knows a heat pump owner
   agents$serial <- as.character(agents$serial)
+  #annualised heating cost
   agents <- agents %>% dplyr::rowwise() %>% dplyr::mutate(annual_cost = annualised_heating_system_cost(primary_heat,
                                       heating_install_time,"new",ber,floor_area,house_type,construction_year,"None",params))
   agents$heat_pump_grant <- 0

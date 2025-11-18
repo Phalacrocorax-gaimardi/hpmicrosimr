@@ -18,5 +18,7 @@ dataframe
 recodes the input survey data for use in initialise_agents. The recoded features are BER, ground floor area, and gross household income.
 }
 \examples{
-recode_survey(hp_survey_oo,scenario_params(sD,2015))
+
+recode_survey(hp_survey_oo,scenario_params(sD,2015)) \%>\% system.time()
+
 }

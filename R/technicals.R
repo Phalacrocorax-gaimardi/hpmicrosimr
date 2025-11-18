@@ -175,6 +175,9 @@ recode_ber <- function(ber_score){
 #' @export
 #'
 #' @examples
+#'
+#' recode_fuels(hp_survey_oo)
+#'
 recode_fuels <- function(hp_data_in){
 
 
@@ -245,17 +248,20 @@ recode_construction_year <- function(q5,house_type_region){
 #' @returns dataframe
 #' @export
 #'
-#' @examples recode_survey(hp_survey_oo,scenario_params(sD,2015))
+#' @examples
+#'
+#' recode_survey(hp_survey_oo,scenario_params(sD,2015)) %>% system.time()
+#'
 recode_survey <- function(hp_data_in,params){
 
 
-  hp_data_out <- hp_data_in
+  hp_data_out <- hp_data_in %>% type.convert(as.is=TRUE)
   codes <- names(hp_data_out)
   #
   for(q_code in c("q6","qc2","q1")){
     if(!(q_code %in% codes)) next
     hp_response <- hp_qanda %>% dplyr::filter(question_code==q_code) %>% dplyr::select(response_code,response) %>% dplyr::rename(!!q_code:=response_code)
-
+    hp_response <- hp_response %>% type.convert(as.is=TRUE)
     hp_data_out <- hp_data_out %>% dplyr::inner_join(hp_response) %>% dplyr::select(-!!rlang::sym(q_code)) %>% dplyr::rename(!!q_code:=response)
 
   }
@@ -266,7 +272,6 @@ recode_survey <- function(hp_data_in,params){
   if("q11" %in% codes) hp_data_out <- recode_fuels(hp_data_out)
   #recode house_type
   if("q1" %in% codes) hp_data_out <- hp_data_out %>% dplyr::mutate(q1 = dplyr::recode(q1, !!!house_type_dictionary))
-
 
   #ber
   hp_data_out <- hp_data_out %>% dplyr::mutate(q6=replace(q6,nchar(q6)>2,NA))
@@ -631,7 +636,7 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
 }
 
 
-#' heating_requirement
+#' space_heating_requirement
 #'
 #' This function calculates the annual space heating requirement from ber rating and floor area. A rebound effect is include.
 #'
@@ -648,17 +653,28 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
 #'
 #' @examples
 #' params <- scenario_params(sD,2025)
-#' heating_requirement(100,200,1,params)
+#' space_heating_requirement(100,200,1,params)
 #'
-#' heating_requirement(100,200,0.5,params)
-heating_requirement <- function(ber,floor_area,rebound=0.5,params) {
+#' space_heating_requirement(100,200,0.5,params)
+space_heating_requirement <- function(ber,floor_area,rebound=0.5,params) {
+
+  offset <- params$q_passive +params$q_hotwater+params$q_lighting #minimum possible
+  ber_heat <- pmax(params$q_passive,ber-params$q_hotwater-params$q_lighting) #minimum heating requirement is q_passive
+  #rebound effect above rebound_threshold
+  ber_heat <- ifelse(ber_heat <= params$rebound_threshold, ber_heat, params$rebound_threshold + rebound*(ber_heat-params$rebound_threshold))
+
+  ber_heat*floor_area %>% return()
+}
+
+
+specific_heating_requirement <- function(ber,rebound=0.5,params) {
 
   offset <- params$q_passive +params$q_hotwater+params$q_lighting
   ber_heat <- pmax(params$q_passive,ber-params$q_hotwater-params$q_lighting) #minimum heating requirement and DHW/Lighting
   #rebound
   ber_heat <- ifelse(ber_heat == params$q_passive, ber_heat, params$q_passive + rebound*(ber_heat-params$q_passive))
 
-  ber_heat*floor_area %>% return()
+  ber_heat %>% return()
 }
 
-
+specific_heating_requirement <- Vectorize(specific_heating_requirement)

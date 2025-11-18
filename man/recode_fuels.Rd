@@ -19,3 +19,8 @@ and tertiary fuel types present. If these are not present, the fuel type is "non
 \details{
 solar thermal is set to "none" if it is present. If solar thermal is indicated as the primary fuel in the survey, then the secondary fuel is promoted.
 }
+\examples{
+
+recode_fuels(hp_survey_oo)
+
+}

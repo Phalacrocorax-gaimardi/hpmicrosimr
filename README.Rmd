@@ -112,7 +112,7 @@ A key concept for the modelling is Effective Annual Cost (EAC). The EAC represen
 
 Effective annual costs (EACs) of heating technologies have changed over time due higher installation (labour) costs, efficiency gains, fuel cost changes ad grants. To illustrate this, early year EACs for heat pump, gas and oil systems installed during 2010-2025 is shown below, using the *hpmicrosimr::annualised_heating_system_cost()*. The property has BER of 175kWh/m2/year in this example. The impact of the introduction of capital grants in 2018 for heat pumps is obvious. This calculation suggests that heat pumps are the lowest cost for this C1/C2 rated household but this assumes that a substantial use of night-rated electricity. The rebound effect is not included. Rebound lowers the operating cost and therefore makes heat pumps appear less attractive.
 
-```{r historical eacs}
+```{r historical_eacs, echo=FALSE,fig.cap="Equivalent annual cost", out.width="70%"}
 library(hpmicrosimr)
 library(tidyverse)
 eac <- tibble()

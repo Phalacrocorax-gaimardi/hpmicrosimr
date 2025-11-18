@@ -9,7 +9,8 @@ retrofit_cost_model_esri(
   ber_new,
   house_type,
   region = "Munster",
-  floor_area = 100
+  floor_area = 100,
+  params
 )
 }
 \arguments{
@@ -22,10 +23,15 @@ retrofit_cost_model_esri(
 \item{region}{region}
 
 \item{floor_area}{total floor area m2}
+
+\item{params}{sD}
 }
 \value{
 cost in euros
 }
 \description{
-retrofit_cost_model_esri
+ESRI quadratic fit to OSS retrofit data
+}
+\details{
+Material costs are fixed. ~30% of 2024 cost is assumed to reflect skill labour costs.
 }

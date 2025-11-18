@@ -8,7 +8,7 @@ library(csodata)
 library(data.table)
 library(tidyverse)
 library(lubridate)
-library(pvbessmicrosimr)
+library(hpmicrosimr)
 
 
 zet_survey <- readxl::read_xlsx("~/Policy/SurveyDataAndAnalysis/Data/ZET_survey_2024_values.xlsx",sheet=1)
@@ -599,6 +599,10 @@ ber_summary <- ber_summary %>% group_by(q1,q2,qc2,q5,q3) %>% summarise(mean_mu =
 
 ber_summary$sigma <- summary(fit_ber)$sigma
 
+#bungalows
+bungalows <- ber %>% filter(NoStoreys==1)
+
+
 area_summary <- ber_imputed %>%
   mutate(mu = predict(fit_area)) %>%
   group_by(q1,q2,qc2,q5,q3) %>%
@@ -656,7 +660,7 @@ summary(fit_q15)
 zet_survey <- readxl::read_xlsx("~/Policy/SurveyDataAndAnalysis/Data/ZET_survey_2024_values.xlsx",sheet=1)
 zet_survey_lab <- readxl::read_xlsx("~/Policy/SurveyDataAndAnalysis/Data/ZET_survey_2024_data_labels.xlsx",sheet=1)
 
-ber_codings <- tibble(respone=zet_survey_lab$q6
+ber_codings <- tibble(respone=zet_survey_lab$q6)
 
 ################################
 # primary and secondary heating
@@ -699,6 +703,7 @@ psych::cohen.kappa(cm)$weighted.kappa
 
 ##################################################
 # upgrade cost model
+# fit including low hanging fuit
 ###################################################
 
 retrofit_cost <- function(ber_old,ber_new, a){
@@ -765,6 +770,7 @@ df_wide <- df %>% ungroup() %>% pivot_wider(id_cols=ber_old_score,values_from=co
 #up to B* (B1, B2)
 df1 <- df %>% filter(ber_new_score %in% c("B2","B1")) %>% group_by(ber_old_score) %>% summarise(cost=mean(cost))
 esri_estimates <- tibble(ber_old_score = c("C1","C2","C3","D1","D2","E1","E2","F","G"), cost_esri = 1000*c(28.9,28.3,28.3,28.9,29.9,31.7,34.8,38.9,43.5))
+esri_estimates <- esri_estimates %>% mutate(ber_new_score = "B1")
 df1 <- df1 %>% inner_join(esri_estimates)
 
 df1 %>% ggplot() + geom_point(aes(ber_old_score,cost),colour="red") +  geom_point(aes(ber_old_score,cost_esri),colour="green")+theme_minimal()
@@ -805,34 +811,110 @@ effic <- effic %>% filter(ber_old > ber_new)
 # data frame df with columns: x_init, y_final, cost_per_kWhm2
 
 cost_model <- function(par, ber_old, ber_new) {
+  #
   k <- par[1]
   alpha <- par[2]
+  #c_0 <- par[3]
+  c_0 <- par[3]
+   #beta <- par[3]
+  #gamma <- par[4]
+  c_0+k/(1-alpha) * (ber_old^(1-alpha)-ber_new^(1-alpha))/(ber_old-ber_new)
+}
+
+cost_model2 <- function(par, ber_old, ber_new) {
+  #
+  k <- par[1]
+  alpha <- 1
+  #c_0 <- par[3]
+  #c_0 <- par[3]
+  d <- par[2]
   #beta <- par[3]
   #gamma <- par[4]
-  k/(1-alpha) * (ber_old^(1-alpha)-ber_new^(1-alpha))/(ber_old-ber_new)
+  integrand <- function(b) exp(d*(100/b)^alpha)
+
+  k*integrate(integrand,lower=ber_new,upper=ber_old)$value/(ber_old-ber_new)
+}
+#
+#cost_model2 <- Vectorize(cost_model2,vectorize.args = c("ber_old","ber_new"))
+#cost_model2(c(1,1),200,100)
+
+cost_model2 <- function(par, ber_old, ber_new) {
+  #
+  k <- par[1]
+  c_0 <- par[2] #10 #cost per kWh/m2 for small b
+  c_inf <- par[3] #cost per kWh/m2 for large b (inefficient limit)
+  b_0 <- par[4]
+  #c_0 <- par[3]
+  #c_0 <- par[3]
+  #beta <- par[3]
+  #gamma <- par[4]
+  marginal_cost <- function(b) 2*c_0-c_inf + 2*(c_inf-c_0)/(1+exp(-k*(b-b_0)))
+  integrate(marginal_cost,lower=ber_new,upper=ber_old)$value/(ber_old-ber_new)
+}
+#
+cost_model2 <- Vectorize(cost_model2,vectorize.args = c("ber_old","ber_new"))
+
+actual_cost_model2 <- function(par, ber_old, ber_new) {
+  #
+  k <- par[1]
+  c_0 <- par[2] #10 #cost per kWh/m2 for small b
+  c_inf <- par[3]
+  b_0 <- par[4]
+    #cost per kWh/m2 for large b (inefficient limit)
+  #c_0 <- par[3]
+  #c_0 <- par[3]
+ # k <- par[3]
+  #beta <- par[3]
+  #gamma <- par[4]
+  marginal_cost <- function(b) 2*c_0-c_inf + 2*(c_inf-c_0)/(1+exp(-k*(b-b_0)))
+  integrate(marginal_cost,lower=ber_new,upper=ber_old)$value*100
 }
 
-effic <- drop_na(effic)
-effic$cost <- as.numeric(effic$cost)
-
-obj_fun <- function(par, data) {
-  with(data, sum((cost - cost_model(par, ber_old, ber_new))^2))
+marginal_cost <- function(par, ber) {
+  #
+  k <- par[1]
+  c_0 <- par[2] #10 #cost per kWh/m2 for small b
+  c_inf <- par[3] #cost per kWh/m2 for large b (inefficient limit)
+  b_0 <- par[4]
+  #c_0 <- par[3]
+  #c_0 <- par[3]
+  #beta <- par[3]
+  #gamma <- par[4]
+  2*c_0-c_inf + 2*(c_inf-c_0)/(1+exp(-k*(ber-b_0)))
 }
 
+
+
+
+
+esri_estimates <- tibble(ber_old_score = c("C1","C2","C3","D1","D2","E1","E2","F","G"), cost_esri = 1000*c(28.9,28.3,28.3,28.9,29.9,31.7,34.8,38.9,43.5))
+esri_estimates <- esri_estimates %>% mutate(ber_new_score = "B1")
+esri_estimates <- esri_estimates %>% inner_join(effic %>% select(-cost_fit,-cost)) %>% mutate(cost_esri = cost_esri/(ber_old-100)/100)
+#esri_estimates %>% ggplot(aes())
+
 obj_fun <- function(par, data) {
-  effic %>% mutate(error=cost-cost_model(par,ber_old,ber_new))
+  data <- data %>% mutate(error=(cost_esri-cost_model2(par,ber_old,100))^2)
   data$error %>% sum()
 }
 
 # initial parameter guesses
-par_init <- c(k=1, alpha=0.1)
+par_init <- c(k=0.01,c_0=10,c_inf=0,b_0=0)
 
-obj_fun(par_init,effic)
+#obj_fun(par_init,effic)
+obj_fun(par_init,esri_estimates)
 
-fit <- optim(par_init, obj_fun, data = effic)
+
+fit <- optim(par_init, obj_fun, data = esri_estimates,method = "BFGS",
+             control = list(maxit = 5000))
 fit$par  # fitted parameters
 
-effic <-effic %>% mutate(cost_fit = cost_model(fit$par,ber_old,ber_new))
+obj_fun(fit$par,esri_estimates)
+esri_estimates <- esri_estimates %>% mutate(cost_fit = cost_model2(fit$par,ber_old,100))
+esri_estimates
+
+actual_cost_model2(fit$par,500,25)
+esri_estimates %>% ggplot(aes(cost_esri,cost_fit))+geom_point()
+#effic <-effic %>% mutate(cost_fit = cost_model(fit$par,ber_old,ber_new))
 
 #
 oss_grant_wide <- data.frame(
@@ -993,4 +1075,264 @@ hp_society_oo %>% dplyr::filter(degree != 0) %>% dplyr::pull(degree) %>% table()
 hp_society_oo %>% dplyr::filter(degree != 0) %>% dplyr::pull(degree) %>% table()/372
 
 load("C:/Users/Joe/pkgs/pvbessmicrosimr/data/homophily.rda")
+
+
+########################
+# Housing Tenure
+#####################
+
+tabs <- cso_search_toc("Tenure")
+tenure <- cso_get_data("TAH04", pivot_format="tidy")
+
+tenure <- tenure %>% filter(Number.of.Rooms=="All households")
+write_csv(tenure,"C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/tenure_cso.csv")
+
+
+tenure_oo <- tenure %>% filter(str_detect(Tenure.Status,"Own"), Number.of.Rooms=="All households")
+tenure_oo %>% group_by(CensusYear) %>% summarise(n_oo=sum(`Number of Private Households in Permanent Housing Units`))
+
+
+###############################
+# DBER
+##############################
+
+tabs <- cso_search_toc("Energy Rating")
+dber <- cso_get_data("EBA02", pivot_format="tidy")
+names(dber) <- c("year","code","house_type","fuel","construction_year","county","number")
+#write_csv(dber,"~/Policy/CAMG/EED/Heat/data/dber_cso_EBA02.csv")
+
+dber <- read_csv("~/Policy/CAMG/EED/Heat/data/dber_cso_EBA02.csv")
+dber <- type.convert(dber,as.is=TRUE)
+dber <- dber %>% filter(code != "All BER ratings", fuel=="All main space heating fuel types", county == "All counties")
+dber <- dber %>% filter(construction_year != "All years of construction")
+
+dber_house <- dber_aggregate %>% filter(str_detect(house_type,"House|house|maison"))
+dber_house <- dber_house %>% group_by(year,code,construction_year) %>% summarise
+#
+dber_apartment <- dber_aggregate %>% filter(str_detect(house_type,"Apartment|apartment|Basement"))
+dber_apartment <- dber_house %>% group_by(year,code,construction_year) %>% summarise(number=sum(number,na.rm=T))
+
+ber_ratings_table <- ber_ratings_table %>% bind_rows(tibble(code="F-G",min_rating=380,max_rating=550))
+
+dber_house <- dber_house %>% inner_join(ber_ratings_table) %>% mutate(mean_rating=(min_rating+max_rating)/2) %>% mutate(number=replace_na(number,0))
+dber_apartment <- dber_apartment %>% inner_join(ber_ratings_table) %>% mutate(mean_rating=(min_rating+max_rating)/2) %>% mutate(number=replace_na(number,0))
+#
+dber_housing_stock <- dber_house %>% filter(year==2024) %>% group_by(construction_year) %>% summarise(n=sum(number))
+
+
+dber_house <- dber_house %>% select(-min_rating,-max_rating)
+dber_mean_house <- dber_house %>% group_by(construction_year,year) %>% summarise(mean_ber = weighted.mean(mean_rating,number))
+
+g <- dber_mean %>% filter(!(construction_year %in%  c("2025-2029","All years of construction")), year > 2010) %>% ggplot(aes(year,space_heat,colour=construction_year))+geom_point()+geom_line()
+g + theme_minimal()
+
+#is age profile correct? NO!
+#age profile of housing stock
+dber_stock <- dber %>% filter(construction_year != "All years of construction",code=="All BER ratings",county=="All counties") %>% group_by(year,construction_year) %>% summarise(n=sum(number,na.rm=T))
+dber_tot <- dber_stock %>% group_by(year) %>% summarise(n_tot=sum(n))
+dber_stock <- dber_stock %>% inner_join(dber_tot) %>% mutate(share=n/n_tot)
+#
+dber_stock %>% filter(construction_year != "All years of construction") %>% ggplot(aes(as.integer(year),share,fill=construction_year))+geom_area()
+
+dber_mean <- dber_mean %>% inner_join(dber_stock) %>% select(-n,-n_tot) %>% arrange(year)
+
+dber_mean %>% group_by(year) %>% summarise(ber=weighted.mean(mean_ber,share))
+#
+#write_csv(dber_mean,"C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/dber_mean.csv")
+
+#housing stock
+housing_stock <- cso_get_data("F2063", pivot_format="tidy")
+names(housing_stock) <- c("census_year","rooms","bedrooms","construction_year","house_type","county","number")
+housing_stock <- type.convert(housing_stock,as.is=TRUE)
+#
+#write_csv(housing_stock,"~/Policy/CAMG/EED/Heat/data/housing_cso_F2063.csv")
+housing_stock <- read_csv("~/Policy/CAMG/EED/Heat/data/housing_cso_F2063.csv") #2022 census
+housing_stock <- housing_stock %>% filter(county=="Ireland",rooms=="All households",bedrooms=="All Households")
+#exclude apartments
+house_stock <- housing_stock %>% filter(str_detect(house_type,"house|House"), house_type != "All households")
+apartment_stock <- housing_stock %>% filter(str_detect(house_type,"apartment|Bed"), house_type != "All households")
+
+house_stock <- house_stock %>% select(-census_year,-rooms,-bedrooms,-county)
+house_stock <- house_stock %>% group_by(construction_year) %>% summarise(number=sum(number))
+house_stock$house_type <- "house"
+
+apartment_stock <- apartment_stock %>% select(-census_year,-rooms,-bedrooms,-county)
+apartment_stock <- apartment_stock %>% group_by(construction_year) %>% summarise(number=sum(number))
+apartment_stock$house_type <- "apartment"
+
+housing_stock <-
+
+housing_stock_2015 <- housing_stock %>% filter(!(construction_year %in% c("All years","Not stated","2016 or later"))) %>% mutate(share=number/(1644872-78874))
+
+#
+#write_csv(house_stock,"C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/house_stock_census_2022.csv")
+#write_csv(apartment_stock,"C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/apartment_stock_census_2022.csv")
+
+#extrapolate building rates
+test <- read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/house_stock_census_2022.csv")
+test <- type.convert(test,as.is=T)
+test <- test %>% mutate(mid = (from + to) / 2, rate = number / (to - from))
+
+# Create full year sequence
+years <- tibble(year = seq(min(test$from), max(test$to)))
+
+# Linear interpolation of annual rate between midpoints
+#annual_a <- years %>% mutate(rate = approx(test$mid, test$rate, xout = year, method = "linear", rule = 2)$y,house_type="apartment")
+annual_h <- years %>% mutate(rate = approx(test$mid, test$rate, xout = year, method = "linear", rule = 2)$y,house_type="house")
+annual <- annual_a %>% bind_rows(annual_h)
+annual %>% ggplot(aes(year,rate,colour=house_type)) + geom_line()
+#write_csv(annual,"C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/annual_housing_units_excl_apartments_census_2022.csv")
+
+annual_house_construction <-
+
+intervals <- read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/dber_mean_stock.csv") %>% select(from,to) %>% distinct()
+interval_totals <- intervals %>%
+  rowwise() %>%
+  mutate(
+    houses = sum(annual$rate[annual$year >= from & annual$year <= to])
+  ) %>%
+  ungroup()
+
+dber_mean_stock <- read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/dber_mean_stock.csv")
+dber_mean_stock <- dber_mean_stock %>% inner_join(interval_totals)
+
+#total space heat requirement
+dber_mean_stock <- dber_mean_stock %>%
+
+#ber data floor area by
+ber <- data.table::fread("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/BERPublicSearch/BERPublicsearch.txt")
+ber0 <- ber %>% filter(str_detect(DwellingTypeDescr,"House|house|Maison")) %>% select("Year_of_Construction","GroundFloorArea(sq m)")
+#
+ber0 <- ber0 %>% group_by(`Year_of_Construction`) %>% summarise(floor_area=mean(`GroundFloorArea(sq m)`))
+names(ber0) <-
+
+
+ber0 %>% ggplot(aes(`Year_of_Construction`,floor_area)) + geom_point()
+
+################################################################
+# estimating total space heating requirement for Ireland in 2015
+################################################################
+#
+ber <- data.table::fread("~/Policy/CAMG/EED/Heat/BER.public.30.09.2020,csv")
+ber <- ber %>% mutate(`Type of rating` = str_trim(`Type of rating`))
+ber <- ber %>% filter(`Type of rating` != "P",str_detect(`Dwelling type description`,"House|house|Maison"))
+
+ber_1 <- ber %>% filter(`No Of Storeys`==1 ) %>% select(contains("Floor Area"))
+ber_2 <- ber %>% filter(`No Of Storeys`==2 ) %>% select(contains("Floor Area"))
+ber_3 <- ber %>% filter(`No Of Storeys`==3 ) %>% select(contains("Floor Area"))
+
+library(lubridate)
+#ber <- ber %>% as_tibble() %>% rowwise() %>% mutate(year=str_split(DateOfAssessment, "\\s+")[[1]][3])
+ber0 <- ber %>% select(`Energy Value`,`Year of assessment`,`Year of construction`) %>% rename("year"=`Year of assessment`) %>% rename("ber"=`Energy Value`)
+
+ber0 <- ber0  %>%  mutate(ber_heat=specific_heating_requirement(ber,1,params))
+
+mean_ber <- tibble()
+
+for(year1 in 2010:2022){
+
+  ber1 <- ber0 %>% filter(year < year1) %>% as_tibble()
+  print(dim(ber1))
+  #apply space heating correction!
+
+  mean_ber <- mean_ber %>% bind_rows(tibble(year=year1,mean_ber=mean(ber1$ber_heat)))
+
+}
+
+mean_ber %>% ggplot(aes(year,mean_ber)) + geom_col()
+
+
+dim(ber)
+ber <- ber %>% filter(Year_of_Construction < 2015) #1093875
+dim(ber)
+#
+#
+#exclude apartments
+ber <- ber %>% filter(str_detect(DwellingTypeDescr,"House|house|Maison"))
+ber <- ber %>% filter(NoStoreys %in% 1:3)
+ber$NoStoreys %>% table()
+
+ber$FloorArea %>% median()
+ber$GroundFloorArea %>% median()
+ber$FirstFloorArea %>% median()
+ber$`GroundFloorArea(sq m)` %>% median()
+#all floor metrics agree for bungalows
+bungalows <- ber %>% filter(NoStoreys==1) %>% select(contains("FloorArea")) %>% as_tibble()
+
+#2 storey
+twostorey <- ber %>% filter(NoStoreys==2) %>% select(contains("FloorArea")) %>% as_tibble()
+
+twostorey$`GroundFloorArea(sq m)` %>% mean()
+twostorey$FloorArea %>% mean()
+twostorey$GroundFloorArea %>% mean()
+twostorey$FirstFloorArea %>% mean()
+
+
+ber$BerRating %>% median()
+#is mean BER declining
+
+#exclude potential duplicates
+ber %>% filter(cso_small_area != "") %>% group_by(cso_small_area,`Year of construction`, `No Of Storeys`,`Dwelling type description`) %>% summarise(n=n()) %>% pull(n) %>% table()
+
+###########################
+#new houses only - guaranteed unique
+ber_new <- ber %>% filter(`Type of rating` == "F",str_detect(`Dwelling type description`,"House|house|Maison")) %>% as_tibble()
+ber_new <- ber_new %>% select(`Energy Value`,`Year of assessment`,`Year of construction`) %>% rename("year"=`Year of assessment`) %>% rename("ber"=`Energy Value`)
+
+ber_new <- ber_new  %>%  mutate(ber_heat=specific_heating_requirement(ber,1,params))
+
+mean_ber <- tibble()
+
+for(year1 in 2010:2020){
+
+  ber1 <- ber_new %>% filter(year < year1) %>% as_tibble()
+  print(dim(ber1))
+  #apply space heating correction!
+
+  mean_ber <- mean_ber %>% bind_rows(tibble(year=year1,mean_ber=mean(ber1$ber_heat)))
+
+}
+##########################
+# Existing building stock
+
+ber_exist <- ber %>% filter(`Type of rating` == "E",str_detect(`Dwelling type description`,"House|house|Maison")) %>% as_tibble()
+ber_exist <- ber_exist %>% select(`Energy Value`,`Year of assessment`,`Year of construction`) %>% rename("year"=`Year of assessment`) %>% rename("ber"=`Energy Value`)
+
+ber_exist <- ber_exist  %>%  mutate(ber_heat=specific_heating_requirement(ber,1,params))
+
+mean_ber <- tibble()
+
+for(year1 in 2010:2020){
+
+  ber1 <- ber_exist %>% filter(year < year1) %>% as_tibble()
+  print(dim(ber1))
+  #apply space heating correction!
+
+  mean_ber <- mean_ber %>% bind_rows(tibble(year=year1,mean_ber=mean(ber1$ber_heat)))
+
+}
+############################
+# exclude potential duplicates
+ber_exist <- ber %>% filter(`Type of rating` == "E",str_detect(`Dwelling type description`,"House|house|Maison"),`Year of assessment`==2014) %>% as_tibble()
+
+ber_exist <- ber_exist %>% filter(cso_small_area != "") #%>% group_by(cso_small_area,`Year of construction`, `No Of Storeys`,`Dwelling type description`) %>% summarise(n=n()) %>% pull(n) %>% table()
+
+ber_unique <- ber_exist %>% group_by(cso_small_area,`Year of construction`, `No Of Storeys`,`Dwelling type description`) %>% summarise
+#ber_unique <- ber_exist %>% distinct(cso_small_area,`Year of construction`, `No Of Storeys`,`Dwelling type description`,keep_all = TRUE)
+
+ber_unique <- ber_unique %>% select(`Energy Value`,`Year of assessment`,`Year of construction`) %>% rename("year"=`Year of assessment`) %>% rename("ber"=`Energy Value`)
+
+ber_unique <- ber_unique  %>%  mutate(ber_heat=specific_heating_requirement(ber,1,params))
+
+mean_ber <- tibble()
+
+for(year1 in 2010:2020){
+
+  ber1 <- ber_unique %>% filter(year < year1) %>% as_tibble()
+  print(dim(ber1))
+  #apply space heating correction!
+
+  mean_ber <- mean_ber %>% bind_rows(tibble(year=year1,mean_ber=mean(ber1$ber_heat)))
+
+}
 

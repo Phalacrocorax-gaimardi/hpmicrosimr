@@ -33,7 +33,7 @@ heating_system_capital_cost(
 \item{include_vat}{TRUE/FALSE}
 }
 \value{
-euro cost
+a list showing actual cost, grant and cost after grant
 }
 \description{
 cost of a new heating system. Includes VAT using the "two-thirds" rule.
@@ -53,5 +53,5 @@ heating_system_capital_cost("heat_pump",18,installation_type="new","detached",20
 #
 heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"OSS",scenario_params(sD,2026),include_vat = TRUE)
 
-heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"BetterEnergyHomes",scenario_params(sD,2019),include_vat = TRUE)
+heating_system_capital_cost("oil",8,installation_type="new","detached",2003,"OSS",params,include_vat = TRUE)
 }
