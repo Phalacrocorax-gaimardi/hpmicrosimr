@@ -53,4 +53,8 @@ efficiency_grant(200,95,2003,"Dublin","detached",100, FALSE,"logistic",params,ra
 
 efficiency_grant(200,200,2003,"Dublin","detached",100, FALSE,"logistic",params,randomise=FALSE)
 
+efficiency_grant(142,60,2003,"Munster","terraced",90,is_fuel_allowance=FALSE,cost_model="logistic",params)
+
+efficiency_grant(142,60,2003,"Munster","semi_detached",90,is_fuel_allowance=FALSE,cost_model="logistic",params)
+
 }

@@ -18,7 +18,8 @@ heating_upgrade_tensor(
   params,
   upgrade_heat = FALSE,
   is_fuel_allowance = FALSE,
-  include_grants = TRUE
+  include_grants = TRUE,
+  include_rebound = FALSE
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ heating_upgrade_tensor(
 \item{is_fuel_allowance}{TRUE/FALSE}
 
 \item{include_grants}{TRUE/FALSE}
+
+\item{include_rebound}{defulat FALSE}
 }
 \value{
 list
@@ -69,6 +72,8 @@ params <- scenario_params(sD,2026)
 
 heating_upgrade_tensor(200,50,"gas",2010,"heat_pump","semi_detached",1990,"Dublin",120,cost_model="logistic",params,TRUE,FALSE,TRUE)
 
-heating_upgrade_tensor(200,200,"oil",2000,"heat_pump","terraced",1980,"Munster",90,"logistic",params,TRUE,FALSE,TRUE)
+heating_upgrade_tensor(142,60,"oil",2000,"heat_pump","terraced",1980,"Munster",90,"logistic",params,TRUE,FALSE,TRUE,include_rebound=TRUE)
+
+heating_upgrade_tensor(450,60,"oil",2000,"gas","terraced",1980,"Munster",90,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
 
 }

@@ -12,8 +12,11 @@ heat_pump_upgrade_savings(
   construction_year,
   region,
   floor_area,
+  cost_model = "logistic",
   params,
-  include_grants
+  is_fuel_allowance,
+  include_grants,
+  include_rebound = FALSE
 )
 }
 \arguments{
@@ -31,24 +34,29 @@ heat_pump_upgrade_savings(
 
 \item{floor_area}{floor area in m2}
 
+\item{cost_model}{logistic, power or esri}
+
 \item{params}{scenario params at current yeartime}
 
+\item{is_fuel_allowance}{default FALSE}
+
 \item{include_grants}{TRUE or FALSE}
+
+\item{include_rebound}{default FALSE}
 }
 \value{
 savings
 }
 \description{
-savings (equivalent annual cost % savings) by replacing current home heating system with a heat pump
+% savings achieved by adopting a heat pump as part of an home energy upgrade, expressed relative to keeping the current technology.
 }
 \details{
-excludes WarmerHomes by assumoing is_fuel_allowance=F
+If the relative gain is sufficient, a heat pump may be adopted.
 
-diagnostic function not used by other functions
+Returns the savings by switching and ber
 }
 \examples{
 params <- scenario_params(sD,2026)
-heat_pump_upgrade_savings(200,"gas",2000,"detached",1990,"Munster",120,params,include_grants=TRUE)
-
+#heat_pump_upgrade_savings(200,"gas",2000,"detached",1990,"Munster",120,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE)
 
 }

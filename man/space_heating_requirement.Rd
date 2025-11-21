@@ -11,7 +11,7 @@ space_heating_requirement(ber, floor_area, rebound = 0.5, params)
 
 \item{floor_area}{floor area}
 
-\item{rebound}{rebound parameter default 0.5}
+\item{rebound}{rebound parameter default 0.3.}
 
 \item{params}{parameters}
 }
@@ -27,7 +27,7 @@ houses space heating energy rating is set to 15.
 }
 \examples{
 params <- scenario_params(sD,2025)
-space_heating_requirement(100,200,1,params)
+space_heating_requirement(400,100,0,params)
 
 space_heating_requirement(100,200,0.5,params)
 }

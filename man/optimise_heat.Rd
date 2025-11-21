@@ -12,7 +12,8 @@ optimise_heat(
   construction_year,
   region,
   floor_area,
-  params
+  params,
+  include_rebound = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ optimise_heat(
 \item{floor_area}{total floor area (m2)}
 
 \item{params}{current parameter values}
+
+\item{include_rebound}{default FALSE}
 }
 \value{
 data frame (2 or 1 rows)

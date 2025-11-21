@@ -37,6 +37,8 @@ for WarmerHomes, it is assumed that the grant covers heat pumps after 1 jan 2025
 heat_pump_grant("new","apartment",2003,"WarmerHomes",scenario_params(sD,2025.5))
 
 heat_pump_grant("new","apartment",2003,"WarmerHomes",scenario_params(sD,2024))
+params <- scenario_params(sD,2025)
+heat_pump_grant("new","semi_detached",1997,"OSS",params)
 
 heat_pump_grant("new","detached",2003,"BetterEnergyHomes",scenario_params(sD,2024))
 }

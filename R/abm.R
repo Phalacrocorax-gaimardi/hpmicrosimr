@@ -63,6 +63,7 @@ scenario_params <- function(sD,yeartime){
 
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="present_bias_threshold",  value=dplyr::filter(sD, parameter=="present_bias_threshold")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="rebound_threshold",  value=dplyr::filter(sD, parameter=="rebound_threshold")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_target_ber",  value=dplyr::filter(sD, parameter=="warmer_homes_target_ber")$value))
 
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_labour_cost_share",  value=dplyr::filter(sD, parameter=="ber_upgrade_labour_cost_share")$value))
 
@@ -195,10 +196,11 @@ initialise_agents <- function(sD,yeartime=2015,cal_run){
 #' @return updated agent dataframe
 #' @export
 #' @examples
-#update_agents(sD,2024,agents_in,social_network,cal_run=10,quiet=FALSE)
+# update_agents(sD,2024,agents_in,social_network,cal_run=10,quiet=FALSE)
 update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,cal_run, quiet=TRUE){
 
   #
+  cost_model <- "logistic"
   #beta. <- 0.2532785
   #params at yeartime
   params <- scenario_params(sD,yeartime)
@@ -235,7 +237,7 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   print(paste("number of potential upgraders",dim(b_s2)[1]))
   #households that consider full upgrade following failure
   b_s3 <- b_s1 %>% dplyr::filter(serial %in% b_s2$serial)
-  #exclude failure where upgrade is being implemented
+  #exclude failure where upgrade is being implemented => just two categories failure and upgr
   b_s1 <- b_s1 %>% dplyr::filter(!(serial %in% b_s3$serial))
   print(paste("number of heating system failures coinciding with upgrades",dim(b_s3)[1]))
   #assume that all households who consider ber upgrade also consider heating system upgrade.
@@ -244,21 +246,24 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   optimise_heat_env <- function(ber,primary_heat, heating_install_time, house_type, construction_year, region, floor_area) {
     optimise_heat(ber,primary_heat, heating_install_time, house_type, construction_year, region, floor_area, params)
   }
-  optimise_upgrade_env <- function(ber, install_time, house_type, construction_year, region, floor_area,is_fuel_allowance) {
-    optimise_upgrade(ber, tech_old, install_time, house_type, construction_year, region, floor_area, params,is_fuel_allowance)
+  optimise_upgrade_env <- function(ber, primary_heat,heating_install_time, house_type, construction_year, region, floor_area,fuel_allowance) {
+    optimise_upgrade(ber,primary_heat, heating_install_time, house_type, construction_year, region, floor_area, cost_model=cost_model, params,upgrade_heat=TRUE,fuel_allowance)
   }
   hp_savings_env <- function(ber,primary_heat, house_type, construction_year, region, floor_area) {
-    heat_pump_savings(ber,primary_heat, params$yeartime, house_type, construction_year, region, floor_area, params)
+    heat_pump_savings(ber,primary_heat, params$yeartime, house_type, construction_year, region, floor_area, params,include_rebound=TRUE)
   }
   hp_upgrade_savings_env <- function(ber,primary_heat, house_type, construction_year, region, floor_area,fuel_allowance) {
-    heat_pump_upgrade_savings(ber,primary_heat, params$yeartime, house_type, construction_year, region, floor_area, params,fuel_allowance)
+    heat_pump_upgrade_savings(ber,primary_heat, params$yeartime, house_type, construction_year, region, floor_area, cost_model,params,fuel_allowance,include_rebound = FALSE)
   }
-  optimise_upgrade_stick <- function(ber,primary_heat,heating_install_time, house_type, construction_year, region, floor_area,fuel_allowance) {
-    optimise_upgrade(ber,primary_heat, heating_install_time, house_type, construction_year, region, floor_area, params,fuel_allowance) %>% dplyr::filter(tech_new==primary_heat)
-  }
+  optimise_upgrade_env <- function(ber,primary_heat,heating_install_time, house_type, construction_year, region, floor_area,fuel_allowance) {
+    df <- optimise_upgrade(ber,primary_heat, heating_install_time, house_type, construction_year, region, floor_area, cost_model,params,upgrade_heat=TRUE,is_fuel_allowance=fuel_allowance,include_rebound=FALSE) %>% dplyr::filter(tech_new==primary_heat)
+
+    }
+
   #logic: if has heat pump replace
   b_s0 <- b_s1 %>% dplyr::select(ber,primary_heat,house_type, construction_year, region, floor_area)
   #df <- purrr::pmap(b_s0,optimise_heat_env)
+  # should REBOUND be inlcuded at this step?
   df <- purrr::pmap(b_s0,hp_savings_env)
   df <- do.call(rbind,df)
   b_s1 <- b_s1 %>% dplyr::bind_cols(df)
@@ -292,6 +297,15 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
     #                                                                          region,floor_area,fuel_allowance),optimise_upgrade_env)) %>% tidyr::unnest_wider(result)
   #optimum upgrades
   b_s2$upgrade <- TRUE
+  b_s0 <- b_s2 %>% dplyr::select(ber,primary_heat,heating_install_time,house_type, construction_year, region, floor_area,fuel_allowance)
+  #df <- purrr::pmap(b_s0,optimise_heat_env)
+  df <- purrr::pmap(b_s0,optimise_upgrade_env)
+  df <- do.call(rbind,df)
+  #relative gains by switching
+
+
+
+   b_s2$upgrade <- TRUE
   b_s0 <- b_s2 %>% dplyr::select(ber,primary_heat,house_type, construction_year, region, floor_area,fuel_allowance)
   #df <- purrr::pmap(b_s0,optimise_heat_env)
   df <- purrr::pmap(b_s0,hp_upgrade_savings_env)

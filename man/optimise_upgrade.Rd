@@ -16,7 +16,8 @@ optimise_upgrade(
   params,
   upgrade_heat = TRUE,
   is_fuel_allowance = FALSE,
-  include_grants = TRUE
+  include_grants = TRUE,
+  include_rebound = FALSE
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ optimise_upgrade(
 \item{is_fuel_allowance}{TRUE/FALSE}
 
 \item{include_grants}{defaults to TRUE}
+
+\item{include_rebound}{defaults to FALSE}
 }
 \value{
 a
@@ -57,20 +60,23 @@ The household also considers retaining their current heating system.
 
 If fuel allowance is TRUE and the houseehold qualifies for WarmerHomes then it is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard
 
-All grant_types apart from WarmerHomes requires BER optimisation
+All grant_types apart from WarmerHomes requires BER optimisation.
+
+Returns a 2 row dataframe with tech_new the existing tech or a heat pump. If the existing tech is a heat pump, reversion to gas is also evaluated.
 }
 \examples{
 
 params <- scenario_params(sD,2026)
 
-optimise_upgrade(200,"gas",2010,"detached",2010,"Dublin",210,"logistic",params,TRUE,FALSE,TRUE)
+optimise_upgrade(400,"gas",2010,"detached",2010,"Dublin",210,"power",params,TRUE,FALSE,TRUE)
 
 optimise_upgrade(200,"oil",2010,"detached",2010,"Dublin",210,"logistic",params,TRUE,FALSE,TRUE)
 
 optimise_upgrade(200,"gas",2010,"detached",2005,"Dublin",100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE)
 
 #WarmerHomes
-optimise_upgrade(200,"gas",2010,"detached",2005,"Dublin",100,"logistic",params,is_fuel_allowance=TRUE)
+optimise_upgrade(200,"heat_pump",2010,"detached",2005,"Dublin",100,"power",params,is_fuel_allowance=TRUE)
 
+optimise_upgrade(350,"heat_pump", 2015, "detached", 2006, "Munster", 200,"logistic",params,is_fuel_allowance=FALSE,include_rebound=FALSE)
 
 }

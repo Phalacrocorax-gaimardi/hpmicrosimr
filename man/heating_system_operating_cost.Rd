@@ -10,7 +10,7 @@ heating_system_operating_cost(
   ber,
   floor_area,
   params,
-  include_rebound = T
+  include_rebound = FALSE
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ heating_system_operating_cost(
 
 \item{params}{current parameters}
 
-\item{include_rebound}{defaults to TRUE}
+\item{include_rebound}{defaults to FALSE}
 }
 \description{
 Annual operational cost based on current fuel price, annual fuel consumption inferred from kWh heating_requirement,
@@ -37,7 +37,7 @@ Also includes an annual maintenance cost.
 params <- scenario_params(sD,2026)
 heating_system_operating_cost("oil",2003,200,100,params)
 
-heating_system_operating_cost("oil",2003,200,100,params,include_rebound=FALSE)
+heating_system_operating_cost("oil",2003,400,100,params,include_rebound=FALSE)
 
 
 }

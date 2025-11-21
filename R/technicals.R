@@ -645,7 +645,7 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
 #'
 #' @param ber quoted ber rating
 #' @param floor_area floor area
-#' @param rebound rebound parameter default 0.5
+#' @param rebound rebound parameter default 0.3.
 #' @param params parameters
 #'
 #' @returns heating requirement in kWh/m2/year
@@ -653,28 +653,44 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
 #'
 #' @examples
 #' params <- scenario_params(sD,2025)
-#' space_heating_requirement(100,200,1,params)
+#' space_heating_requirement(400,100,0,params)
 #'
 #' space_heating_requirement(100,200,0.5,params)
 space_heating_requirement <- function(ber,floor_area,rebound=0.5,params) {
 
-  offset <- params$q_passive +params$q_hotwater+params$q_lighting #minimum possible
+  #offset <- params$q_passive +params$q_hotwater+params$q_lighting #minimum possible
   ber_heat <- pmax(params$q_passive,ber-params$q_hotwater-params$q_lighting) #minimum heating requirement is q_passive
   #rebound effect above rebound_threshold
-  ber_heat <- ifelse(ber_heat <= params$rebound_threshold, ber_heat, params$rebound_threshold + rebound*(ber_heat-params$rebound_threshold))
-
+  ber_heat <- ifelse(ber_heat <= params$rebound_threshold, ber_heat, params$rebound_threshold + (1-rebound)*(ber_heat-params$rebound_threshold))
   ber_heat*floor_area %>% return()
 }
 
 
-specific_heating_requirement <- function(ber,rebound=0.5,params) {
 
-  offset <- params$q_passive +params$q_hotwater+params$q_lighting
-  ber_heat <- pmax(params$q_passive,ber-params$q_hotwater-params$q_lighting) #minimum heating requirement and DHW/Lighting
-  #rebound
-  ber_heat <- ifelse(ber_heat == params$q_passive, ber_heat, params$q_passive + rebound*(ber_heat-params$q_passive))
+#' heating_system_size
+#'
+#' returns the kW heating system required to heat building (rounded up to nearest kW).
+#'
+#' @param annual_heating_requirement estimated annual heating requirement based on BER and floor area
+#' @param hdd_annual annual Heating Degree Days at location
+#' @param coldest_day mean temperature expected on the coldest day (design temperature e.g -2C)
+#' @param operating_hours assumed max operating hours
+#' @param efficiency boiler efficiency
+#'
+#' @returns kW capacity
+#' @export
+#'
+#' @examples
+#'
+#' sapply(seq(50,500,by=10), function(ber) heating_system_size(ber*90))
+heating_system_size <- function(annual_heating_requirement, hdd_annual=2200, coldest_day=-10,operating_hours=12, efficiency=0.9) {
 
-  ber_heat %>% return()
+  #average heating required per degree day
+  kwh_per_hdd <- annual_heating_requirement / hdd_annual
+
+  hdd_worst_day <- 16-coldest_day
+  #
+  kw_peak <- kwh_per_hdd * hdd_worst_day/24
+  #assume system runs for 1 hours per day on coldest days
+  return(ceiling(24/operating_hours*kw_peak/efficiency))
 }
-
-specific_heating_requirement <- Vectorize(specific_heating_requirement)

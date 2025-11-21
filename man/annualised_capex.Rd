@@ -51,5 +51,7 @@ A present bias (above a capex threshold) params$beta. is included.
  sapply(2010:2040, function(y) annualised_capex("heat_pump",18,2010,"swap","detached",2003,"WarmerHomes",scenario_params(sD,y)))
 params <- scenario_params(sD,2026)
 annualised_capex("heat_pump",18,params$yeartime,"new","detached",2003,"None",params)
-annualised_capex("oil",18,params$yeartime,"new","detached",2003,"BetterEnergyHomes",params)
+params$beta. <- 0.5
+annualised_capex("heat_pump",18,params$yeartime,"new","detached",2003,"None",params)
+annualised_capex("heat_pump",18,params$yeartime,"new","detached",2003,"BetterEnergyHomes",params)
 }
