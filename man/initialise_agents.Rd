@@ -21,6 +21,6 @@ creates the agent initial state including model weights, stochastically imputed 
 }
 \examples{
 
-initialise_agents(sD,2015,10) \%>\% system.time()
+initialise_agents(sD,2015,10) #\%>\% system.time()
 
 }

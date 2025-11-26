@@ -683,7 +683,7 @@ space_heating_requirement <- function(ber,floor_area,rebound=0.5,params) {
 #' @examples
 #'
 #' sapply(seq(50,500,by=10), function(ber) heating_system_size(ber*90))
-heating_system_size <- function(annual_heating_requirement, hdd_annual=2200, coldest_day=-10,operating_hours=12, efficiency=0.9) {
+heating_system_size <- function(annual_heating_requirement, hdd_annual=2200, coldest_day=-7,operating_hours=12, efficiency=0.9) {
 
   #average heating required per degree day
   kwh_per_hdd <- annual_heating_requirement / hdd_annual

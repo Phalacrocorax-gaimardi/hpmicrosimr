@@ -7,7 +7,7 @@
 heating_system_size(
   annual_heating_requirement,
   hdd_annual = 2200,
-  coldest_day = -10,
+  coldest_day = -7,
   operating_hours = 12,
   efficiency = 0.9
 )

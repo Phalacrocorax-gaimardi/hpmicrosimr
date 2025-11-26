@@ -15,8 +15,7 @@ heat_pump_upgrade_savings(
   cost_model = "logistic",
   params,
   is_fuel_allowance,
-  include_grants,
-  include_rebound = FALSE
+  include_grants
 )
 }
 \arguments{
@@ -41,11 +40,9 @@ heat_pump_upgrade_savings(
 \item{is_fuel_allowance}{default FALSE}
 
 \item{include_grants}{TRUE or FALSE}
-
-\item{include_rebound}{default FALSE}
 }
 \value{
-savings
+a single row dataframe
 }
 \description{
 % savings achieved by adopting a heat pump as part of an home energy upgrade, expressed relative to keeping the current technology.
@@ -57,6 +54,6 @@ Returns the savings by switching and ber
 }
 \examples{
 params <- scenario_params(sD,2026)
-#heat_pump_upgrade_savings(200,"gas",2000,"detached",1990,"Munster",120,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE)
+heat_pump_upgrade_savings(200,"gas",2000,"detached",1990,"Munster",120,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE)
 
 }

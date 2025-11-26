@@ -39,3 +39,10 @@ micro-simulation time-step updater
 The workhorse ABM function.Within a scenario, does a single month update of the agent characteristics. A random sample of agents evaluates their economic and social
 utilities. If these exceed their individual threshold an optimal PV_BESS system is adopted.
 }
+\examples{
+
+agents_in <- initialise_agents(sD,2015,100)
+social_network <- make_artificial_society(hp_society_oo \%>\% dplyr::filter(serial \%in\% agents_in$serial),homophily)
+agents_1 <- update_agents(sD,2015+1/6,agents_in,social_network,cal_run=10,quiet=FALSE)
+agents_2 <- update_agents(sD,2015+1/3,agents_1,social_network,cal_run=10,quiet=FALSE)
+}

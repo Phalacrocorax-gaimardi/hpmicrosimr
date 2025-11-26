@@ -87,7 +87,7 @@ heating_system_capital_cost <- function(tech,kW,installation_type="new",house_ty
 #' to the intuition that older systems that continue to operate are "free".
 
 #'
-#' The discount rate set from calibration (params$delta.).
+#' The discount rate set from calibration (params$r.).
 #'
 #' A present bias (above a capex threshold) params$beta. is included.
 #'
@@ -128,7 +128,7 @@ annualised_capex <- function(tech,kW,installation_time, installation_type,house_
   #
   #print(capex)
   #continuous time discount rate
-  r <- log(1+params$delta.) #continuous
+  r <- log(1+params$r.) #annual to continuous time
   eac <- eac_weibull(lifetime,beta,params$yeartime - installation_time,r)
   annualised_capex <- ifelse(capex <= params$present_bias_threshold, capex*eac,eac*(params$present_bias_threshold+ (capex-params$present_bias_threshold)/params$beta.))
   return(annualised_capex)
@@ -174,7 +174,7 @@ heating_system_operating_cost <- function(tech,installation_time,ber,floor_area,
   tech_fuel_dictionary <- c("electricity"="electricity","heat_pump"= "electricity","solid_fuel"="solid_fuel","gas"="gas","oil"="oil")
   fuel_type <- tech_fuel_dictionary[tech]
   efficiency <- heating_system_efficiency(tech,installation_time)
-  heating_req <- ifelse(include_rebound, space_heating_requirement(ber,floor_area,params$r.,params),space_heating_requirement(ber,floor_area,0,params))
+  heating_req <- ifelse(include_rebound, space_heating_requirement(ber,floor_area,params$rho.,params),space_heating_requirement(ber,floor_area,0,params))
   opex <- heating_req*params[[paste(fuel_type,"price",sep="_")]]/(100*efficiency) #prices given in cents per kWh
   #electric heating may be primarily used at night. The night usage fraction is a fixed parameter at the moment
   if(tech %in% c("heat_pump","electricity")) opex <- opex*(params$night_rate_usage_factor*(1-params$night_rate_discount) + (1-params$night_rate_usage_factor))
@@ -514,8 +514,8 @@ heating_upgrade_tensor <- function(ber_old,ber_new,tech_old,installation_time,te
   ber_upgrade_capex <- ifelse(ber_old==ber_new,0,retrofit_cost_model(ber_old,ber_new,house_type,region,floor_area,cost_model,params)-
                                ifelse(include_grants,upgrade_grants$grant_value,0)) #
   #include present bias
-  ber_upgrade_annualised_capex <- ifelse( ber_upgrade_capex <= params$present_bias_threshold, ber_upgrade_capex*params$delta.,(params$present_bias_threshold + (ber_upgrade_capex-params$present_bias_threshold)/params$beta.)*params$delta.)
-  #ber_upgrade_annualised_capex <- ber_upgrade_capex*params$delta.
+  ber_upgrade_annualised_capex <- ifelse( ber_upgrade_capex <= params$present_bias_threshold, ber_upgrade_capex*params$r.,(params$present_bias_threshold + (ber_upgrade_capex-params$present_bias_threshold)/params$beta.)*params$r.)
+  #ber_upgrade_annualised_capex <- ber_upgrade_capex*params$r.
   #grant_type <- ifelse(include_grants,upgrade_grants$scheme,"None")
   #print(upgrade_grants$grant_value)
   if(upgrade_heat){
@@ -726,10 +726,14 @@ optimise_upgrade <- function(ber_old,tech_old,installation_time,house_type,const
 #'
 #' params <- scenario_params(sD,2026)
 #' optimise_heat(200,"oil",2000,"terraced",1980,"Munster",90,params)
+#' optimise_heat(200,"heat_pump",2000,"terraced",1980,"Munster",90,params)
 #'
 optimise_heat <- function(ber,tech_old,installation_time,house_type,construction_year,region,floor_area,params,include_rebound=FALSE){
   #optimise_upgrade(ber_old=175,tech_old = "oil",house_type="detached",2003,region="Munster",floor_area=100,params)
-      df0 <- tibble::tibble("tech_old"=tech_old,"tech_new"=c(tech_old,"heat_pump"))
+
+  newtechs <- ifelse(tech_old=="heat_pump",list(c("heat_pump","gas")), list(c(tech_old,"heat_pump")))[[1]]
+
+  df0 <- tibble::tibble("tech_old"=tech_old,"tech_new"=newtechs)
       upgrade_fun <- function(tech_old, tech_new){
         heating_upgrade_tensor(ber,ber,tech_old,installation_time,tech_new,house_type,construction_year,region,floor_area,"power",params,TRUE,FALSE,TRUE,include_rebound)
       }
@@ -750,7 +754,9 @@ optimise_heat <- function(ber,tech_old,installation_time,house_type,construction
 #'
 #' The "savings" are relative to an replacing the current system with a new system with the same technology e.g. gas -> gas
 #'
-#' if current system is a heat pump, choose between a heat pump swap or reversion to gas.
+#' If current system is a heat pump, choose between a heat pump swap or reversion to gas.
+#'
+#' This function is used in update_agents to determine the system choice when current heating system fails
 #'
 #' @param ber old ber kWh/m2/year
 #' @param tech_old new ber kWh/m2/year
@@ -760,7 +766,6 @@ optimise_heat <- function(ber,tech_old,installation_time,house_type,construction
 #' @param region region
 #' @param floor_area total floor area (m2)
 #' @param params current parameter values
-#' @param include_rebound default FALSE
 #'
 #' @returns one row dataframe
 #' @export
@@ -771,22 +776,25 @@ optimise_heat <- function(ber,tech_old,installation_time,house_type,construction
 #' params$beta. <- 1
 #' heat_pump_savings(400,"gas",2010,"detached",1995,"Munster",120,params)
 #'
-#' heat_pump_savings(400,"gas",2010,"detached",1995,"Munster",120,params,include_rebound=TRUE)
+#' heat_pump_savings(400,"heat_pump",2010,"detached",1995,"Munster",120,params)
 
-heat_pump_savings <- function(ber,tech_old,installation_time,house_type,construction_year,region,floor_area,params,include_rebound=FALSE){
+heat_pump_savings <- function(ber,tech_old,installation_time,house_type,construction_year,region,floor_area,params){
   #
-  df <- optimise_heat(ber,tech_old,installation_time,house_type,construction_year,region,floor_area,params,include_rebound)
+  df <- optimise_heat(ber,tech_old,installation_time,house_type,construction_year,region,floor_area,params,include_rebound=FALSE)
   stick_cost <- df %>% dplyr::filter(tech_old==tech_new) %>% dplyr::pull(new_cost)
-  switch_cost <- ifelse(tech_old=="heat_pump",NA,df %>% dplyr::filter(tech_old!=tech_new) %>% dplyr::pull(new_cost))
-  savings <- ifelse(tech_old=="heat_pump",NA, switch_cost/stick_cost -1)
+  switch_cost <- df %>% dplyr::filter(tech_old!=tech_new) %>% dplyr::pull(new_cost)
+  #switch_cost <- ifelse(tech_old=="heat_pump",NA,df %>% dplyr::filter(tech_old!=tech_new) %>% dplyr::pull(new_cost))
+  #savings <- ifelse(tech_old=="heat_pump",NA, switch_cost/stick_cost -1)
   grant <- df %>% dplyr::filter(tech_new=="heat_pump") %>% dplyr::pull(heat_pump_grant)
-  tibble::tibble(tech_old=tech_old,stick_cost=stick_cost, switch_cost=switch_cost,savings=savings, heat_pump_grant = grant) %>% return()
+  tibble::tibble(eac_stick=stick_cost, eac_switch=switch_cost,savings=switch_cost/stick_cost -1, heat_pump_grant = grant) %>% return()
 }
 
 
 #' heat_pump_upgrade_savings
 #'
 #' % savings achieved by adopting a heat pump as part of an home energy upgrade, expressed relative to keeping the current technology.
+#'
+#'
 #'
 #' If the relative gain is sufficient, a heat pump may be adopted.
 #'
@@ -804,28 +812,29 @@ heat_pump_savings <- function(ber,tech_old,installation_time,house_type,construc
 #' @param params scenario params at current yeartime
 #' @param is_fuel_allowance default FALSE
 #' @param include_grants TRUE or FALSE
-#' @param include_rebound default FALSE
 #'
-#' @returns savings
+#' @returns a single row dataframe
 #' @export
 #'
 #' @examples
 #' params <- scenario_params(sD,2026)
-#' #heat_pump_upgrade_savings(200,"gas",2000,"detached",1990,"Munster",120,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE)
+#' heat_pump_upgrade_savings(200,"gas",2000,"detached",1990,"Munster",120,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE)
 #'
-heat_pump_upgrade_savings <-  function(ber_old,tech_old,installation_time,house_type,construction_year,region,floor_area,cost_model="logistic",params,is_fuel_allowance,include_grants,include_rebound=FALSE){
+heat_pump_upgrade_savings <-  function(ber_old,tech_old,installation_time,house_type,construction_year,region,floor_area,cost_model="logistic",params,is_fuel_allowance,include_grants){
   #
-  df <- optimise_upgrade(ber_old,tech_old,installation_time,house_type,construction_year,region,floor_area,cost_model,params,upgrade_heat=TRUE,is_fuel_allowance,include_grants,include_rebound)
-  cost_switch <- df %>% dplyr::filter(tech_old==tech_new) %>% dplyr::pull(new_cost)
-  cost_stick <- ifelse(tech_old=="heat_pump",NA,df %>% dplyr::filter(tech_old!=tech_new) %>% dplyr::pull(new_cost))
-  ber_switch <- df %>% dplyr::filter(tech_old==tech_new) %>% dplyr::pull(ber_new)
-  ber_stick <- ifelse(tech_old=="heat_pump",NA,df %>% dplyr::filter(tech_old!=tech_new) %>% dplyr::pull(ber_new))
-  #stick_ber <- df %>% dplyr::filter(tech_old==tech_new) %>% dplyr::pull(ber_new)
+  df <- optimise_upgrade(ber_old,tech_old,installation_time,house_type,construction_year,region,floor_area,cost_model,params,upgrade_heat=TRUE,is_fuel_allowance,include_grants,include_rebound=FALSE)
+  #
+  df_stick <- df %>% dplyr::filter(tech_new == tech_old) %>% dplyr::select(ber_new,new_cost,upgrade_cost,heating_sys_cost, grant_type,upgrade_grant, heat_pump_grant)
+  df_switch <- df %>% dplyr::filter(tech_new != tech_old) %>% dplyr::select(ber_new,new_cost,upgrade_cost,heating_sys_cost, grant_type,upgrade_grant, heat_pump_grant)
+  df_stick <- df_stick %>% dplyr::rename("ber"=ber_new,"eac"=new_cost)
+  df_switch <- df_switch %>% dplyr::rename("ber"=ber_new,"eac"=new_cost)
+  df_stick <- df_stick %>% dplyr::rename_with(~ paste0(.x,"_stick"))
+  df_switch <- df_switch %>% dplyr::rename_with(~ paste0(.x,"_switch"))
+  df1 <- df_stick %>% dplyr::bind_cols(df_switch)
+  df1 <- df1 %>% dplyr::mutate(savings=eac_switch/eac_switch-1)
+  #df1 <- df1 %>% dplyr::rename("tech"=tech_old_stick)
   #switch_ber <- ifelse(tech_old=="heat_pump",NA,df %>% dplyr::filter(tech_old!=tech_new) %>% dplyr::pull(ber_new))
-  savings <- ifelse(tech_old=="heat_pump",NA, switch_cost/stick_cost -1)
-  grant <- df %>% dplyr::filter(tech_new=="heat_pump") %>% dplyr::pull(heat_pump_grant)
-  tibble::tibble(tech_old=tech_old,ber_old=ber_old,ber_stick=ber_stick,ber_switch=ber_switch,stick_cost=stick_cost, switch_cost=switch_cost,savings=savings, heat_pump_grant = grant) %>% return()
-
+  df1 %>% return()
 }
 
 

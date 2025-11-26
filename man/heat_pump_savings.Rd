@@ -12,8 +12,7 @@ heat_pump_savings(
   construction_year,
   region,
   floor_area,
-  params,
-  include_rebound = FALSE
+  params
 )
 }
 \arguments{
@@ -32,8 +31,6 @@ heat_pump_savings(
 \item{floor_area}{total floor area (m2)}
 
 \item{params}{current parameter values}
-
-\item{include_rebound}{default FALSE}
 }
 \value{
 one row dataframe
@@ -44,7 +41,9 @@ find the financially optimum household heating system replacement. Choose betwee
 \details{
 The "savings" are relative to an replacing the current system with a new system with the same technology e.g. gas -> gas
 
-if current system is a heat pump, choose between a heat pump swap or reversion to gas.
+If current system is a heat pump, choose between a heat pump swap or reversion to gas.
+
+This function is used in update_agents to determine the system choice when current heating system fails
 }
 \examples{
 params <- scenario_params(sD,2025)
@@ -52,5 +51,5 @@ heat_pump_savings(120,"gas",2010,"detached",1995,"Munster",120,params)
 params$beta. <- 1
 heat_pump_savings(400,"gas",2010,"detached",1995,"Munster",120,params)
 
-heat_pump_savings(400,"gas",2010,"detached",1995,"Munster",120,params,include_rebound=TRUE)
+heat_pump_savings(400,"heat_pump",2010,"detached",1995,"Munster",120,params)
 }

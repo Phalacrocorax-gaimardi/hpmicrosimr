@@ -43,7 +43,7 @@ this function uses a capital reduction factor with with a technology specific
 Weibull survival function. The annualised capex falls when the system age exceeds the expected lifetime. This corresponds
 to the intuition that older systems that continue to operate are "free".
 
-The discount rate set from calibration (params$delta.).
+The discount rate set from calibration (params$r.).
 
 A present bias (above a capex threshold) params$beta. is included.
 }
