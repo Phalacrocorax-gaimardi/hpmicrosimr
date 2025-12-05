@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # hpmicrosimr
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/Phalacrocorax-gaimardi/hpmicrosimr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Phalacrocorax-gaimardi/hpmicrosimr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 *hpmicrosimr* is an agent-based model simulation framework describing home energy efficiency and heating technology system upgrades by $\approx 800$ Irish owner-occupier households. Typically the model is initialised in 2015 and is run to 2040 or 2050. Agent characteristics are based on survey data collected in 2024.
