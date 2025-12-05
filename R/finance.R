@@ -604,34 +604,32 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
 
 #' optimise_upgrade
 #'
-#' optimise_upgrade finds the financially optimum household energy upgrade (fabric and heating system)
+#' optimise_upgrade finds the financially optimum household energy efficiency upgrade (fabric and replacement heating technology)
 #'
-#' The potential new heating technologies (tech_new) considered are current tech and heat pump for all grant types.
+#' The potential new heating technologies (tech_new) considered are current tech and a heat pump. Choices such as gas to oil are not considered,
 #'
-#' The household also considers retaining their current heating system.
-#'
-#' If fuel allowance is TRUE and the household qualifies for WarmerHomes then it is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard.
+#' If fuel_allowance is TRUE and the household qualifies for WarmerHomes. It is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard.
 #'
 #' All grant_types apart from WarmerHomes requires BER optimisation.
 #'
 #' Returns a 2 row dataframe with tech_new the existing tech or a heat pump. If the existing tech is a heat pump, reversion to gas is also evaluated.
 #'
-#' @param hli_old old ber kWh/m2/year
-#' @param tech_old new ber kWh/m2/year
+#' @param hli_old heat loss indicator before upgrade W/Km2
+#' @param tech_old current heating technology
 #' @param installation_time year of installation of old (current) tech
-#' @param house_type seai house type
-#' @param storeys number of storeys 1, 2+
-#' @param construction_year integer
-#' @param region region
-#' @param floor_area total floor area (m2)
-#' @param cost_model efficiency upgrade cost model - one of "logistic", "power" or "esri"
-#' @param params current parameter values
+#' @param house_type seai house type (detached, semi_detached, terraced, apartment)
+#' @param storeys number of storeys 1, 2, 3
+#' @param construction_year year of construction integer
+#' @param region region (Dublin, Munster, Rest of Leinster, Ulster/Connacht)
+#' @param floor_area treated floor area (m2)
+#' @param cost_model efficiency upgrade cost model - only "logistic" at the moment
+#' @param params current parameter values from scenario_params(sD, yeartime)
 #' @param upgrade_heat if TRUE then upgrade the current heating system
 #' @param is_fuel_allowance TRUE/FALSE
 #' @param include_grants defaults to TRUE
 #' @param include_rebound defaults to FALSE
 #'
-#' @returns a
+#' @returns a two row dataframe. The new EAC "new_cost"
 #' @export
 #'
 #' @examples

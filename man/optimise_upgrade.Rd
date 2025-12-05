@@ -22,25 +22,25 @@ optimise_upgrade(
 )
 }
 \arguments{
-\item{hli_old}{old ber kWh/m2/year}
+\item{hli_old}{heat loss indicator before upgrade W/Km2}
 
-\item{tech_old}{new ber kWh/m2/year}
+\item{tech_old}{current heating technology}
 
 \item{installation_time}{year of installation of old (current) tech}
 
-\item{house_type}{seai house type}
+\item{house_type}{seai house type (detached, semi_detached, terraced, apartment)}
 
-\item{storeys}{number of storeys 1, 2+}
+\item{storeys}{number of storeys 1, 2, 3}
 
-\item{construction_year}{integer}
+\item{construction_year}{year of construction integer}
 
-\item{region}{region}
+\item{region}{region (Dublin, Munster, Rest of Leinster, Ulster/Connacht)}
 
-\item{floor_area}{total floor area (m2)}
+\item{floor_area}{treated floor area (m2)}
 
-\item{cost_model}{efficiency upgrade cost model - one of "logistic", "power" or "esri"}
+\item{cost_model}{efficiency upgrade cost model - only "logistic" at the moment}
 
-\item{params}{current parameter values}
+\item{params}{current parameter values from scenario_params(sD, yeartime)}
 
 \item{upgrade_heat}{if TRUE then upgrade the current heating system}
 
@@ -51,17 +51,15 @@ optimise_upgrade(
 \item{include_rebound}{defaults to FALSE}
 }
 \value{
-a
+a two row dataframe. The new EAC "new_cost"
 }
 \description{
-optimise_upgrade finds the financially optimum household energy upgrade (fabric and heating system)
+optimise_upgrade finds the financially optimum household energy efficiency upgrade (fabric and replacement heating technology)
 }
 \details{
-The potential new heating technologies (tech_new) considered are current tech and heat pump for all grant types.
+The potential new heating technologies (tech_new) considered are current tech and a heat pump. Choices such as gas to oil are not considered,
 
-The household also considers retaining their current heating system.
-
-If fuel allowance is TRUE and the household qualifies for WarmerHomes then it is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard.
+If fuel_allowance is TRUE and the household qualifies for WarmerHomes. It is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard.
 
 All grant_types apart from WarmerHomes requires BER optimisation.
 
