@@ -115,21 +115,19 @@ utilities. If these exceed their individual threshold an optimal PV_BESS system 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   upgrade_cost &lt;dbl&gt;, grant_type &lt;chr&gt;, tech_cost &lt;dbl&gt;, upgrade_grant &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   eac_stick &lt;dbl&gt;, eac_switch &lt;dbl&gt;, savings &lt;dbl&gt;, hp_grant_type &lt;chr&gt;, …</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "time 2015.2 number of system breakdowns 4"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "time 2015.2 number of efficiency upgrades 7"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "time 2015.2 number of heat pump adopters following system breakdown 1"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "time 2015.2 number of efficiency upgrades 6"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "time 2015.2 number of heat pump adopters following system breakdown 0"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "number of heat pump adopters as part of efficiency upgrade 0"</span>
 <span class="r-in"><span><span class="va">agents_2</span> <span class="op">&lt;-</span> <span class="fu">update_agents</span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2015</span><span class="op">+</span><span class="fl">1</span><span class="op">/</span><span class="fl">3</span>,<span class="va">agents_1</span>,<span class="va">social_network</span>,cal_run<span class="op">=</span><span class="fl">10</span>,quiet<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 31</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   serial w_q52 w_q13 w_theta region  house_type storeys construction_year   ber</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 875    0.991  1.03   0.124 Munster detached         1              <span style="text-decoration: underline;">1</span>930  176.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 22 more variables: hli &lt;dbl&gt;, floor_area &lt;dbl&gt;, tech &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 0 × 31</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 31 variables: serial &lt;chr&gt;, w_q52 &lt;dbl&gt;, w_q13 &lt;dbl&gt;, w_theta &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   region &lt;chr&gt;, house_type &lt;chr&gt;, storeys &lt;int&gt;, construction_year &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ber &lt;dbl&gt;, hli &lt;dbl&gt;, floor_area &lt;dbl&gt;, tech &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   heating_install_time &lt;dbl&gt;, income &lt;dbl&gt;, fuel_allowance &lt;lgl&gt;, kW &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   q52 &lt;dbl&gt;, eac &lt;dbl&gt;, eac_actual &lt;dbl&gt;, upgrade &lt;lgl&gt;, failure &lt;lgl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   upgrade_cost &lt;dbl&gt;, grant_type &lt;chr&gt;, tech_cost &lt;dbl&gt;, upgrade_grant &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   heating_sys_cost &lt;dbl&gt;, eac_stick &lt;dbl&gt;, eac_switch &lt;dbl&gt;, savings &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   hp_grant_type &lt;chr&gt;, heat_pump_grant &lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "time 2015.3 number of system breakdowns 11"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   heating_sys_cost &lt;dbl&gt;, eac_stick &lt;dbl&gt;, eac_switch &lt;dbl&gt;, savings &lt;dbl&gt;, …</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "time 2015.3 number of system breakdowns 13"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "time 2015.3 number of efficiency upgrades 6"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "time 2015.3 number of heat pump adopters following system breakdown 0"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "number of heat pump adopters as part of efficiency upgrade 0"</span>
