@@ -5,20 +5,20 @@
 \title{heating_system_operating cost}
 \usage{
 heating_system_operating_cost(
+  hli,
   tech,
   installation_time,
-  ber,
   floor_area,
   params,
   include_rebound = FALSE
 )
 }
 \arguments{
+\item{hli}{heat loss indicator}
+
 \item{tech}{heating technology}
 
 \item{installation_time}{heating installation year}
-
-\item{ber}{annual heating requirement in kWh}
 
 \item{floor_area}{floor area in m2}
 
@@ -35,9 +35,10 @@ Also includes an annual maintenance cost.
 }
 \examples{
 params <- scenario_params(sD,2026)
-heating_system_operating_cost("oil",2003,200,100,params)
+heating_system_operating_cost(2, "oil",2003,100,params)
 
-heating_system_operating_cost("oil",2003,400,100,params,include_rebound=FALSE)
+heating_system_operating_cost(3,"oil",2003,100,params,include_rebound=FALSE)
 
+heating_system_operating_cost(3,"oil",2003,100,params,include_rebound=TRUE)
 
 }

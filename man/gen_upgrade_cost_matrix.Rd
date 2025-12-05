@@ -6,15 +6,18 @@
 \usage{
 gen_upgrade_cost_matrix(
   house_type,
+  storeys,
   region = "Dublin",
   floor_area = 100,
   params,
-  cost_model = "power",
+  cost_model = "logistic",
   include_grant = FALSE
 )
 }
 \arguments{
 \item{house_type}{house or apartment}
+
+\item{storeys}{1,2+}
 
 \item{region}{region}
 
@@ -35,8 +38,8 @@ generates an implied BER upgrade for given cost model params and house_type, reg
 \examples{
 
 params <- scenario_params(sD,2024)
-gen_upgrade_cost_matrix("semi_detached","Dublin",100,params,cost_model="power",FALSE)
-gen_upgrade_cost_matrix("semi_detached","Dublin",100,params,cost_model="esri",FALSE)
-gen_upgrade_cost_matrix("semi_detached","Dublin",100,params,cost_model="logistic",FALSE)
+#gen_upgrade_cost_matrix("semi_detached","Dublin",100,params,cost_model="power",FALSE)
+#gen_upgrade_cost_matrix("semi_detached","Dublin",100,params,cost_model="esri",FALSE)
+gen_upgrade_cost_matrix("semi_detached",2,"Dublin",100,params,cost_model="logistic",FALSE)
 
 }

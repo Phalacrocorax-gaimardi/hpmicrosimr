@@ -4,12 +4,10 @@
 \alias{recode_survey}
 \title{recode_survey}
 \usage{
-recode_survey(hp_data_in, params)
+recode_survey(hp_data_in)
 }
 \arguments{
 \item{hp_data_in}{input survey e.g. hp_survey_oo}
-
-\item{params}{parameter values}
 }
 \value{
 dataframe
@@ -17,8 +15,11 @@ dataframe
 \description{
 recodes the input survey data for use in initialise_agents. The recoded features are BER, ground floor area, and gross household income.
 }
+\details{
+Note that this function is based on the actual survey date, taken as 2024.5
+}
 \examples{
 
-recode_survey(hp_survey_oo,scenario_params(sD,2015)) \%>\% system.time()
+recode_survey(hp_survey_oo) #\%>\% system.time()
 
 }

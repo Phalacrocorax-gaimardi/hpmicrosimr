@@ -5,10 +5,11 @@
 \title{optimise_heat}
 \usage{
 optimise_heat(
-  ber,
+  hli,
   tech_old,
   installation_time,
   house_type,
+  storeys,
   construction_year,
   region,
   floor_area,
@@ -17,13 +18,15 @@ optimise_heat(
 )
 }
 \arguments{
-\item{ber}{old ber kWh/m2/year}
+\item{hli}{the current W/Km2 not upgraded}
 
 \item{tech_old}{new ber kWh/m2/year}
 
 \item{installation_time}{year of installation of old tech}
 
 \item{house_type}{seai house type}
+
+\item{storeys}{1 or 2+}
 
 \item{construction_year}{integer}
 
@@ -47,11 +50,11 @@ The function is used for example in the case of a heating system failure, where 
 If current system is a heat pump, choose between a heat pump swap or reversion to gas.
 }
 \examples{
-params <- scenario_params(sD,2017)
-optimise_heat(200,"oil",2000,"terraced",1980,"Munster",90,params)
+params <- scenario_params(sD,2026)
+optimise_heat(2,"oil",2000,"terraced",2,1980,"Munster",90,params)
 
 params <- scenario_params(sD,2026)
-optimise_heat(200,"oil",2000,"terraced",1980,"Munster",90,params)
-optimise_heat(200,"heat_pump",2000,"terraced",1980,"Munster",90,params)
+optimise_heat(4,"oil",2000,"terraced",2,1980,"Munster",90,params)
+optimise_heat(1.9,"oil",2000,"terraced",2,1980,"Munster",90,params)
 
 }

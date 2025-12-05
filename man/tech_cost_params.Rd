@@ -16,6 +16,7 @@ A data frame with 10 rows and 12 variables:
   \item{\code{kw_tech_cost}}{double base tech cost per kW installed capacity}
   \item{\code{fixed_ancilliary_cost}}{double base ancilliary works cost}
   \item{\code{kw_ancilliary_cost}}{double ancilliary works cost per kW capacity}
+  \item{\code{5kW}}{double implied cost of 5kW system }
   \item{\code{12kW}}{double implied cost of 12kW system }
   \item{\code{18kW}}{double implied cost of 18KW system}
   \item{\code{24kW}}{double implied cost of 24kW system}

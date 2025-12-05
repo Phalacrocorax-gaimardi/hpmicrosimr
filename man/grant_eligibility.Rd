@@ -27,7 +27,10 @@ grant_eligibility(
 scheme one of "None", "WarmerHomes", "OSS", "BetterEner
 }
 \description{
-utility to determine which home energy efficiency grant scheme a homeowner is or was eligible
+utility function to determine which home energy efficiency grant scheme a homeowner is or was eligible
+}
+\details{
+expressed in terms of ber_old and ber_new
 }
 \examples{
 

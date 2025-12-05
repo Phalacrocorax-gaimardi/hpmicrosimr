@@ -5,21 +5,24 @@
 \title{retrofit_cost_model}
 \usage{
 retrofit_cost_model(
-  ber_old,
-  ber_new,
+  hli_old,
+  hli_new,
   house_type,
+  storeys,
   region = "Dublin",
   floor_area = 100,
-  cost_model = "power",
+  cost_model = "logistic",
   params
 )
 }
 \arguments{
-\item{ber_old}{old ber}
+\item{hli_old}{old hli}
 
-\item{ber_new}{new ber}
+\item{hli_new}{new hli}
 
 \item{house_type}{house type}
+
+\item{storeys}{1, 2+}
 
 \item{region}{region}
 
@@ -34,4 +37,10 @@ euros
 }
 \description{
 energy retrofit upgrade cost model collection
+}
+\examples{
+
+params <- scenario_params(sD,2026)
+retrofit_cost_model(2.8,1.8,"detached",2,"Dublin",120,"logistic",params)
+
 }

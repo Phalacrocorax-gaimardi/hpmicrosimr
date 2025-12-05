@@ -7,7 +7,6 @@
 #tech_cost_params <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/technology_cost_model.csv")
 #tech_efficiency_params <-  readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/tech_efficiency_parameters.csv")
 
-
 #' tech_params_fun
 #'
 #' utility function to generate tech_params environment object. The model can be adjusted by modifying the tech_cost_params dataframe,
@@ -20,7 +19,6 @@
 #'
 #' @examples tech_params_fun()
 tech_params_fun <- function(){
-
   #tech_cost_params <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/technology_cost_model.csv")
   #tech_efficiency_params <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/tech_efficiency_parameters.csv")
   data("tech_cost_params", envir = environment())

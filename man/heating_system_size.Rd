@@ -29,7 +29,3 @@ kW capacity
 \description{
 returns the kW heating system required to heat building (rounded up to nearest kW).
 }
-\examples{
-
-sapply(seq(50,500,by=10), function(ber) heating_system_size(ber*90))
-}

@@ -5,20 +5,23 @@
 \title{retrofit_cost_model_logistic}
 \usage{
 retrofit_cost_model_logistic(
-  ber_old,
-  ber_new,
+  hli_old,
+  hli_new,
   house_type,
+  storeys,
   region = "Dublin",
   floor_area = 100,
   params
 )
 }
 \arguments{
-\item{ber_old}{old ber}
+\item{hli_old}{hli before upgrade}
 
-\item{ber_new}{new ber}
+\item{hli_new}{hli after upgrade}
 
 \item{house_type}{house type}
+
+\item{storeys}{number of storeys}
 
 \item{region}{region}
 
@@ -30,8 +33,19 @@ retrofit_cost_model_logistic(
 euros
 }
 \description{
-Possible the most plausible model.
+Building fabric + ventilation retrofit upgrade cost bute excluding tech such as solar PV or Heat Pumps
 }
 \details{
-energy retrofit upgrade cost
+The default and possibly the most plausible cost model, based on HLI to exclude effects of heating technology efficiency.
+
+Economies of scale currently use a \eqn{area^\frac{2}{3}} scaling law.
+}
+\examples{
+params <- scenario_params(sD,2018)
+retrofit_cost_model_logistic(5,4,"semi_detached",2,"Dublin",100,params)
+
+params <- scenario_params(sD,2024)
+retrofit_cost_model_logistic(4.5,2.0,"detached",2,"Munster",100,params)
+retrofit_cost_model_logistic(2.41,1.91,"detached",1,"Dublin",175,params) #UCD example
+
 }

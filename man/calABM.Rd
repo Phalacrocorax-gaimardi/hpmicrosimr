@@ -9,13 +9,12 @@ calABM(
   Nrun = 4,
   n_unused_cores = 2,
   use_parallel = T,
-  nu,
-  lambda,
-  p,
-  r,
-  beta,
-  eta,
-  rho
+  nu = 0.27,
+  p = 0.0022,
+  r = 0.04,
+  beta = 0.8,
+  eta = 0.8,
+  rho = 0.3
 )
 }
 \arguments{
@@ -29,8 +28,6 @@ calABM(
 
 \item{nu}{financial utility scale (drawn from financial_utility_scale)}
 
-\item{lambda}{bias correction parameter, default not to vary}
-
 \item{p}{upgrade rate parameter default}
 
 \item{r}{risk neutral rate}
@@ -40,6 +37,9 @@ calABM(
 \item{eta}{OSS sludge/hassle}
 
 \item{rho}{rebound}
+}
+\value{
+calibration run data
 }
 \description{
 macro-calibration of hpmicrosimr

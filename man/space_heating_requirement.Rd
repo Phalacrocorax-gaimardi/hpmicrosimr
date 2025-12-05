@@ -4,30 +4,29 @@
 \alias{space_heating_requirement}
 \title{space_heating_requirement}
 \usage{
-space_heating_requirement(ber, floor_area, rebound = 0.5, params)
+space_heating_requirement(hli, floor_area, rebound = 0.5, params)
 }
 \arguments{
-\item{ber}{quoted ber rating}
+\item{hli}{heat loss indicator}
 
-\item{floor_area}{floor area}
+\item{floor_area}{treated floor area}
 
-\item{rebound}{rebound parameter default 0.3.}
+\item{rebound}{rebound 0-1}
 
-\item{params}{parameters}
+\item{params}{scenario parameters (only used for HDD in this instance)}
 }
 \value{
-heating requirement in kWh/m2/year
+kWh/m2/year
 }
 \description{
-This function calculates the annual space heating requirement from ber rating and floor area. A rebound effect is include.
+annual space heating energy requirement in kWh based on building HLI.
 }
 \details{
-The ber rating includes contributions from hot water heating and lighting. Standard of these components are removed. For A rated
-houses space heating energy rating is set to 15.
+requirement is reduced if rebound > 0
 }
 \examples{
-params <- scenario_params(sD,2025)
-space_heating_requirement(400,100,0,params)
 
-space_heating_requirement(100,200,0.5,params)
+params <- scenario_params(sD,2025)
+space_heating_requirement2(3,100,0,params)
+
 }

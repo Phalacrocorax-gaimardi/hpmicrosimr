@@ -4,7 +4,7 @@
 \alias{initialise_agents}
 \title{initialise_agents}
 \usage{
-initialise_agents(sD, yeartime = 2015, cal_run)
+initialise_agents(sD, yeartime = 2015, cal_run = 10)
 }
 \arguments{
 \item{sD}{scenario (usable_roof_fraction only)}

@@ -5,10 +5,11 @@
 \title{heat_pump_savings}
 \usage{
 heat_pump_savings(
-  ber,
+  hli,
   tech_old,
   installation_time,
   house_type,
+  storeys,
   construction_year,
   region,
   floor_area,
@@ -16,13 +17,15 @@ heat_pump_savings(
 )
 }
 \arguments{
-\item{ber}{old ber kWh/m2/year}
+\item{hli}{current HLI}
 
-\item{tech_old}{new ber kWh/m2/year}
+\item{tech_old}{current tech}
 
 \item{installation_time}{year of installation of old tech}
 
 \item{house_type}{seai house type}
+
+\item{storeys}{1 or 2+}
 
 \item{construction_year}{integer}
 
@@ -47,9 +50,9 @@ This function is used in update_agents to determine the system choice when curre
 }
 \examples{
 params <- scenario_params(sD,2025)
-heat_pump_savings(120,"gas",2010,"detached",1995,"Munster",120,params)
+heat_pump_savings(4,"gas",2010,"detached",2,1995,"Munster",120,params)
 params$beta. <- 1
-heat_pump_savings(400,"gas",2010,"detached",1995,"Munster",120,params)
+heat_pump_savings(3,"solid_fuel",2010,"detached",2,1995,"Munster",100,params)
 
-heat_pump_savings(400,"heat_pump",2010,"detached",1995,"Munster",120,params)
+heat_pump_savings(4,"heat_pump",2010,"detached",2,1995,"Munster",120,params)
 }

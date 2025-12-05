@@ -18,6 +18,8 @@
 #weibull_params <- readr::read_csv("inst/extdata/weibull_params.csv")
 #tech_failure_params <- readr::read_csv("inst/extdata/tech_failure_parameters.csv")
 #seai_grants_average <- readr::read_csv("inst/extdata/seai_grants_averaged.csv")
+#pef_electricity <- readr::read_csv("inst/extdata/primary_energy_factors_electricity_consumption_seai_2024.csv")
+#upgrade_logistic_cost_model <- readr::read_csv("inst/extdata/logistic_upgrade_cost_model_parameters.csv")
 
 #' get_ber_score
 #'
@@ -161,7 +163,6 @@ recode_ber <- function(ber_score){
 }
 
 
-
 #' recode_fuels
 #'
 #' this function recodes heating fuel types present in survey to oil,gas,electricity,heat_pump,solid_fuel. It also returns primary,secondary
@@ -232,29 +233,25 @@ recode_fuels <- function(hp_data_in){
 }
 
 
-recode_construction_year <- function(q5,house_type_region){
-
-
-}
-
 
 #' recode_survey
 #'
 #' recodes the input survey data for use in initialise_agents. The recoded features are BER, ground floor area, and gross household income.
 #'
+#' Note that this function is based on the actual survey date, taken as 2024.5
+#'
 #' @param hp_data_in input survey e.g. hp_survey_oo
-#' @param params parameter values
 #'
 #' @returns dataframe
 #' @export
 #'
 #' @examples
 #'
-#' recode_survey(hp_survey_oo,scenario_params(sD,2015)) %>% system.time()
+#' recode_survey(hp_survey_oo) #%>% system.time()
 #'
-recode_survey <- function(hp_data_in,params){
+recode_survey <- function(hp_data_in){
 
-
+  params <- scenario_params(sD,2024.5)
   hp_data_out <- hp_data_in %>% type.convert(as.is=TRUE)
   codes <- names(hp_data_out)
   #
@@ -278,6 +275,7 @@ recode_survey <- function(hp_data_in,params){
   hp_data_out <- hp_data_out %>% dplyr::mutate(q6_b=recode_ber(q6))
   #hp_new <- hp_new %>% mutate(q6=gen_ber_rating(q6))
   hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(ber=ifelse(!is.na(q6_b),gen_ber_rating(q6_b),impute_ber(q1,q2,qc2,q5,q3)))
+
   #total floor area replaces ground floor area
   hp_data_out <- hp_data_out %>% dplyr::rowwise() %>%  dplyr::mutate(floor_area=q2*impute_floor_area(q1,q2,qc2,q5,q3)) %>% dplyr::select(-q6_b)
 
@@ -290,6 +288,9 @@ recode_survey <- function(hp_data_in,params){
   #hp_data_out <- hp_data_out %>% dplyr::rowwise() %>%  dplyr::mutate(heating_requirment=ber*ground_floor_area*q2)
   #if heating installation is before construction year then set heating installation to construction year
   hp_data_out <- hp_data_out %>% dplyr::mutate(heating_install_time =ifelse(heating_install_time < construction_year,construction_year,heating_install_time))
+  #calculate hli
+  hp_data_out <- hp_data_out %>% dplyr::mutate(hli=heat_loss_indicator(ber,primary_heat,heating_install_time,params))
+
   #check fuel allowance eligibility
   hp_data_out <- hp_data_out %>% dplyr::mutate(fuel_allowance = is_eligible_fuel_allowance(actualage,income,qi))
 
@@ -351,7 +352,9 @@ impute_hh_income <- function(hp_data_in){
 #' @returns
 #' @export
 #'
-#' @examples heating_system_age(6,"oil",scenario_params(sD,2015))
+#' @examples
+#' heating_system_age(6,"oil",scenario_params(sD,2015))
+#'
 heating_system_age <- function(q7,tech,params){
 
   l <- list(1,2,c(3,5),c(6,10),c(11,20),c(21,50),c(5,50))[[q7]]
@@ -638,7 +641,7 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
 
 #' space_heating_requirement
 #'
-#' This function calculates the annual space heating requirement from ber rating and floor area. A rebound effect is include.
+#' This function calculates the annual space heating requirement from hli and floor area. Optionally, a rebound effect is included.
 #'
 #' The ber rating includes contributions from hot water heating and lighting. Standard of these components are removed. For A rated
 #' houses space heating energy rating is set to 15.
@@ -648,7 +651,7 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
 #' @param rebound rebound parameter default 0.3.
 #' @param params parameters
 #'
-#' @returns heating requirement in kWh/m2/year
+#' @returns heating requirement in kWh/year
 #' @export
 #'
 #' @examples
@@ -656,7 +659,7 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
 #' space_heating_requirement(400,100,0,params)
 #'
 #' space_heating_requirement(100,200,0.5,params)
-space_heating_requirement <- function(ber,floor_area,rebound=0.5,params) {
+space_heating_requirement2 <- function(ber,floor_area,rebound=0.5,params) {
 
   #offset <- params$q_passive +params$q_hotwater+params$q_lighting #minimum possible
   ber_heat <- pmax(params$q_passive,ber-params$q_hotwater-params$q_lighting) #minimum heating requirement is q_passive
@@ -665,6 +668,33 @@ space_heating_requirement <- function(ber,floor_area,rebound=0.5,params) {
   ber_heat*floor_area %>% return()
 }
 
+
+#' space_heating_requirement
+#'
+#' annual space heating energy requirement in kWh based on building HLI.
+#'
+#' requirement is reduced if rebound > 0
+#'
+#' @param hli heat loss indicator
+#' @param floor_area treated floor area
+#' @param rebound rebound 0-1
+#' @param params scenario parameters (only used for HDD in this instance)
+#'
+#' @returns kWh/m2/year
+#' @export
+#'
+#' @examples
+#'
+#' params <- scenario_params(sD,2025)
+#' space_heating_requirement2(3,100,0,params)
+#'
+space_heating_requirement <- function(hli,floor_area,rebound=0.5,params) {
+
+  sh <- hli*params$hdd*24/1000*floor_area
+  #rbound
+  sh <- ifelse(sh <= params$rebound_threshold, sh, params$rebound_threshold + (1-rebound)*(sh-params$rebound_threshold))
+  sh %>% return()
+}
 
 
 #' heating_system_size
@@ -682,7 +712,7 @@ space_heating_requirement <- function(ber,floor_area,rebound=0.5,params) {
 #'
 #' @examples
 #'
-#' sapply(seq(50,500,by=10), function(ber) heating_system_size(ber*90))
+#'
 heating_system_size <- function(annual_heating_requirement, hdd_annual=2200, coldest_day=-7,operating_hours=12, efficiency=0.9) {
 
   #average heating required per degree day
@@ -694,3 +724,124 @@ heating_system_size <- function(annual_heating_requirement, hdd_annual=2200, col
   #assume system runs for 1 hours per day on coldest days
   return(ceiling(24/operating_hours*kw_peak/efficiency))
 }
+
+#' peak_heating_demand
+#'
+#' Peak space heating demand in kW. Used to determine the installed heating technology capacity.
+#'
+#' In the past, boiler nameplate capacities were excessively high.
+#'
+#'
+#' @param hli heat loss indicator W/Cm2
+#' @param floor_area treated floor area
+#' @param coldest_day outside design temperature. Default -7, often set to -4/-2.
+#' @param size_factor a factor to reflect water heating demand and specification overcapacity
+#'
+#' @returns capacity in kW
+#' @export
+#'
+#' @examples
+#'
+#' peak_heating_demand(2.2,100)
+#'
+#'
+peak_heating_demand <- function(hli,floor_area, coldest_day = -7,size_factor = 1.3) {
+
+  #average heating required per degree day
+  peak_q <- hli*floor_area*(21-coldest_day)/1000
+  #assume system runs for 1 hours per day on coldest days
+  return(peak_q*size_factor)
+}
+
+
+#' heat_loss_indicator
+#'
+#' calculates implied heat loss indicator (HLI) in W/(m2 K) from ber. HLI is a property the building fabric *only*.
+#'
+#' the value is sensitive to the efficiency of the installed technology.
+#'
+#' @param ber building energy rating kWh/m2/year
+#' @param tech installed technology
+#' @param install_time time of installation
+#' @param params parameters
+#'
+#' @returns real valued HLI
+#' @export
+#'
+#' @examples
+#'
+#' params <- scenario_params(sD,2026)
+#' heat_loss_indicator(120,"gas",2020,params)
+#' heat_loss_indicator(200,"heat_pump",2022,params)
+#'
+heat_loss_indicator <- function(ber,tech,install_time,params) {
+  #
+  primary_heat <- pmax(params$q_passive,ber-params$q_hotwater-params$q_lighting) #minimum heating requirement is q_passive
+  #rebound effect above rebound_threshold
+  #primary_heat <- ifelse(primary_heat <= params$rebound_threshold, primary_heat, params$rebound_threshold + (1-rebound)*(primary_heat-params$rebound_threshold))
+  pef <- ifelse(tech %in% c("electricity","heat_pump"), params$pef_electricity, 1.1)
+  hli <- primary_heat*heating_system_efficiency(tech,install_time)/(params$hdd*24*pef)*1000
+  return(hli)
+}
+
+
+#' ber_from_hli
+#'
+#' calculate the BER (kWh/m2/year) from HLI (W/Km2)
+#'
+#'
+#' @param hli heat loss indicator
+#' @param tech technology
+#' @param install_time installation time of the technology (implied efficiency)
+#' @param params scenario parameters
+#'
+#' @returns ber (kWh/m2/year)
+#' @export
+#'
+#' @examples
+#'
+#' #check reversibility
+#' params <- scenario_params(sD,2020)
+#' heat_loss_indicator(25,"heat_pump",2020,params)
+#' ber_from_hli(0.417,"heat_pump",2020,params)
+#'
+ber_from_hli <- function(hli,tech,install_time,params){
+  #
+  pef <- ifelse(tech %in% c("electricity","heat_pump"), params$pef_electricity, 1.1)
+  primary_heat <- hli*params$hdd*24*pef/(1000*heating_system_efficiency(tech,install_time))
+  ber <- ifelse(primary_heat > params$q_hotwater+params$q_lighting,primary_heat+params$q_hotwater+params$q_lighting,runif(1,params$q_passive,params$q_hotwater+params$q_lighting)) #add back non-space heating contributions to BER
+  return(ber)
+
+}
+
+
+#' pef_fun
+#'
+#' Interpolated primary Energy Factor for electricity, which is a strong function of time.
+#'
+#' Projected values are used for 2030, 2040 and 2050. These are set in sD.
+#'
+#' Historical values are in
+#'
+#' @param sD scenarion data
+#' @param yeartime decimal time
+#'
+#' @returns real, PEF
+#' @export
+#'
+#' @examples
+#'
+#'
+#'
+pef_fun <- function(sD,yeartime){
+  #
+  values <- pef_electricity %>% dplyr::filter(year < 2030) %>% dplyr::pull(pef)
+  values <- c(values,sD %>% dplyr::filter(stringr::str_detect(parameter,"pef_electricity_20")) %>% dplyr::pull(value))
+  #
+  years <-  pef_electricity %>% dplyr::filter(year < 2030) %>% dplyr::pull(year)
+  years <- c(years,c(2030,2040,2050))+0.5
+  #
+  cost <- approx(x=years, y=values,xout=yeartime,rule=2)$y
+  return(cost)
+}
+

@@ -26,7 +26,7 @@ heating_system_capital_cost(
 
 \item{construction_year}{for grant eligibility}
 
-\item{grant_type}{choose "None" to exclude grant}
+\item{grant_type}{choose "None" to exclude grant e.g. because HLI > threshold}
 
 \item{params}{scenario params}
 
@@ -47,11 +47,12 @@ The current version of this function assumed that ancilliary costs are halved if
 params <- scenario_params(sD,2026)
 heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"BetterEnergyHomes",params)
 #
-heating_system_capital_cost("heat_pump",40,installation_type="new","detached",2003,"None",params)
+heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"BetterEnergyHomes",params)
 
 heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"WarmerHomes",scenario_params(sD,2026),include_vat = TRUE)
 #
-heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"OSS",scenario_params(sD,2026),include_vat = TRUE)
+heating_system_capital_cost("heat_pump",5,installation_type="new","detached",2003,"OSS",scenario_params(sD,2026),include_vat = TRUE)
 
 heating_system_capital_cost("oil",8,installation_type="new","detached",2003,"OSS",params,include_vat = TRUE)
+heating_system_capital_cost("heat_pump",5,installation_type="new","detached",2003,"None",params,include_vat = TRUE)
 }

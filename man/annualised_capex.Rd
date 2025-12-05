@@ -53,5 +53,5 @@ params <- scenario_params(sD,2026)
 annualised_capex("heat_pump",18,params$yeartime,"new","detached",2003,"None",params)
 params$beta. <- 0.5
 annualised_capex("heat_pump",18,params$yeartime,"new","detached",2003,"None",params)
-annualised_capex("heat_pump",18,params$yeartime,"new","detached",2003,"BetterEnergyHomes",params)
+annualised_capex("heat_pump",8,params$yeartime,"new","detached",2003,"BetterEnergyHomes",params)
 }

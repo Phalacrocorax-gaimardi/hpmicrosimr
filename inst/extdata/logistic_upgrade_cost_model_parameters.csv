@@ -1,0 +1,8 @@
+﻿dwelling_type,no_storeys,c_min ,c_max,h_0,k
+detached,2,45,480,2.4,2.8
+detached,1,48,525,2.55,2.9
+semi_detached,2,40,420,2.3,2.7
+semi_detached,1,42,465,2.45,2.8
+terraced,2,35,390,2.2,2.6
+terraced,1,38,427.5,2.35,2.7
+apartment,1,30,285,1.9,2.4

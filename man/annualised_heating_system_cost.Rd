@@ -5,10 +5,10 @@
 \title{annualised_heating_system_cost}
 \usage{
 annualised_heating_system_cost(
+  hli,
   tech,
   installation_time,
   installation_type = "swap",
-  ber,
   floor_area,
   house_type,
   construction_year,
@@ -18,13 +18,13 @@ annualised_heating_system_cost(
 )
 }
 \arguments{
+\item{hli}{heat loss indicator}
+
 \item{tech}{heating technology}
 
 \item{installation_time}{time heating system installed}
 
 \item{installation_type}{new or swap}
-
-\item{ber}{energy rating}
 
 \item{floor_area}{TFA}
 
@@ -39,7 +39,7 @@ annualised_heating_system_cost(
 \item{include_rebound}{default FALSE}
 }
 \description{
-annualised heating cost equal to the sum of annualised capital cost and operating cost.
+The annualised heating cost or "equivalent annual cost" equal to the sum of annualised capital cost (calculated with Weibull survival) and operating cost.
 }
 \details{
 See annualised_capex for details of present bias assumptions
@@ -47,10 +47,10 @@ See annualised_capex for details of present bias assumptions
 \examples{
 params <- scenario_params(sD,2025)
 # theoretical cost without rebound
-annualised_heating_system_cost("heat_pump",2010,"new",200,100,"semi_detached",1997,grant_type="None",params)
+annualised_heating_system_cost(2.4,"heat_pump",2010,"new",100,"semi_detached",1997,grant_type="None",params)
 # actual cost with rebound
-annualised_heating_system_cost("oil",2010,"new",200,100,"semi_detached",1997,grant_type="BetterEnergyHomes",params)
+annualised_heating_system_cost(2.4,"oil",2010,"new",100,"semi_detached",1997,grant_type="None",params)
 params$beta. <- 0.5
-annualised_heating_system_cost("heat_pump",params$yeartime,"new",200,100,"semi_detached",1997,grant_type="BetterEnergyHomes",params)
-annualised_heating_system_cost("oil",2010,"new",400,100,"semi_detached",1997,grant_type="BetterEnergyHomes",params)
+annualised_heating_system_cost(2.4,"heat_pump",2010,"new",100,"semi_detached",1997,grant_type="None",params)
+annualised_heating_system_cost(2.4,"oil",2010,"new",100,"semi_detached",1997,grant_type="BetterEnergyHomes",params)
 }

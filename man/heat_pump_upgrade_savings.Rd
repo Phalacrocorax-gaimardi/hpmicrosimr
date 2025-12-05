@@ -5,10 +5,11 @@
 \title{heat_pump_upgrade_savings}
 \usage{
 heat_pump_upgrade_savings(
-  ber_old,
+  hli_old,
   tech_old,
   installation_time,
   house_type,
+  storeys,
   construction_year,
   region,
   floor_area,
@@ -19,13 +20,15 @@ heat_pump_upgrade_savings(
 )
 }
 \arguments{
-\item{ber_old}{old ber, assumed to be the same as ber_new (no energy efficiency upgrade)}
+\item{hli_old}{starting hli}
 
 \item{tech_old}{old tech}
 
 \item{installation_time}{time of installation of old tech}
 
 \item{house_type}{seai house type}
+
+\item{storeys}{1 or 2+}
 
 \item{construction_year}{house construction year}
 
@@ -45,7 +48,7 @@ heat_pump_upgrade_savings(
 a single row dataframe
 }
 \description{
-% savings achieved by adopting a heat pump as part of an home energy upgrade, expressed relative to keeping the current technology.
+% savings achieved by adopting a heat pump as part of an home energy upgrade, expressed relative to retaining the current technology.
 }
 \details{
 If the relative gain is sufficient, a heat pump may be adopted.
@@ -53,7 +56,8 @@ If the relative gain is sufficient, a heat pump may be adopted.
 Returns the savings by switching and ber
 }
 \examples{
+
 params <- scenario_params(sD,2026)
-heat_pump_upgrade_savings(200,"gas",2000,"detached",1990,"Munster",120,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE)
+heat_pump_upgrade_savings(5,"gas",2000,"detached",2,1990,"Munster",120,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE)
 
 }

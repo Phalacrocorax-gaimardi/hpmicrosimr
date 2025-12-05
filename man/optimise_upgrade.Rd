@@ -5,10 +5,11 @@
 \title{optimise_upgrade}
 \usage{
 optimise_upgrade(
-  ber_old,
+  hli_old,
   tech_old,
   installation_time,
   house_type,
+  storeys,
   construction_year,
   region,
   floor_area,
@@ -21,13 +22,15 @@ optimise_upgrade(
 )
 }
 \arguments{
-\item{ber_old}{old ber kWh/m2/year}
+\item{hli_old}{old ber kWh/m2/year}
 
 \item{tech_old}{new ber kWh/m2/year}
 
 \item{installation_time}{year of installation of old (current) tech}
 
 \item{house_type}{seai house type}
+
+\item{storeys}{number of storeys 1, 2+}
 
 \item{construction_year}{integer}
 
@@ -51,14 +54,14 @@ optimise_upgrade(
 a
 }
 \description{
-optimise_upgrade finds the financially optimum household energy upgrade
+optimise_upgrade finds the financially optimum household energy upgrade (fabric and heating system)
 }
 \details{
 The potential new heating technologies (tech_new) considered are current tech and heat pump for all grant types.
 
 The household also considers retaining their current heating system.
 
-If fuel allowance is TRUE and the houseehold qualifies for WarmerHomes then it is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard
+If fuel allowance is TRUE and the household qualifies for WarmerHomes then it is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard.
 
 All grant_types apart from WarmerHomes requires BER optimisation.
 
@@ -68,15 +71,21 @@ Returns a 2 row dataframe with tech_new the existing tech or a heat pump. If the
 
 params <- scenario_params(sD,2026)
 
-optimise_upgrade(400,"gas",2010,"detached",2010,"Dublin",210,"power",params,TRUE,FALSE,TRUE)
+optimise_upgrade(4,"gas",2010,"detached",2,2003,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE)
 
-optimise_upgrade(200,"oil",2010,"detached",2010,"Dublin",210,"logistic",params,TRUE,FALSE,TRUE)
+optimise_upgrade(3,"gas",2010,"detached",2,2010,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE)
 
-optimise_upgrade(200,"gas",2010,"detached",2005,"Dublin",100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE)
+optimise_upgrade(2.4,"gas",2010,"detached",2,2010,"Dublin",175,"logistic",params,TRUE,FALSE,TRUE)
+
+optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
+
+optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 200,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
+
+optimise_upgrade(3,"gas",2000,"detached",2,1990,"Dublin",120,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE)
 
 #WarmerHomes
-optimise_upgrade(200,"heat_pump",2010,"detached",2005,"Dublin",100,"power",params,is_fuel_allowance=TRUE)
 
-optimise_upgrade(350,"heat_pump", 2015, "detached", 2006, "Munster", 200,"logistic",params,is_fuel_allowance=FALSE,include_rebound=FALSE)
+optimise_upgrade(4,"gas", 2015, "detached",2, 2003, "Munster", 100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
+
 
 }
