@@ -75,7 +75,7 @@
 <p>Householders face a complex decision when considering home energy upgrades. <em>hpmicrosimr</em> has a number of functions that determine the financially optimum upgrade, taking grantsinto account. The financial return must be sufficient to overcome any behavioural correction factors such as risk aversion, hassle, present bias, likely rebound etc before adoption occurs.</p>
 <p>First load in the technical and cost scenario parameters for 2026 <em>params</em>. A set of technology specific cost parameters are contained in <em>tech_parms</em> and are assumed to be fixed (apart from skilled labour cost).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">hpmicrosimr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span>
 <span><span class="va">tech_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tech_params_fun.html">tech_params_fun</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#optimise_upgrade(ber_old=180,tech_old = "oil",house_type="detached",2003,region="Munster",floor_area=100,params, is_fuel_allowance=FALSE)</span></span></code></pre></div>
@@ -85,7 +85,7 @@
 </h3>
 <p>The default cost model for energy efficiency improvements used by <em>hpmicrosimr</em> does not consider specific measures such as lift insulation, new windows etc. Instead it is based on a marginal cost model <span class="math inline">$`\frac{k_0}{BER^{\alpha}}`$</span>. This reflects the steep increase in that upgrade costs required to reach the most efficient ratings A2 etc. The resulting efficiency upgrade matrix is shown below.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">hpmicrosimr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2025</span><span class="op">)</span></span>
 <span><span class="fu">hpmicrosimr</span><span class="fu">::</span><span class="fu"><a href="reference/gen_upgrade_cost_matrix.html">gen_upgrade_cost_matrix</a></span><span class="op">(</span>house_type<span class="op">=</span><span class="st">"semi_detached"</span>,<span class="st">"Dublin"</span>,<span class="fl">120</span>,include_grant <span class="op">=</span> <span class="cn">FALSE</span>,<span class="va">params</span>,model<span class="op">=</span><span class="st">"marginal"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 16 × 17</span></span>
@@ -117,7 +117,7 @@
 </h3>
 <p>Capital costs for each technology depend on the time of installation, the system capacity (kW), whether the system replaces an earlier system of the same fuel type, etc. For example, the influence of grants is shown in the example below.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">hpmicrosimr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span>
 <span><span class="va">tech_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tech_params_fun.html">tech_params_fun</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#18kW output heat pump cost before grant</span></span>
@@ -128,7 +128,7 @@
 <span><span class="co">#&gt; [1] 9120</span></span></code></pre></div>
 <p>Annual operating costs are sensitive to BER which determines the heat requirement of the property. These depend on the current time params$yeartime but also the installation time of the system. This is because efficiency has changed significantly in the past e.g. with the introduction of condensing boilers.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">hpmicrosimr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span>
 <span><span class="va">tech_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tech_params_fun.html">tech_params_fun</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#C3 rating</span></span>
@@ -139,7 +139,7 @@
 <span><span class="co">#&gt; [1] 976</span></span></code></pre></div>
 <p>The notional operating costs calculated above assume standard heating season conditions and a fully heated property (<em>include_rebound=FALSE</em>). Operating costs calculated when households trade comfort for cost should be calculated using <em>include_rebound=TRUE</em>. Assuming a large rebound of 50% ( <em>params$r.</em>):</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">hpmicrosimr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span>
 <span><span class="va">tech_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tech_params_fun.html">tech_params_fun</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#C3 rating</span></span>
@@ -155,7 +155,7 @@
 <p>A key concept for the modelling is Effective Annual Cost (EAC). The EAC represent the annual “bill”. This includes the actual heating bill as well as the annualised capital cost of heating technology and any efficiency upgrade undertaken. For example, a heat pump is adopted if the EAC gain relative to a competing technology such as gas is sufficient. This is a complex calculation because the optimal BER upgrade for gas and heat pumps may differ. For real technologies with uncertain lifetimes, EAC declines as the lifetime of the system is approached. <em>hpmicrosimr</em> calculates EAC and expected system lifetimes using technology-specific Weibull hazard functions.</p>
 <p>Effective annual costs (EACs) of heating technologies have changed over time due higher installation (labour) costs, efficiency gains, fuel cost changes ad grants. To illustrate this, early year EACs for heat pump, gas and oil systems installed during 2010-2025 is shown below, using the <em>hpmicrosimr::annualised_heating_system_cost()</em>. The property has BER of 175kWh/m2/year in this example. The impact of the introduction of capital grants in 2018 for heat pumps is obvious. This calculation suggests that heat pumps are the lowest cost for this C1/C2 rated household but this assumes that a substantial use of night-rated electricity. The rebound effect is not included. Rebound lowers the operating cost and therefore makes heat pumps appear less attractive.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">hpmicrosimr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──</span></span>
 <span><span class="co">#&gt; ✔ dplyr     1.1.4     ✔ readr     2.1.5</span></span>
@@ -201,7 +201,7 @@
 </h2>
 <p>The example below illustrates the use of <em>initialise_agents</em>. The initial annual heating requirements for each household is calculated. The figure shows the resulting distribution of a kWh/year values with and without rebound of 30%.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">hpmicrosimr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2015</span><span class="op">)</span></span>
 <span><span class="va">agents_in</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/initialise_agents.html">initialise_agents</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2015</span>, cal_run<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
@@ -223,7 +223,7 @@
 </h2>
 <p><em>update_agents</em> is the core function that advances the system by one time step</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">hpmicrosimr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/help.html" class="external-link">help</a></span><span class="op">(</span><span class="st">"update_agents"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
