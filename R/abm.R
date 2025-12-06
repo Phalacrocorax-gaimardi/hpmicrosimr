@@ -217,7 +217,7 @@ initialise_agents <- function(sD,yeartime=2015,cal_run=10){
 #' agents_1 <- update_agents(sD,2015+1/6,agents_in,social_network,cal_run=10,quiet=FALSE)
 #' agents_2 <- update_agents(sD,2015+1/3,agents_1,social_network,cal_run=10,quiet=FALSE)
 
-update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,cal_run, quiet=TRUE){
+update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,cal_run=50, quiet=TRUE){
   #
   cost_model <- "logistic"
   #beta. <- 0.2532785
@@ -266,8 +266,8 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   hp_savings_env <- function(hli,tech, house_type,storeys, construction_year, region, floor_area) {
     heat_pump_savings(hli,tech, params$yeartime, house_type, storeys,construction_year, region, floor_area, params)
   }
-  hp_upgrade_savings_env <- function(hli,tech, house_type, storeys,construction_year, region, floor_area,fuel_allowance) {
-    heat_pump_upgrade_savings(hli,tech, params$yeartime, house_type,storeys, construction_year, region, floor_area, cost_model,params,fuel_allowance,include_grants = TRUE)
+  hp_upgrade_savings_env <- function(hli,tech, heating_install_time,house_type, storeys,construction_year, region, floor_area,fuel_allowance) {
+    heat_pump_upgrade_savings(hli,tech, heating_install_time, house_type,storeys, construction_year, region, floor_area, cost_model,params,fuel_allowance,include_grants = TRUE)
   }
 
   ########################
@@ -332,11 +332,12 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   #################################
 
   b_s2$upgrade <- TRUE
-  b_s0 <- b_s2 %>% dplyr::select(hli,tech,house_type,storeys, construction_year, region, floor_area,fuel_allowance)
+  b_s0 <- b_s2 %>% dplyr::select(hli,tech,heating_install_time,house_type,storeys, construction_year, region, floor_area,fuel_allowance)
   #df <- purrr::pmap(b_s0,optimise_heat_env)
   df <- purrr::pmap(b_s0,hp_upgrade_savings_env)
   df <- do.call(rbind,df)
   b_s2 <- b_s2 %>% dplyr::bind_cols(df)
+  b_s2 %>% dplyr::select(tech,hli,hli_stick,hli_switch,eac_stick,eac_switch,savings)
     ################################################################
     # Efficiency upgrade where there is an existing heat pump
     #################################################################
@@ -771,7 +772,7 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
   #cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r, n_heat=n_heat_pump,number_b2=n_b2, oss_cost=cost_oss,betterenergy_cost=cost_betterenergy,
   #               warmerhomes_cost=cost_warmerhomes)
   #print(cals)
-  cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r,n_heat=n_heat_pump,number_b2=n_b2,oss_total=cost_oss,warmerhomes_total=cost_warmerhomes,betterenergy_total=cost_betterenergy)
+  cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r,n_heat=n_heat_pump,number_b2=n_b2,oss_total=cost_oss,warmerhomes_total=cost_warmerhomes)#,betterenergy_total=cost_betterenergy)
   cals %>% return()
 
   #tibble::tibble(beta.=beta,lambda.=lambda,p.=p,nu.=nu,rho.=rho,delta.=delta) %>% dplyr::bind_cols(cal) %>% return()

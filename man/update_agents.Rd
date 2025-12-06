@@ -10,7 +10,7 @@ update_agents(
   agents_in,
   social_network,
   ignore_social = F,
-  cal_run,
+  cal_run = 50,
   quiet = TRUE
 )
 }

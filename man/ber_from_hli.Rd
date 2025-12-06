@@ -24,8 +24,9 @@ calculate the BER (kWh/m2/year) from HLI (W/Km2)
 \examples{
 
 #check reversibility
-params <- scenario_params(sD,2020)
+params <- scenario_params(sD,2026)
 heat_loss_indicator(25,"heat_pump",2020,params)
-ber_from_hli(0.417,"heat_pump",2020,params)
+ber_from_hli(1.21,"heat_pump",params$yeartime,params)
+ber_from_hli(1.2,"heat_pump",params$yeartime,params)
 
 }

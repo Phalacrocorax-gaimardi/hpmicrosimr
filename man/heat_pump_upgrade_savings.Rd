@@ -58,6 +58,6 @@ Returns the savings by switching and ber
 \examples{
 
 params <- scenario_params(sD,2026)
-heat_pump_upgrade_savings(5,"gas",2000,"detached",2,1990,"Munster",120,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE)
+heat_pump_upgrade_savings(1.8,"gas",2000,"semi_detached",2,1990,"Munster",106,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE)
 
 }

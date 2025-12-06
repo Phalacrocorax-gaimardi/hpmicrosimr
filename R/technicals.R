@@ -801,15 +801,17 @@ heat_loss_indicator <- function(ber,tech,install_time,params) {
 #' @examples
 #'
 #' #check reversibility
-#' params <- scenario_params(sD,2020)
+#' params <- scenario_params(sD,2026)
 #' heat_loss_indicator(25,"heat_pump",2020,params)
-#' ber_from_hli(0.417,"heat_pump",2020,params)
+#' ber_from_hli(1.21,"heat_pump",params$yeartime,params)
+#' ber_from_hli(1.2,"heat_pump",params$yeartime,params)
 #'
 ber_from_hli <- function(hli,tech,install_time,params){
   #
   pef <- ifelse(tech %in% c("electricity","heat_pump"), params$pef_electricity, 1.1)
   primary_heat <- hli*params$hdd*24*pef/(1000*heating_system_efficiency(tech,install_time))
-  ber <- ifelse(primary_heat > params$q_hotwater+params$q_lighting,primary_heat+params$q_hotwater+params$q_lighting,runif(1,params$q_passive,params$q_hotwater+params$q_lighting)) #add back non-space heating contributions to BER
+  #ber <- ifelse(primary_heat > params$q_hotwater+params$q_lighting,primary_heat+params$q_hotwater+params$q_lighting,runif(1,params$q_passive,params$q_hotwater+params$q_lighting)) #add back non-space heating contributions to BER
+  ber <- primary_heat+params$q_hotwater+params$q_lighting
   return(ber)
 
 }
