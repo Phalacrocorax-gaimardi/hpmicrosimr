@@ -47,7 +47,7 @@ See annualised_capex for details of present bias assumptions
 \examples{
 params <- scenario_params(sD,2025)
 # theoretical cost without rebound
-annualised_heating_system_cost(2.4,"heat_pump",2010,"new",100,"semi_detached",1997,grant_type="None",params)
+replicate(100,annualised_heating_system_cost(2.3,"heat_pump",params$yeartime,"new",100,"semi_detached",1997,grant_type="OSS",params)) \%>\% table()
 # actual cost with rebound
 annualised_heating_system_cost(2.4,"oil",2010,"new",100,"semi_detached",1997,grant_type="None",params)
 params$beta. <- 0.5

@@ -69,7 +69,7 @@ Returns a 2 row dataframe with tech_new the existing tech or a heat pump. If the
 
 params <- scenario_params(sD,2026)
 
-optimise_upgrade(4,"gas",2010,"detached",2,2003,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE)
+optimise_upgrade(5.4,"oil",2005,"semi_detached",2,2003,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE)
 
 optimise_upgrade(3,"gas",2010,"detached",2,2010,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE)
 

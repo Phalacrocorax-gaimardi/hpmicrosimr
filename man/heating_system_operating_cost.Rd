@@ -35,7 +35,7 @@ Also includes an annual maintenance cost.
 }
 \examples{
 params <- scenario_params(sD,2026)
-heating_system_operating_cost(2, "oil",2003,100,params)
+heating_system_operating_cost(2.3, "heat_pump",2003,100,params)
 
 heating_system_operating_cost(3,"oil",2003,100,params,include_rebound=FALSE)
 

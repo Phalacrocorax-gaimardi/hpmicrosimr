@@ -55,6 +55,6 @@ optimise_heat(2,"oil",2000,"terraced",2,1980,"Munster",90,params)
 
 params <- scenario_params(sD,2026)
 optimise_heat(4,"oil",2000,"terraced",2,1980,"Munster",90,params)
-optimise_heat(1.9,"oil",2000,"terraced",2,1980,"Munster",90,params)
+optimise_heat(5.4,"oil",2000,"terraced",2,1980,"Munster",90,params)
 
 }
