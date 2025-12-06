@@ -1,4 +1,9 @@
 url: https://phalacrocorax-gaimardi.github.io/hpmicrosimr/
-template:
-  bootstrap: 5
+destination: docs
+
+deploy:
+  provider: github
+  path: docs
+  branch: gh-pages  # or "main" if you prefer
+  cleanup: true
 
