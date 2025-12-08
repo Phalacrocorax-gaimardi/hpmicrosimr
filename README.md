@@ -1,5 +1,18 @@
 
-<img src="man/figures/UCDENERGY_STACKED_RGB_TRANS.png" align="right" height="139" />
+<div class="logo-readme">
+
+<img src="logo.png" />
+
+</div>
+
+<style>
+.logo-readme img {
+  height: 60px;
+  width: auto;
+  float: right;
+}
+</style>
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # hpmicrosimr
@@ -11,7 +24,7 @@
 
 *hpmicrosimr* is an agent-based model simulation framework describing
 home energy efficiency and heating technology system upgrades by
-$\approx 800$ Irish owner-occupier households. Typically the model is
+$`\approx 800`$ Irish owner-occupier households. Typically the model is
 initialised in 2015 and is run to 2040 or 2050. Agent characteristics
 are based on survey data collected in 2024.
 
@@ -37,17 +50,17 @@ even in cases where this offers a better financial return. Possibilities
 such as oil $`\rightarrow`$ gas are excluded as this is not an option
 for households not near the gas network.
 
-A more significant, event from the point of view of
-energy efficiency is the decision by a household to carry out a deep home
-energy efficiency retrofit (DER). The rate at which households take this
+A less common, but more significant, event from the point of view of
+energy efficiency is the decision by a household to carry out a home
+energy efficiency retrofit. The rate at which households take this
 option is set by a parameter *p.* fit from calibration to historical
-data. The household investment decision involves a choice of $HLI$
-upgrade from $HLI_{old} \rightarrow HLI_{new}$, as well as a potential
-technology change from $tech_{old} \rightarrow tech_{new}$. The
+data. The household investment decision involves a choice of $`BER`$
+upgrade from $`BER_{old} \rightarrow BER_{new}`$, as well as a potential
+technology shift from $`tech_{old} \rightarrow tech_{new}`$. The
 household may also choose to retain their current heating system. This
 choice may be advantageous if the expected residual value of the
 existing asset is high. A function **optimise_upgrade()** determines the
-optimum upgrade choice, including the effect of any currently applicable
+optimum upgrade choice, including the effect of all currently applicable
 grants.
 
 Applications of *hpmicrosimr* are to project energy efficiency outcomes
@@ -56,11 +69,9 @@ emissions, and associated cost-benefit analysis of generous incentive
 schemes.
 
 There are large behavioural preferences that influence energy efficiency
-outcomes. There is compelling evidence from the literature of “temperature
+outcomes. There is strong evidence (Coyne & Denny) of “temperature
 take-back” or rebound effects following space heating efficiency
-upgrades. *hpmicrosimr* includes a homogeneous rebound parameter $\rho$ to describe this effect. No rebound corresponds to $\rho=0$.
-
-Many home energy retrofits can be expensive and are likely to to suppressed by present bias $
+upgrades. *hpmicrosimr*
 
 A separate package *hpmicrocalibrater* is used to generate the model
 weights and thresholds and are provided in a dataset *agents_init*

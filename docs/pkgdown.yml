@@ -2,7 +2,7 @@ pandoc: 3.6.3
 pkgdown: 2.0.9
 pkgdown_sha: ~
 articles: {}
-last_built: 2025-12-08T13:11Z
+last_built: 2025-12-08T14:52Z
 urls:
   reference: https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference
   article: https://phalacrocorax-gaimardi.github.io/hpmicrosimr/articles

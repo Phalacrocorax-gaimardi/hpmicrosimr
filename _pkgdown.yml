@@ -1,9 +1,30 @@
 url: https://phalacrocorax-gaimardi.github.io/hpmicrosimr/
 destination: docs
 
+template:
+  includes:
+    in_header: |
+      <style>
+      /* Remove the broken logo class */
+      .navbar-brand .logo\\.png {
+        display: none !important;
+      }
+      /* Add logo as background image */
+      .navbar-brand {
+        background: url('logo.png') no-repeat left center;
+        background-size: 30px 30px;
+        padding-left: 40px !important;
+        min-height: 30px;
+        margin: 5px 0;
+      }
+      /* Hide the empty span */
+      .navbar-brand span {
+        display: none;
+      }
+      </style>
+
 deploy:
   provider: github
   path: docs
-  branch: gh-pages  # or "main" if you prefer
+  branch: gh-pages
   cleanup: true
-
