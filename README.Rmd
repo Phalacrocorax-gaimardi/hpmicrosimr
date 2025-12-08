@@ -1,7 +1,7 @@
 ---
 output: github_document
 ---
-
+<img src="man/figures/UCDENERGY_STACKED_RGB_TRANS.png" align="right" height="139" />
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
@@ -66,9 +66,9 @@ The default cost model for energy efficiency improvements used by *hpmicrosimr* 
 ```{r upgrade costs}
 library(hpmicrosimr)
 params <- scenario_params(sD,2025)
-hpmicrosimr::gen_upgrade_cost_matrix(house_type="semi_detached","Dublin",120,include_grant = FALSE,params,model="marginal")
+#hpmicrosimr::gen_upgrade_cost_matrix(house_type="semi_detached","Dublin",120,include_grant = FALSE,params,model="marginal")
 #optimise_upgrade(ber_old=180,tech_old = "oil",house_type="detached",2003,region="Munster",floor_area=100,params, is_fuel_allowance=FALSE)
-retrofit_cost_model_marginal(200,100,"semi_detached","Dublin",120,scenario_params(sD,2026))
+hpmicrosimr::retrofit_cost_model_logistic(4,2,"semi_detached",2,"Dublin",120,scenario_params(sD,2026))
 ```
 
 ### Heating system capital and operating costs 
@@ -91,9 +91,9 @@ library(hpmicrosimr)
 params <- scenario_params(sD,2026)
 tech_params <- tech_params_fun()
 #C3 rating
-heating_system_operating_cost(tech="oil",installation_time=2003,ber=210,floor_area=100,params,include_rebound=FALSE)
+heating_system_operating_cost(hli=4,tech="oil",installation_time=2003,floor_area=100,params,include_rebound=FALSE)
 #B1 rating
-heating_system_operating_cost(tech="oil",installation_time=2003,ber=80,floor_area=100,params,include_rebound=FALSE)
+heating_system_operating_cost(hli=2.4,tech="oil",installation_time=2003,floor_area=100,params,include_rebound=FALSE)
 ```
 
 The notional operating costs calculated above assume standard heating season conditions and a fully heated property (*include_rebound=FALSE*). Operating costs calculated when households trade comfort for cost should be calculated using *include_rebound=TRUE*. Assuming a large rebound of 50% ( *params$r.*):
@@ -103,9 +103,9 @@ library(hpmicrosimr)
 params <- scenario_params(sD,2026)
 tech_params <- tech_params_fun()
 #C3 rating
-heating_system_operating_cost(tech="oil",installation_time=2003,ber=210,floor_area=100,params,include_rebound=TRUE)
+heating_system_operating_cost(hli=4,tech="oil",installation_time=2003,floor_area=100,params,include_rebound=TRUE)
 #B2 rating
-heating_system_operating_cost(tech="oil",installation_time=2003,ber=120,floor_area=100,params,include_rebound=TRUE)
+heating_system_operating_cost(hli=2.4,tech="oil",installation_time=2003,floor_area=100,params,include_rebound=TRUE)
 ```
 
 ### Effective Annual Costs
@@ -119,13 +119,13 @@ library(tidyverse)
 eac <- tibble()
 for(year in 2010:2025){
 params <- scenario_params(sD,year)
-ber <- 175
+hli <- 3
 incl_rebound <- FALSE
-hp <- annualised_heating_system_cost("heat_pump", params$yeartime,"new",ber,100,"detached",2000,"None",params,include_rebound=incl_rebound)
-hp_grant <- annualised_heating_system_cost("heat_pump", params$yeartime,"new",ber,100,"detached",2000,"BetterEnergyHomes",params,include_rebound=incl_rebound)
-oil <- annualised_heating_system_cost("oil", params$yeartime,"new",ber,100,"detached",2000,"None",params,include_rebound=incl_rebound)
-gas <- annualised_heating_system_cost("gas", params$yeartime,"new",ber,100,"detached",2000,"None",params,include_rebound=incl_rebound)
-electric <- annualised_heating_system_cost("electricity", params$yeartime,"new",ber,100,"detached",2000,"None",params,include_rebound=incl_rebound)
+hp <- annualised_heating_system_cost(hli,"heat_pump", params$yeartime,"new",100,"detached",2000,"None",params,include_rebound=incl_rebound)
+hp_grant <- heat_pump_grant("new","detached",2000,"BetterEnergyHomes",params)
+oil <- annualised_heating_system_cost(hli,"oil", params$yeartime,"new",100,"detached",2000,"None",params,include_rebound=incl_rebound)
+gas <- annualised_heating_system_cost(hli,"gas", params$yeartime,"new",100,"detached",2000,"None",params,include_rebound=incl_rebound)
+electric <- annualised_heating_system_cost(hli,"electricity", params$yeartime,"new",100,"detached",2000,"None",params,include_rebound=incl_rebound)
 eac <- eac %>% bind_rows(tibble(year=year,hp_nogrant=hp,hp_grant=hp_grant,oil=oil,gas=gas))
 }
 eac %>% pivot_longer(cols=-year) %>% ggplot(aes(year,value,colour=name))+geom_line()
@@ -158,8 +158,8 @@ library(hpmicrosimr)
 library(ggplot2)
 params <- scenario_params(sD,2015)
 agents_in <- initialise_agents(sD,2015, cal_run=sample(1:100,1))
-heat <- agents_in %>% dplyr::rowwise() %>% dplyr::mutate(q_norebound=heating_requirement(ber,floor_area,rebound=1,params))
-heat <- heat %>% dplyr::rowwise() %>% dplyr::mutate(q_rebound=heating_requirement(ber,floor_area,rebound=0.7,params))
+heat <- agents_in %>% dplyr::rowwise() %>% dplyr::mutate(q_norebound=space_heating_requirement(hli,floor_area,rebound=1,params))
+heat <- heat %>% dplyr::rowwise() %>% dplyr::mutate(q_rebound=space_heating_requirement(ber,floor_area,rebound=0.3,params))
 heat <- heat %>% dplyr::select(serial,q_norebound,q_rebound) %>% tidyr::pivot_longer(cols=-serial)
 heat %>% dplyr::filter(value < 1e+5) %>% ggplot(aes(value,fill=name))+geom_density(alpha=0.5) #+ facet_wrap(.~name)
 

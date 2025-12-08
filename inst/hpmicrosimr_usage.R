@@ -65,6 +65,6 @@ for(i in 1:100)
 df <-  df %>% bind_rows(heating_upgrade_tensor(5.4,2.3,"oil",2005,"heat_pump","semi_detached",2,1990,"Dublin",100,cost_model="logistic",params,TRUE,FALSE,TRUE))
 
 
-x <- seq(2,0.2,by=-.05)
-y <- sapply(x, function(h) heating_upgrade_tensor(2,h,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)$new_cost)
+x <- seq(3,0.2,by=-.05)
+y <- sapply(x, function(h) heating_upgrade_tensor(1.8,h,"gas",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)$new_cost)
 plot(x,y)
