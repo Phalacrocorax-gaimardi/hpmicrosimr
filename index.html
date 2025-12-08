@@ -13,6 +13,7 @@
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Agent-based simulation of the uptake of heat pumps and energy efficiency upgrades by Irish households">
 <meta property="og:description" content="Models energy heating system and efficiency upgrades using agent-based approaches. Allows users to simulate the interactions between utilities and consumers under various tariff and technology adoption scenarios.">
+<meta property="og:image" content="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -33,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.7</span>
       </span>
     </div>
 
@@ -55,17 +56,20 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
+
+<p><img src="reference/figures/UCDENERGY_STACKED_RGB_TRANS.png" align="right" height="139"><!-- README.md is generated from README.Rmd. Please edit that file --></p>
 <div class="section level1">
 <div class="page-header"><h1 id="hpmicrosimr">hpmicrosimr<a class="anchor" aria-label="anchor" href="#hpmicrosimr"></a>
 </h1></div>
 <!-- badges: start -->
-<!-- badges: end -->
-<p><em>hpmicrosimr</em> is an agent-based model simulation framework describing home energy efficiency and heating technology system upgrades by <span class="math inline">$`\approx 800`$</span> Irish owner-occupier households. Typically the model is initialised in 2015 and is run to 2040 or 2050. Agent characteristics are based on survey data collected in 2024.</p>
-<p>This is the development version of <em>hpmicrosimr</em>. The main functionality is (1) a detailed model of financial return on household energy investments including choice of heating technology (2) an initialiser, (3) an <strong>updater</strong> and (4) runABM. Agents live on a artificial social network to allow peer effects in heat pump adoption to be described.</p>
+
+<p><em>hpmicrosimr</em> is an agent-based model simulation framework describing home energy efficiency and heating technology system upgrades by <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>800</mn></mrow><annotation encoding="application/x-tex">\approx 800</annotation></semantics></math> Irish owner-occupier households. Typically the model is initialised in 2015 and is run to 2040 or 2050. Agent characteristics are based on survey data collected in 2024.</p>
+<p>This is the development, but fully working, version of <em>hpmicrosimr</em>. The main functionality is (1) a detailed model of financial return on household energy investments including choice of heating technology (2) an initialiser, (3) an <strong>updater</strong> and (4) runABM. Agents live on a artificial social network to allow peer effects in heat pump adoption to be described.</p>
 <p>The heating systems included in the current version of <em>hpmicrosimr</em> are oil, solid_fuel, gas, electric and air source heat_pumps. There are two underlying space heating upgrade processes describe by <em>hpmicrosimr</em> at each time step. The most common event is failure and replacement of the current heating system.Failure probability is described by a Weibull distribution with technology-specific factors. The current version of <em>hpmicrosimr</em> assumes that the full heating requirement is supplied by the primary heating source. Backup secondary and tertiary heat sources do not play a role in the modelling. Agents choose between replacing the current fuel source with the same tech or adopting a heat pump. Risk aversion and “status quo bias” lowers the rate of adoption of heat pumps even in cases where this offers a better financial return. Possibilities such as oil <span class="math inline">$`\rightarrow`$</span> gas are excluded as this is not an option for households not near the gas network.</p>
-<p>A less common, but more significant, event from the point of view of energy efficiency is the decision by a household to carry out a home energy efficiency retrofit. The rate at which households take this option is set by a parameter <em>p.</em> fit from calibration to historical data. The household investment decision involves a choice of <span class="math inline">$`BER`$</span> upgrade from <span class="math inline">$`BER_{old} \rightarrow BER_{new}`$</span>, as well as a potential technology shift from <span class="math inline">$`tech_{old} \rightarrow tech_{new}`$</span>. The household may also choose to retain their current heating system. This choice may be advantageous if the expected residual value of the existing asset is high. A function <strong>optimise_upgrade()</strong> determines the optimum upgrade choice, including the effect of all currently applicable grants.</p>
+<p>A more significant, event from the point of view of energy efficiency is the decision by a household to carry out a deep home energy efficiency retrofit (DER). The rate at which households take this option is set by a parameter <em>p.</em> fit from calibration to historical data. The household investment decision involves a choice of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mi>L</mi><mi>I</mi></mrow><annotation encoding="application/x-tex">HLI</annotation></semantics></math> upgrade from <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mi>L</mi><msub><mi>I</mi><mrow><mi>o</mi><mi>l</mi><mi>d</mi></mrow></msub><mo>→</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mrow><mi>n</mi><mi>e</mi><mi>w</mi></mrow></msub></mrow><annotation encoding="application/x-tex">HLI_{old} \rightarrow HLI_{new}</annotation></semantics></math>, as well as a potential technology change from <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mi>e</mi><mi>c</mi><msub><mi>h</mi><mrow><mi>o</mi><mi>l</mi><mi>d</mi></mrow></msub><mo>→</mo><mi>t</mi><mi>e</mi><mi>c</mi><msub><mi>h</mi><mrow><mi>n</mi><mi>e</mi><mi>w</mi></mrow></msub></mrow><annotation encoding="application/x-tex">tech_{old} \rightarrow tech_{new}</annotation></semantics></math>. The household may also choose to retain their current heating system. This choice may be advantageous if the expected residual value of the existing asset is high. A function <strong>optimise_upgrade()</strong> determines the optimum upgrade choice, including the effect of any currently applicable grants.</p>
 <p>Applications of <em>hpmicrosimr</em> are to project energy efficiency outcomes based on future policy scenarios (such as WEM/WAM), impacts on CO2 emissions, and associated cost-benefit analysis of generous incentive schemes.</p>
-<p>There are large behavioural preferences that influence energy efficiency outcomes. There is strong evidence (Coyne &amp; Denny) of “temperature take-back” or rebound effects following space heating efficiency upgrades. <em>hpmicrosimr</em></p>
+<p>There are large behavioural preferences that influence energy efficiency outcomes. There is compelling evidence from the literature of “temperature take-back” or rebound effects following space heating efficiency upgrades. <em>hpmicrosimr</em> includes a homogeneous rebound parameter <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ρ</mi><annotation encoding="application/x-tex">\rho</annotation></semantics></math> to describe this effect. No rebound corresponds to <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\rho=0</annotation></semantics></math>.</p>
+<p>Many home energy retrofits can be expensive and are likely to to suppressed by present bias $</p>
 <p>A separate package <em>hpmicrocalibrater</em> is used to generate the model weights and thresholds and are provided in a dataset <em>agents_init</em> attached to <em>hpmicrosimr</em>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -92,30 +96,10 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2025</span><span class="op">)</span></span>
-<span><span class="fu">hpmicrosimr</span><span class="fu">::</span><span class="fu"><a href="reference/gen_upgrade_cost_matrix.html">gen_upgrade_cost_matrix</a></span><span class="op">(</span>house_type<span class="op">=</span><span class="st">"semi_detached"</span>,<span class="st">"Dublin"</span>,<span class="fl">120</span>,include_grant <span class="op">=</span> <span class="cn">FALSE</span>,<span class="va">params</span>,model<span class="op">=</span><span class="st">"marginal"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 16 × 17</span></span>
-<span><span class="co">#&gt;    ber_old      A     A1     A2     A3     B1     B2     B3     C1     C2     C3</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 A       3.18e3 0      0      0      0          0      0      0      0      0 </span></span>
-<span><span class="co">#&gt;  2 A1      2.20e4 2.91e3 0      0      0          0      0      0      0      0 </span></span>
-<span><span class="co">#&gt;  3 A2      4.23e4 2.02e4 3.30e3 0      0          0      0      0      0      0 </span></span>
-<span><span class="co">#&gt;  4 A3      5.97e4 3.76e4 1.74e4 2.37e3 0          0      0      0      0      0 </span></span>
-<span><span class="co">#&gt;  5 B1      7.29e4 5.09e4 3.07e4 1.33e4 1.90e3     0      0      0      0      0 </span></span>
-<span><span class="co">#&gt;  6 B2      8.39e4 6.18e4 4.16e4 2.42e4 1.10e4  1616.     0      0      0      0 </span></span>
-<span><span class="co">#&gt;  7 B3      9.33e4 7.13e4 5.11e4 3.37e4 2.04e4  9450.  1417.     0      0      0 </span></span>
-<span><span class="co">#&gt;  8 C1      1.02e5 7.97e4 5.94e4 4.20e4 2.88e4 17828.  8378.  1269.     0      0 </span></span>
-<span><span class="co">#&gt;  9 C2      1.09e5 8.72e4 6.70e4 4.96e4 3.63e4 25394. 15944.  7566.  1155.     0 </span></span>
-<span><span class="co">#&gt; 10 C3      1.16e5 9.42e4 7.39e4 5.65e4 4.33e4 32321. 22870. 14493.  6927.  1064.</span></span>
-<span><span class="co">#&gt; 11 D1      1.24e5 1.02e5 8.15e4 6.41e4 5.09e4 39938. 30488. 22110. 14544.  7618.</span></span>
-<span><span class="co">#&gt; 12 D2      1.33e5 1.10e5 9.02e4 7.29e4 5.96e4 48644. 39194. 30816. 23250. 16323.</span></span>
-<span><span class="co">#&gt; 13 E1      1.41e5 1.19e5 9.87e4 8.13e4 6.81e4 57126. 47675. 39298. 31732. 24805.</span></span>
-<span><span class="co">#&gt; 14 E2      1.49e5 1.27e5 1.07e5 8.91e4 7.59e4 64930. 55480. 47102. 39536. 32609.</span></span>
-<span><span class="co">#&gt; 15 F       1.59e5 1.37e5 1.16e5 9.89e4 8.57e4 74735. 65284. 56907. 49341. 42414.</span></span>
-<span><span class="co">#&gt; 16 G       1.76e5 1.54e5 1.34e5 1.16e5 1.03e5 91955. 82505. 74127. 66561. 59635.</span></span>
-<span><span class="co">#&gt; # ℹ 6 more variables: D1 &lt;dbl&gt;, D2 &lt;dbl&gt;, E1 &lt;dbl&gt;, E2 &lt;dbl&gt;, F &lt;dbl&gt;, G &lt;dbl&gt;</span></span>
+<span><span class="co">#hpmicrosimr::gen_upgrade_cost_matrix(house_type="semi_detached","Dublin",120,include_grant = FALSE,params,model="marginal")</span></span>
 <span><span class="co">#optimise_upgrade(ber_old=180,tech_old = "oil",house_type="detached",2003,region="Munster",floor_area=100,params, is_fuel_allowance=FALSE)</span></span>
-<span><span class="fu">retrofit_cost_model_marginal</span><span class="op">(</span><span class="fl">200</span>,<span class="fl">100</span>,<span class="st">"semi_detached"</span>,<span class="st">"Dublin"</span>,<span class="fl">120</span>,<span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 34535.57</span></span></code></pre></div>
+<span><span class="fu">hpmicrosimr</span><span class="fu">::</span><span class="fu"><a href="reference/retrofit_cost_model_logistic.html">retrofit_cost_model_logistic</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">2</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="st">"Dublin"</span>,<span class="fl">120</span>,<span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 37058.93</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="heating-system-capital-and-operating-costs">Heating system capital and operating costs<a class="anchor" aria-label="anchor" href="#heating-system-capital-and-operating-costs"></a>
@@ -127,65 +111,68 @@
 <span><span class="va">tech_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tech_params_fun.html">tech_params_fun</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#18kW output heat pump cost before grant</span></span>
 <span><span class="fu"><a href="reference/heating_system_capital_cost.html">heating_system_capital_cost</a></span><span class="op">(</span><span class="st">"heat_pump"</span>,kW<span class="op">=</span><span class="fl">18</span>,installation_type<span class="op">=</span><span class="st">"new"</span>,house_type<span class="op">=</span><span class="st">"detached"</span>,construction_year<span class="op">=</span><span class="fl">2000</span>,grant_type<span class="op">=</span><span class="st">"None"</span>,<span class="va">params</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 15620</span></span>
+<span><span class="co">#&gt; $cost</span></span>
+<span><span class="co">#&gt; [1] 21580</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $grant</span></span>
+<span><span class="co">#&gt; [1] 0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $cost_after_grant</span></span>
+<span><span class="co">#&gt; [1] 21580</span></span>
 <span><span class="co">#effect of grants</span></span>
 <span><span class="fu"><a href="reference/heating_system_capital_cost.html">heating_system_capital_cost</a></span><span class="op">(</span><span class="st">"heat_pump"</span>,<span class="fl">18</span>,<span class="st">"new"</span>,<span class="st">"detached"</span>,<span class="fl">2000</span>,<span class="st">"BetterEnergyHomes"</span>,<span class="va">params</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 9120</span></span></code></pre></div>
+<span><span class="co">#&gt; $cost</span></span>
+<span><span class="co">#&gt; [1] 21580</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $grant</span></span>
+<span><span class="co">#&gt; [1] 6500</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $cost_after_grant</span></span>
+<span><span class="co">#&gt; [1] 15080</span></span></code></pre></div>
 <p>Annual operating costs are sensitive to BER which determines the heat requirement of the property. These depend on the current time params$yeartime but also the installation time of the system. This is because efficiency has changed significantly in the past e.g. with the introduction of condensing boilers.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span>
 <span><span class="va">tech_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tech_params_fun.html">tech_params_fun</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#C3 rating</span></span>
-<span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,ber<span class="op">=</span><span class="fl">210</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 3532.667</span></span>
+<span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>hli<span class="op">=</span><span class="fl">4</span>,tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 4296.048</span></span>
 <span><span class="co">#B1 rating</span></span>
-<span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,ber<span class="op">=</span><span class="fl">80</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 976</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>hli<span class="op">=</span><span class="fl">2.4</span>,tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2637.629</span></span></code></pre></div>
 <p>The notional operating costs calculated above assume standard heating season conditions and a fully heated property (<em>include_rebound=FALSE</em>). Operating costs calculated when households trade comfort for cost should be calculated using <em>include_rebound=TRUE</em>. Assuming a large rebound of 50% ( <em>params$r.</em>):</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span>
 <span><span class="va">tech_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tech_params_fun.html">tech_params_fun</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#C3 rating</span></span>
-<span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,ber<span class="op">=</span><span class="fl">210</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1988.833</span></span>
+<span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>hli<span class="op">=</span><span class="fl">4</span>,tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 3055.184</span></span>
 <span><span class="co">#B2 rating</span></span>
-<span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,ber<span class="op">=</span><span class="fl">120</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1103.833</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>hli<span class="op">=</span><span class="fl">2.4</span>,tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1894.29</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="effective-annual-costs">Effective Annual Costs<a class="anchor" aria-label="anchor" href="#effective-annual-costs"></a>
 </h3>
 <p>A key concept for the modelling is Effective Annual Cost (EAC). The EAC represent the annual “bill”. This includes the actual heating bill as well as the annualised capital cost of heating technology and any efficiency upgrade undertaken. For example, a heat pump is adopted if the EAC gain relative to a competing technology such as gas is sufficient. This is a complex calculation because the optimal BER upgrade for gas and heat pumps may differ. For real technologies with uncertain lifetimes, EAC declines as the lifetime of the system is approached. <em>hpmicrosimr</em> calculates EAC and expected system lifetimes using technology-specific Weibull hazard functions.</p>
 <p>Effective annual costs (EACs) of heating technologies have changed over time due higher installation (labour) costs, efficiency gains, fuel cost changes ad grants. To illustrate this, early year EACs for heat pump, gas and oil systems installed during 2010-2025 is shown below, using the <em>hpmicrosimr::annualised_heating_system_cost()</em>. The property has BER of 175kWh/m2/year in this example. The impact of the introduction of capital grants in 2018 for heat pumps is obvious. This calculation suggests that heat pumps are the lowest cost for this C1/C2 rated household but this assumes that a substantial use of night-rated electricity. The rebound effect is not included. Rebound lowers the operating cost and therefore makes heat pumps appear less attractive.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──</span></span>
-<span><span class="co">#&gt; ✔ dplyr     1.1.4     ✔ readr     2.1.5</span></span>
-<span><span class="co">#&gt; ✔ forcats   1.0.0     ✔ stringr   1.5.1</span></span>
-<span><span class="co">#&gt; ✔ ggplot2   3.5.1     ✔ tibble    3.2.1</span></span>
-<span><span class="co">#&gt; ✔ lubridate 1.9.3     ✔ tidyr     1.3.1</span></span>
-<span><span class="co">#&gt; ✔ purrr     1.0.2     </span></span>
-<span><span class="co">#&gt; ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
-<span><span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span></span>
-<span><span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span></span>
-<span><span class="co">#&gt; ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</span></span>
-<span><span class="va">eac</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="kw">for</span><span class="op">(</span><span class="va">year</span> <span class="kw">in</span> <span class="fl">2010</span><span class="op">:</span><span class="fl">2025</span><span class="op">)</span><span class="op">{</span></span>
-<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="va">year</span><span class="op">)</span></span>
-<span><span class="va">ber</span> <span class="op">&lt;-</span> <span class="fl">175</span></span>
-<span><span class="va">incl_rebound</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
-<span><span class="va">hp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/annualised_heating_system_cost.html">annualised_heating_system_cost</a></span><span class="op">(</span><span class="st">"heat_pump"</span>, <span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="va">ber</span>,<span class="fl">100</span>,<span class="st">"detached"</span>,<span class="fl">2000</span>,<span class="st">"None"</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="va">incl_rebound</span><span class="op">)</span></span>
-<span><span class="va">hp_grant</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/annualised_heating_system_cost.html">annualised_heating_system_cost</a></span><span class="op">(</span><span class="st">"heat_pump"</span>, <span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="va">ber</span>,<span class="fl">100</span>,<span class="st">"detached"</span>,<span class="fl">2000</span>,<span class="st">"BetterEnergyHomes"</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="va">incl_rebound</span><span class="op">)</span></span>
-<span><span class="va">oil</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/annualised_heating_system_cost.html">annualised_heating_system_cost</a></span><span class="op">(</span><span class="st">"oil"</span>, <span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="va">ber</span>,<span class="fl">100</span>,<span class="st">"detached"</span>,<span class="fl">2000</span>,<span class="st">"None"</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="va">incl_rebound</span><span class="op">)</span></span>
-<span><span class="va">gas</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/annualised_heating_system_cost.html">annualised_heating_system_cost</a></span><span class="op">(</span><span class="st">"gas"</span>, <span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="va">ber</span>,<span class="fl">100</span>,<span class="st">"detached"</span>,<span class="fl">2000</span>,<span class="st">"None"</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="va">incl_rebound</span><span class="op">)</span></span>
-<span><span class="va">electric</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/annualised_heating_system_cost.html">annualised_heating_system_cost</a></span><span class="op">(</span><span class="st">"electricity"</span>, <span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="va">ber</span>,<span class="fl">100</span>,<span class="st">"detached"</span>,<span class="fl">2000</span>,<span class="st">"None"</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="va">incl_rebound</span><span class="op">)</span></span>
-<span><span class="va">eac</span> <span class="op">&lt;-</span> <span class="va">eac</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">bind_rows</span><span class="op">(</span><span class="fu">tibble</span><span class="op">(</span>year<span class="op">=</span><span class="va">year</span>,hp_nogrant<span class="op">=</span><span class="va">hp</span>,hp_grant<span class="op">=</span><span class="va">hp_grant</span>,oil<span class="op">=</span><span class="va">oil</span>,gas<span class="op">=</span><span class="va">gas</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">eac</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">pivot_longer</span><span class="op">(</span>cols<span class="op">=</span><span class="op">-</span><span class="va">year</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">year</span>,<span class="va">value</span>,colour<span class="op">=</span><span class="va">name</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-historical%20eacs-1.png" width="100%"></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.4.3</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; ✔ dplyr     1.1.4     ✔ readr     2.1.5</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; ✔ forcats   1.0.0     ✔ stringr   1.5.1</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; ✔ ggplot2   4.0.1     ✔ tibble    3.2.1</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; ✔ lubridate 1.9.3     ✔ tidyr     1.3.1</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; ✔ purrr     1.0.2     </span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</span></span></code></pre></div>
+<div class="figure">
+<img src="reference/figures/README-historical_eacs-1.png" alt="Equivalent annual cost" width="70%"><p class="caption">
+Equivalent annual cost
+</p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="optimum-upgrade">optimum upgrade<a class="anchor" aria-label="anchor" href="#optimum-upgrade"></a>
@@ -215,8 +202,8 @@
 <span><span class="co">#&gt; Joining with `by = join_by(q1)`</span></span>
 <span><span class="co">#&gt; Joining with `by = join_by(serial)`</span></span>
 <span><span class="co">#&gt; Joining with `by = join_by(qh)`</span></span>
-<span><span class="va">heat</span> <span class="op">&lt;-</span> <span class="va">agents_in</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html" class="external-link">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>q_norebound<span class="op">=</span><span class="fu">heating_requirement</span><span class="op">(</span><span class="va">ber</span>,<span class="va">floor_area</span>,rebound<span class="op">=</span><span class="fl">1</span>,<span class="va">params</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">heat</span> <span class="op">&lt;-</span> <span class="va">heat</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html" class="external-link">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>q_rebound<span class="op">=</span><span class="fu">heating_requirement</span><span class="op">(</span><span class="va">ber</span>,<span class="va">floor_area</span>,rebound<span class="op">=</span><span class="fl">0.7</span>,<span class="va">params</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">heat</span> <span class="op">&lt;-</span> <span class="va">agents_in</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html" class="external-link">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>q_norebound<span class="op">=</span><span class="fu"><a href="reference/space_heating_requirement.html">space_heating_requirement</a></span><span class="op">(</span><span class="va">hli</span>,<span class="va">floor_area</span>,rebound<span class="op">=</span><span class="fl">1</span>,<span class="va">params</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">heat</span> <span class="op">&lt;-</span> <span class="va">heat</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html" class="external-link">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>q_rebound<span class="op">=</span><span class="fu"><a href="reference/space_heating_requirement.html">space_heating_requirement</a></span><span class="op">(</span><span class="va">ber</span>,<span class="va">floor_area</span>,rebound<span class="op">=</span><span class="fl">0.3</span>,<span class="va">params</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">heat</span> <span class="op">&lt;-</span> <span class="va">heat</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">serial</span>,<span class="va">q_norebound</span>,<span class="va">q_rebound</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols<span class="op">=</span><span class="op">-</span><span class="va">serial</span><span class="op">)</span></span>
 <span><span class="va">heat</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">value</span> <span class="op">&lt;</span> <span class="fl">1e+5</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">value</span>,fill<span class="op">=</span><span class="va">name</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu">geom_density</span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span> <span class="co">#+ facet_wrap(.~name)</span></span></code></pre></div>
 <p><img src="reference/figures/README-initialiser%7D-1.png" width="100%"></p>
@@ -229,9 +216,11 @@
 <p><em>update_agents</em> is the core function that advances the system by one time step</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/help.html" class="external-link">help</a></span><span class="op">(</span><span class="st">"update_agents"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/help.html" class="external-link">help</a></span><span class="op">(</span><span class="st">"update_agents"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; starting httpd help server ... done</span></span></code></pre></div>
 </div>
 </div>
+
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -260,7 +249,12 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/Phalacrocorax-gaimardi/hpmicrosimr/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/Phalacrocorax-gaimardi/hpmicrosimr/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </div>
 </div>
