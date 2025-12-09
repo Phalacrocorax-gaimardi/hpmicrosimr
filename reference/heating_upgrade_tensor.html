@@ -3,24 +3,7 @@
 i.e. the costs and cost savings (hli_old,tech_old) -&amp;gt; (hli_new,tech_new)"><meta property="og:image" content="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/logo.png"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]--><style>
-/* Remove the broken logo class */
-.navbar-brand .logo\\.png {
-  display: none !important;
-}
-/* Add logo as background image */
-.navbar-brand {
-  background: url('logo.png') no-repeat left center;
-  background-size: 30px 30px;
-  padding-left: 40px !important;
-  min-height: 30px;
-  margin: 5px 0;
-}
-/* Hide the empty span */
-.navbar-brand span {
-  display: none;
-}
-</style></head><body data-spy="scroll" data-target="#toc">
+<![endif]--></head><body data-spy="scroll" data-target="#toc">
 
 
     <div class="container template-reference-topic">
@@ -35,7 +18,7 @@ i.e. the costs and cost savings (hli_old,tech_old) -&amp;gt; (hli_new,tech_new)"
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.9</span>
       </span>
     </div>
 
@@ -202,17 +185,23 @@ i.e. the costs and cost savings (hli_old,tech_old) -&gt; (hli_new,tech_new)</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    <span style="text-decoration: underline;">3</span>213.    <span style="text-decoration: underline;">3</span>610.  -<span style="color: #BB0000;">0.110</span>       <span style="text-decoration: underline;">32</span>179.            <span style="text-decoration: underline;">2</span>061. BetterEnergyHomes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: upgrade_grant &lt;dbl&gt;, heat_pump_grant &lt;dbl&gt;</span></span>
-<span class="r-in"><span><span class="fu">heating_upgrade_tensor</span><span class="op">(</span><span class="fl">3</span>,<span class="fl">1</span>,<span class="st">"gas"</span>,<span class="fl">2000</span>,<span class="st">"gas"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>, <span class="fl">1980</span>,<span class="st">"Dublin"</span>,<span class="fl">100</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,<span class="cn">TRUE</span>,<span class="cn">FALSE</span>,<span class="cn">TRUE</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">heating_upgrade_tensor</span><span class="op">(</span><span class="fl">4.8</span>,<span class="fl">2.3</span>,<span class="st">"gas"</span>,<span class="fl">2000</span>,<span class="st">"gas"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>, <span class="fl">1980</span>,<span class="st">"Dublin"</span>,<span class="fl">100</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,<span class="cn">TRUE</span>,<span class="cn">FALSE</span>,<span class="cn">TRUE</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   new_cost old_cost savings upgrade_cost heating_sys_cost grant_type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    <span style="text-decoration: underline;">4</span>708.    <span style="text-decoration: underline;">3</span>610.   0.304       <span style="text-decoration: underline;">92</span>514.            <span style="text-decoration: underline;">1</span>806. OSS       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   new_cost old_cost savings upgrade_cost heating_sys_cost grant_type       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    <span style="text-decoration: underline;">3</span>455.    <span style="text-decoration: underline;">5</span>697.  -<span style="color: #BB0000;">0.394</span>       <span style="text-decoration: underline;">32</span>212.            <span style="text-decoration: underline;">2</span>138. BetterEnergyHomes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: upgrade_grant &lt;dbl&gt;, heat_pump_grant &lt;dbl&gt;</span></span>
+<span class="r-in"><span><span class="fu">heating_upgrade_tensor</span><span class="op">(</span><span class="fl">4.8</span>,<span class="fl">2.3</span>,<span class="st">"gas"</span>,<span class="fl">2000</span>,<span class="st">"gas"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>, <span class="fl">1980</span>,<span class="st">"Dublin"</span>,<span class="fl">100</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,<span class="cn">TRUE</span>,<span class="cn">TRUE</span>,<span class="cn">TRUE</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   new_cost old_cost savings upgrade_cost heating_sys_cost grant_type </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    <span style="text-decoration: underline;">2</span>133.    <span style="text-decoration: underline;">5</span>697.  -<span style="color: #BB0000;">0.626</span>       <span style="text-decoration: underline;">25</span>769.            <span style="text-decoration: underline;">2</span>138. WarmerHomes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: upgrade_grant &lt;dbl&gt;, heat_pump_grant &lt;dbl&gt;</span></span>
 <span class="r-in"><span><span class="fu">heating_upgrade_tensor</span><span class="op">(</span><span class="fl">3</span>,<span class="fl">2</span>,<span class="st">"oil"</span>,<span class="fl">2000</span>,<span class="st">"heat_pump"</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>, <span class="fl">1980</span>,<span class="st">"Munster"</span>,<span class="fl">100</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,<span class="cn">TRUE</span>,<span class="cn">FALSE</span>,<span class="cn">TRUE</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   new_cost old_cost savings upgrade_cost heating_sys_cost grant_type</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    <span style="text-decoration: underline;">2</span>104.    <span style="text-decoration: underline;">3</span>282.  -<span style="color: #BB0000;">0.359</span>       <span style="text-decoration: underline;">20</span>213.           <span style="text-decoration: underline;">12</span>682. OSS       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    <span style="text-decoration: underline;">1</span>887.    <span style="text-decoration: underline;">3</span>282.  -<span style="color: #BB0000;">0.425</span>       <span style="text-decoration: underline;">20</span>213.           <span style="text-decoration: underline;">12</span>682. OSS       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: upgrade_grant &lt;dbl&gt;, heat_pump_grant &lt;dbl&gt;</span></span>
 <span class="r-in"><span><span class="fu"><a href="ber_from_hli.html">ber_from_hli</a></span><span class="op">(</span><span class="fl">1.27</span>,<span class="st">"gas"</span>,<span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="va">params</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 119.8083</span>
