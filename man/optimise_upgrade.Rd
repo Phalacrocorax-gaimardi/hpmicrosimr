@@ -60,8 +60,7 @@ optimise_upgrade finds the financially optimum household energy efficiency upgra
 The potential new heating technologies (tech_new) considered are current tech and a heat pump. Choices such as gas to oil are not considered,
 
 If fuel_allowance is TRUE and the household qualifies for WarmerHomes. It is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard.
-
-All grant_types apart from WarmerHomes requires BER optimisation.
+Therefore WarmerHomes does not requires BER optimisation.
 
 Returns a 2 row dataframe with tech_new the existing tech or a heat pump. If the existing tech is a heat pump, reversion to gas is also evaluated.
 }
@@ -82,11 +81,11 @@ optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 100,"logistic",
 
 optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 200,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
 
-optimise_upgrade(3,"gas",2000,"detached",2,1990,"Dublin",120,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE)
+optimise_upgrade(1.8,"gas",2000,"detached",2,1990,"Munster",100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE)
 
 #WarmerHomes
 
-optimise_upgrade(1.8,"gas", 2000, "detached",2, 2003, "Munster", 100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
-
+optimise_upgrade(4.8,"gas", 2000, "detached",2, 2003, "Munster", 100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
+optimise_upgrade(4.8,"gas", 2000, "detached",2, 2003, "Munster", 100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
 
 }

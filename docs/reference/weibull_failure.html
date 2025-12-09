@@ -3,24 +3,7 @@
 Use in update_agents() to model failure and replacement of heating systems according to a weibull failure model"><meta property="og:image" content="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/logo.png"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]--><style>
-/* Remove the broken logo class */
-.navbar-brand .logo\\.png {
-  display: none !important;
-}
-/* Add logo as background image */
-.navbar-brand {
-  background: url('logo.png') no-repeat left center;
-  background-size: 30px 30px;
-  padding-left: 40px !important;
-  min-height: 30px;
-  margin: 5px 0;
-}
-/* Hide the empty span */
-.navbar-brand span {
-  display: none;
-}
-</style></head><body data-spy="scroll" data-target="#toc">
+<![endif]--></head><body data-spy="scroll" data-target="#toc">
     
 
     <div class="container template-reference-topic">
@@ -35,7 +18,7 @@ Use in update_agents() to model failure and replacement of heating systems accor
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.82</span>
       </span>
     </div>
 
@@ -96,7 +79,7 @@ Use in update_agents() to model failure and replacement of heating systems accor
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span><span class="fl">1000</span>,<span class="fu">weibull_failure</span><span class="op">(</span><span class="fl">2010</span>,<span class="fl">2015</span>,<span class="fl">2016</span>,<span class="st">"oil"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> .</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> FALSE  TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   979    21 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   975    25 </span>
 </code></pre></div>
     </div>
   </div>

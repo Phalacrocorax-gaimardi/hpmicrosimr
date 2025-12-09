@@ -46,7 +46,7 @@ The current version of this function assumed that ancilliary costs are halved if
 \examples{
 params <- scenario_params(sD,2026)
 replicate(100,heating_system_capital_cost("heat_pump",13,installation_type="new","detached",2003,"OSS",params)$cost_after_grant) \%>\% table()
-#
+
 heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"BetterEnergyHomes",params)
 
 heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"WarmerHomes",scenario_params(sD,2026),include_vat = TRUE)

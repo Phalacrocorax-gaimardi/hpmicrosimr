@@ -83,6 +83,9 @@ scenario_params <- function(sD,yeartime){
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="oss_introduction",  value=dplyr::filter(sD, parameter=="oss_introduction")$value))
 
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hli_heat_pump_threshold",  value=dplyr::filter(sD, parameter=="hli_heat_pump_threshold")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_cost_scale",  value=dplyr::filter(sD, parameter=="warmer_homes_cost_scale")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_heat_pump",  value=dplyr::filter(sD, parameter=="warmer_homes_heat_pump")$value))
+
 
   #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="evening_tariff", value =  evening_tariff_fun(sD,yeartime)))
   #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="night_tariff", value =  night_tariff_fun(sD,yeartime)))
@@ -767,12 +770,17 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
   cost_warmerhomes <- cal2 %>% dplyr::filter(grant_type=="WarmerHomes") %>% dplyr::pull(grant)/1e+6
   cost_oss <- cal2 %>% dplyr::filter(grant_type=="OSS") %>% dplyr::pull(grant)/1e+6
   cost_betterenergy <- cal2 %>% dplyr::filter(grant_type=="BetterEnergyHomes") %>% dplyr::pull(grant)/1e+6
-  print(cost_betterenergy)
-  #print(paste("n_heat=",n_heat_pump))
+  print(paste("cost BetterEnergy",cost_betterenergy))
+  print(paste("cost WarmerHomes",cost_warmerhomes))
+  print(paste("cost OSS",cost_oss))
+  print(paste("n_heat=",n_heat_pump))
+  print(paste("number_b2=",n_b2))
   #cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r, n_heat=n_heat_pump,number_b2=n_b2, oss_cost=cost_oss,betterenergy_cost=cost_betterenergy,
   #               warmerhomes_cost=cost_warmerhomes)
   #print(cals)
   cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r,n_heat=n_heat_pump,number_b2=n_b2,oss_total=cost_oss,warmerhomes_total=cost_warmerhomes)#,betterenergy_total=cost_betterenergy)
+  #print(cals)
+  #print(cals %>% dplyr::bind_cols(tibble::tibble(betterenergy_cost=cost_betterenergy)))
   cals %>% return()
 
   #tibble::tibble(beta.=beta,lambda.=lambda,p.=p,nu.=nu,rho.=rho,delta.=delta) %>% dplyr::bind_cols(cal) %>% return()

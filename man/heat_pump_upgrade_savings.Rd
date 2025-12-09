@@ -48,16 +48,18 @@ heat_pump_upgrade_savings(
 a single row dataframe
 }
 \description{
-% savings achieved by adopting a heat pump as part of an home energy upgrade, expressed relative to retaining the current technology.
+% annual equivalent savings achieved by adopting a heat pump as part of an home energy upgrade, expressed relative to retaining the current technology.
 }
 \details{
 If the relative gain is sufficient, a heat pump may be adopted.
 
-Returns the savings by switching and ber
+Returns the savings by switching and ber.
+
+For WarmerHomes, it is assumed that pre-2025 retrofits "stick" to current heating technology. Post-2025 the cost optimal choice is made.
 }
 \examples{
 
 params <- scenario_params(sD,2026)
-heat_pump_upgrade_savings(1.8,"gas",2000,"semi_detached",2,1990,"Munster",106,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE)
+heat_pump_upgrade_savings(2.5,"gas",2000,"semi_detached",2,1990,"Munster",106,"logistic",params,is_fuel_allowance=TRUE,include_grants=TRUE)
 
 }

@@ -46,7 +46,7 @@ crf <- function(r,term){
 #' @examples
 #' params <- scenario_params(sD,2026)
 #' replicate(100,heating_system_capital_cost("heat_pump",13,installation_type="new","detached",2003,"OSS",params)$cost_after_grant) %>% table()
-#' #
+#'
 #' heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"BetterEnergyHomes",params)
 #'
 #' heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"WarmerHomes",scenario_params(sD,2026),include_vat = TRUE)
@@ -524,7 +524,9 @@ gen_upgrade_cost_matrix <- function(house_type,storeys,region="Dublin",floor_are
 #'
 #' heating_upgrade_tensor(2,1.2,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
 #' heating_upgrade_tensor(3,2,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
-#' heating_upgrade_tensor(3,1,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
+#' heating_upgrade_tensor(4.8,2.3,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
+#' heating_upgrade_tensor(4.8,2.3,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,TRUE,TRUE,include_rebound=FALSE)
+
 #' heating_upgrade_tensor(3,2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
 #' ber_from_hli(1.27,"gas",params$yeartime,params)
 
@@ -620,8 +622,7 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
 #' The potential new heating technologies (tech_new) considered are current tech and a heat pump. Choices such as gas to oil are not considered,
 #'
 #' If fuel_allowance is TRUE and the household qualifies for WarmerHomes. It is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard.
-#'
-#' All grant_types apart from WarmerHomes requires BER optimisation.
+#' Therefore WarmerHomes does not requires BER optimisation.
 #'
 #' Returns a 2 row dataframe with tech_new the existing tech or a heat pump. If the existing tech is a heat pump, reversion to gas is also evaluated.
 #'
@@ -660,12 +661,12 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
 #'
 #' optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 200,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
 #'
-#' optimise_upgrade(3,"gas",2000,"detached",2,1990,"Dublin",120,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE)
+#' optimise_upgrade(1.8,"gas",2000,"detached",2,1990,"Munster",100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE)
 #'
 #' #WarmerHomes
 #'
-#' optimise_upgrade(1.8,"gas", 2000, "detached",2, 2003, "Munster", 100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
-#'
+#' optimise_upgrade(4.8,"gas", 2000, "detached",2, 2003, "Munster", 100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
+#' optimise_upgrade(4.8,"gas", 2000, "detached",2, 2003, "Munster", 100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
 #'
 optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,cost_model="logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE){
 
@@ -680,15 +681,37 @@ optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,store
   #print(grant_type)
   if(upgrade_heat){
   if(grant_type=="WarmerHomes"){
-    #WarmerHomes is assume to retain current heating system
+    ##########################################################
+    #WarmerHomes. Hit B2 with MINIMUM CAPEX expenditure
+    # optimisation is from the perspective of grant authority
+    #########################################################
     #tech_new <- ifelse(params$yeartime >= 2025,"heat_pump",tech_old)
     #df <- tibble::tibble(tech_old=tech_old,tech_new=c(tech_old,"heat_pump"), ber_old=ber_old,ber_new=120)
     df <- tibble::tibble()
     newtechs <- ifelse(tech_old=="heat_pump",list(c("heat_pump","gas")), list(c(tech_old,"heat_pump")))[[1]]
     for(tech_new in newtechs){
-     ber_new <- params$warmer_homes_target_ber
-     hli_new <- heat_loss_indicator(ber_new,tech_new,params$yeartime,params)
-     df1 <- tibble::tibble(tech_old=tech_old,tech_new = tech_new,hli_old=hli_old,hli_new=hli_new,ber_old=ber_old,ber_new =120) %>% dplyr::bind_cols(heating_upgrade_tensor(hli_old,hli_new,tech_old,installation_time,tech_new,house_type,storeys,construction_year,region,floor_area,cost_model,params,upgrade_heat,is_fuel_allowance,include_grants=TRUE))
+     #if ber_old <-
+     #ber_new <- params$warmer_homes_target_ber
+     #if a house is already well ulated it may be possible
+     #hli_new <- pmin(hli_old,heat_loss_indicator(ber_new,tech_new,params$yeartime,params))
+     #if tech_new is a heat pump require that hli_new < threshold
+     #hli_new <- ifelse(tech_new=="heat_pump",pmin(params$hli_heat_pump_threshold,hli_new),hli_new)
+     #
+     fun <- function(hli_new){
+       #capital costs only
+       kW <- peak_heating_demand(hli_new,floor_area)
+       installation_type <- ifelse(tech_old==tech_new,"swap","new")
+       heat_capex <- heating_system_capital_cost(tech_new,kW,installation_type,house_type,construction_year,"None",params)$cost
+       fabric_capex <- retrofit_cost_model(hli_old,hli_new,house_type,storeys,region,floor_area,cost_model,params)
+       heat_capex + fabric_capex
+     }
+     hli_max <- heat_loss_indicator(params$warmer_homes_target_ber,tech_new,params$yeartime,params)
+     #if tech_new is a heat pump, hli_new must be below threshold
+     hli_max <- ifelse(hli_max < params$hli_heat_pump_threshold,hli_max,params$hli_heat_pump_threshold)
+     result <- optim(par=hli_old,fn=fun,lower=0.2,upper=hli_max,method="Brent")
+     hli_new <- result$par
+     ber_new <- ber_from_hli(hli_new,tech_new,params$yeartime,params)
+     df1 <- tibble::tibble(tech_old=tech_old,tech_new = tech_new,hli_old=hli_old,hli_new=hli_new,ber_old=ber_old,ber_new =ber_new) %>% dplyr::bind_cols(heating_upgrade_tensor(hli_old,hli_new,tech_old,installation_time,tech_new,house_type,storeys,construction_year,region,floor_area,cost_model,params,upgrade_heat,is_fuel_allowance,include_grants=TRUE))
      df <- df %>% dplyr::bind_rows(df1)
     }
     #df <- df %>% dplyr::mutate(bill_savings = 100*(annualised_cost-annualised_cost_old)/annualised_cost_old)
@@ -862,11 +885,13 @@ heat_pump_savings <- function(hli,tech_old,installation_time,house_type,storeys,
 
 #' heat_pump_upgrade_savings
 #'
-#' % savings achieved by adopting a heat pump as part of an home energy upgrade, expressed relative to retaining the current technology.
+#' % annual equivalent savings achieved by adopting a heat pump as part of an home energy upgrade, expressed relative to retaining the current technology.
 #'
 #' If the relative gain is sufficient, a heat pump may be adopted.
 #'
-#' Returns the savings by switching and ber
+#' Returns the savings by switching and ber.
+#'
+#' For WarmerHomes, it is assumed that pre-2025 retrofits "stick" to current heating technology. Post-2025 the cost optimal choice is made.
 #'
 #'
 #' @param hli_old starting hli
@@ -888,12 +913,13 @@ heat_pump_savings <- function(hli,tech_old,installation_time,house_type,storeys,
 #' @examples
 #'
 #' params <- scenario_params(sD,2026)
-#' heat_pump_upgrade_savings(1.8,"gas",2000,"semi_detached",2,1990,"Munster",106,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE)
+#' heat_pump_upgrade_savings(2.5,"gas",2000,"semi_detached",2,1990,"Munster",106,"logistic",params,is_fuel_allowance=TRUE,include_grants=TRUE)
 #'
 heat_pump_upgrade_savings <-  function(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,cost_model="logistic",params,is_fuel_allowance,include_grants){
   #
   df <- optimise_upgrade(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,cost_model,params,upgrade_heat=TRUE,is_fuel_allowance,include_grants,include_rebound=FALSE)
   #
+  if(df$grant_type[1] != "WarmerHomes"){
   df_stick <- df %>% dplyr::filter(tech_new == tech_old) %>% dplyr::select(hli_new,new_cost,upgrade_cost,heating_sys_cost, grant_type,upgrade_grant, heat_pump_grant)
   df_switch <- df %>% dplyr::filter(tech_new != tech_old) %>% dplyr::select(hli_new,new_cost,upgrade_cost,heating_sys_cost, grant_type,upgrade_grant, heat_pump_grant)
   df_stick <- df_stick %>% dplyr::rename("hli"=hli_new,"eac"=new_cost)
@@ -901,7 +927,19 @@ heat_pump_upgrade_savings <-  function(hli_old,tech_old,installation_time,house_
   df_stick <- df_stick %>% dplyr::rename_with(~ paste0(.x,"_stick"))
   df_switch <- df_switch %>% dplyr::rename_with(~ paste0(.x,"_switch"))
   df1 <- df_stick %>% dplyr::bind_cols(df_switch)
-  df1 <- df1 %>% dplyr::mutate(savings=eac_switch/eac_stick-1)
+  df1 <- df1 %>% dplyr::mutate(savings=eac_switch/eac_stick-1)}
+  else {
+    df_stick <- df %>% dplyr::filter(tech_new == tech_old) %>% dplyr::select(hli_new,new_cost,upgrade_cost,heating_sys_cost, grant_type,upgrade_grant, heat_pump_grant)
+    df_switch <- df %>% dplyr::filter(tech_new != tech_old) %>% dplyr::select(hli_new,new_cost,upgrade_cost,heating_sys_cost, grant_type,upgrade_grant, heat_pump_grant)
+    df_stick <- df_stick %>% dplyr::rename("hli"=hli_new,"eac"=new_cost)
+    df_switch <- df_switch %>% dplyr::rename("hli"=hli_new,"eac"=new_cost)
+    df_stick <- df_stick %>% dplyr::rename_with(~ paste0(.x,"_stick"))
+    df_switch <- df_switch %>% dplyr::rename_with(~ paste0(.x,"_switch"))
+    df1 <- df_stick %>% dplyr::bind_cols(df_switch)
+    #for early dates heat pumps are not used in the basis of "fabric first"
+    df1 <- df1 %>% dplyr::mutate(savings=ifelse(params$yeartime > params$warmer_homes_heat_pump,(upgrade_cost_switch+heating_sys_cost_switch)/(upgrade_cost_stick+heating_sys_cost_stick)-1,
+                                 NA))
+  }
   #df1 <- df1 %>% dplyr::rename("tech"=tech_old_stick)
   #switch_ber <- ifelse(tech_old=="heat_pump",NA,df %>% dplyr::filter(tech_old!=tech_new) %>% dplyr::pull(ber_new))
   df1 %>% return()
@@ -910,7 +948,9 @@ heat_pump_upgrade_savings <-  function(hli_old,tech_old,installation_time,house_
 
 #' grant_eligibility
 #'
-#' utility function to determine which home energy efficiency grant scheme a homeowner is or was eligible
+#' utility function to determine whether or which home energy efficiency grant scheme a homeowner is or was eligible
+#'
+#' if is_fuel_allowance is TRUE ber_old > 150 to qualifify for WarmerHomes.
 #'
 #' expressed in terms of ber_old and ber_new
 #'
@@ -984,7 +1024,10 @@ grant_eligibility <- function(ber_old, ber_new, construction_year, is_fuel_allow
 #'
 #' fabric_grant(300,100,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,"logistic",params,randomise=TRUE)
 #'
-#' fabric_grant(150,40,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,"logistic",params,randomise=TRUE)
+#' fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,"logistic",params,randomise=TRUE)
+#'
+#' fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,"logistic",params,randomise=TRUE)
+
 #'
 fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,construction_year,region,house_type,storeys,floor_area = 100,is_fuel_allowance = FALSE,cost_model="logistic",params,randomise=FALSE) {
 
@@ -1001,8 +1044,8 @@ fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,
   #print(cost_estimate)
   #in case of WarmerHomes cap grant at B2 (100)
   if(scheme0=="WarmerHomes") {
-    hli_new <- heat_loss_indicator(params$warmer_homes_target_ber,tech_new,params$yeartime,params)
-    cost_estimate <- retrofit_cost_model(hli_old,hli_new,house_type,storeys,region,floor_area,cost_model,params)
+    #inlcude an economy-of-scale discount for fabric upgrades in WarmerHomes
+    cost_estimate <- params$warmer_homes_cost_scale*cost_estimate
     return(list(scheme=scheme0,grant_value=cost_estimate,cost_estimate=cost_estimate, grant_share=1))
   }
   #if(scheme0=="WarmerHomes") return(list(scheme=scheme0,grant_value="cost")

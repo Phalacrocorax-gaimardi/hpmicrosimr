@@ -7,7 +7,7 @@
 
 <style>
 .logo-readme img {
-  height: 60px;
+  height: 120px;
   width: auto;
   float: right;
 }
@@ -20,6 +20,10 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/Phalacrocorax-gaimardi/hpmicrosimr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Phalacrocorax-gaimardi/hpmicrosimr/actions/workflows/R-CMD-check.yaml)
+[![License: Apache
+2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Data License: CC0
+1.0](https://img.shields.io/badge/Data%20License-CC0%201.0-lightgrey.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
 <!-- badges: end -->
 
 *hpmicrosimr* is an agent-based model simulation framework describing
@@ -124,10 +128,12 @@ The resulting efficiency upgrade matrix is shown below.
 ``` r
 library(hpmicrosimr)
 params <- scenario_params(sD,2025)
-#hpmicrosimr::gen_upgrade_cost_matrix(house_type="semi_detached","Dublin",120,include_grant = FALSE,params,model="marginal")
-#optimise_upgrade(ber_old=180,tech_old = "oil",house_type="detached",2003,region="Munster",floor_area=100,params, is_fuel_allowance=FALSE)
-hpmicrosimr::retrofit_cost_model_logistic(4,2,"semi_detached",2,"Dublin",120,scenario_params(sD,2026))
-#> [1] 37058.93
+#HLI upgrades from 3.3 to 2.3 (the value of params$hli_heat_pump_threshold)
+hpmicrosimr::retrofit_cost_model_logistic(3.3,2.3,"semi_detached",2,"Dublin",120,scenario_params(sD,2026))
+#> [1] 19503.48
+#HLI upgrade from 2.3 to 1.3 becomex expensive
+hpmicrosimr::retrofit_cost_model_logistic(2.3,1.3,"semi_detached",2,"Dublin",120,scenario_params(sD,2026))
+#> [1] 51356.53
 ```
 
 ### Heating system capital and operating costs
@@ -163,11 +169,12 @@ heating_system_capital_cost("heat_pump",18,"new","detached",2000,"BetterEnergyHo
 #> [1] 15080
 ```
 
-Annual operating costs are sensitive to BER which determines the heat
+Annual operating costs are sensitive to HLI which determines the heat
 requirement of the property. These depend on the current time
-params\$yeartime but also the installation time of the system. This is
-because efficiency has changed significantly in the past e.g. with the
-introduction of condensing boilers.
+params\$yeartime but also the efficieny (equivalent to the installation
+time in hpmicrosimr) of the system. This is because efficiency has
+changed significantly in the past e.g. with the introduction of
+condensing boilers.
 
 ``` r
 library(hpmicrosimr)
@@ -184,12 +191,14 @@ heating_system_operating_cost(hli=2.4,tech="oil",installation_time=2003,floor_ar
 The notional operating costs calculated above assume standard heating
 season conditions and a fully heated property (*include_rebound=FALSE*).
 Operating costs calculated when households trade comfort for cost should
-be calculated using *include_rebound=TRUE*. Assuming a large rebound of
-50% ( *params\$r.*):
+be calculated using *include_rebound=TRUE*. Assuming a default rebound
+of 50% ( *params\$r.*):
 
 ``` r
 library(hpmicrosimr)
 params <- scenario_params(sD,2026)
+print(paste("default rebound",params$rho))
+#> [1] "default rebound "
 tech_params <- tech_params_fun()
 #C3 rating
 heating_system_operating_cost(hli=4,tech="oil",installation_time=2003,floor_area=100,params,include_rebound=TRUE)
@@ -201,26 +210,27 @@ heating_system_operating_cost(hli=2.4,tech="oil",installation_time=2003,floor_ar
 
 ### Effective Annual Costs
 
-A key concept for the modelling is Effective Annual Cost (EAC). The EAC
-represent the annual “bill”. This includes the actual heating bill as
-well as the annualised capital cost of heating technology and any
-efficiency upgrade undertaken. For example, a heat pump is adopted if
-the EAC gain relative to a competing technology such as gas is
-sufficient. This is a complex calculation because the optimal BER
-upgrade for gas and heat pumps may differ. For real technologies with
-uncertain lifetimes, EAC declines as the lifetime of the system is
-approached. *hpmicrosimr* calculates EAC and expected system lifetimes
-using technology-specific Weibull hazard functions.
+A key financial concept for the modelling is Effective Annual Cost
+(EAC). The EAC is the annual “bill”. This includes the actual heating
+bill as well as an annualised capital cost of heating technology and
+fabric upgrades undertaken. For example, a heat pump is adopted if the
+EAC gain relative to a competing technology such as gas is sufficient.
+This is a complex calculation because the optimal BER upgrade for gas
+and heat pumps are not the same. For real technologies with uncertain
+lifetimes, EAC declines as the lifetime of the system is approached.
+*hpmicrosimr* calculates EAC and expected system lifetimes using a set
+of technology-specific Weibull hazard functions. The parameters of the
+failure model is contained in *tech_failure_params*.
 
-Effective annual costs (EACs) of heating technologies have changed over
-time due higher installation (labour) costs, efficiency gains, fuel cost
-changes ad grants. To illustrate this, early year EACs for heat pump,
-gas and oil systems installed during 2010-2025 is shown below, using the
-*hpmicrosimr::annualised_heating_system_cost()*. The property has BER of
-175kWh/m2/year in this example. The impact of the introduction of
-capital grants in 2018 for heat pumps is obvious. This calculation
-suggests that heat pumps are the lowest cost for this C1/C2 rated
-household but this assumes that a substantial use of night-rated
+Effective annual costs (EACs) of heating technologies are assume to
+changed over time due installation (labour) costs, efficiency gains,
+fuel cost changes and grants. To illustrate this, early year EACs for
+heat pump, gas and oil systems installed during 2010-2025 is shown
+below, using the *hpmicrosimr::annualised_heating_system_cost()*. The
+property has BER of 175kWh/m2/year in this example. The impact of the
+introduction of capital grants in 2018 for heat pumps is obvious. This
+calculation suggests that heat pumps are the lowest cost for this C1/C2
+rated household but this assumes that a substantial use of night-rated
 electricity. The rebound effect is not included. Rebound lowers the
 operating cost and therefore makes heat pumps appear less attractive.
 

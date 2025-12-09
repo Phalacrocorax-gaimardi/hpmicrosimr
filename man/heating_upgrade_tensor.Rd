@@ -86,7 +86,8 @@ heating_upgrade_tensor(2,1.2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Mun
 
 heating_upgrade_tensor(2,1.2,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
 heating_upgrade_tensor(3,2,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
-heating_upgrade_tensor(3,1,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
+heating_upgrade_tensor(4.8,2.3,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
+heating_upgrade_tensor(4.8,2.3,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,TRUE,TRUE,include_rebound=FALSE)
 heating_upgrade_tensor(3,2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
 ber_from_hli(1.27,"gas",params$yeartime,params)
 }
