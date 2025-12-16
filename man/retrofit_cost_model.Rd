@@ -42,5 +42,7 @@ energy retrofit upgrade cost model collection
 
 params <- scenario_params(sD,2026)
 retrofit_cost_model(2.8,1.8,"detached",2,"Dublin",120,"logistic",params)
+#bungalow
+retrofit_cost_model(2.8,1.8,"detached",1,"Dublin",120,"logistic",params)
 
 }

@@ -52,6 +52,6 @@ A present bias (above a capex threshold) params$beta. is included.
 params <- scenario_params(sD,2026)
 replicate(100,annualised_capex("heat_pump",13,params$yeartime,"new","detached",2003,"None",params)) \%>\% table()
 params$beta. <- 0.5
-annualised_capex("heat_pump",18,params$yeartime,"new","detached",2003,"None",params)
+annualised_capex("gas",8,params$yeartime,"new","detached",2003,"None",params)
 annualised_capex("heat_pump",8,params$yeartime,"new","detached",2003,"BetterEnergyHomes",params)
 }

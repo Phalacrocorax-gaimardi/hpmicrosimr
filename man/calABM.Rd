@@ -13,7 +13,8 @@ calABM(
   p = 0.0022,
   r = 0.04,
   beta = 0.8,
-  eta = 0.8,
+  eta = 0.02,
+  tau = 0.02,
   rho = 0.3
 )
 }
@@ -36,6 +37,8 @@ calABM(
 
 \item{eta}{OSS sludge/hassle}
 
+\item{tau}{sludge (transaction cost)}
+
 \item{rho}{rebound}
 }
 \value{
@@ -48,4 +51,8 @@ macro-calibration of hpmicrosimr
 Windows version
 
 return heat pump uptake
+}
+\examples{
+#calABM(sD,4,2,use_parallel=T,0.5,0.0022,0.05,0.7,1,0.3)
+
 }

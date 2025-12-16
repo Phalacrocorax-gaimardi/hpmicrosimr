@@ -50,9 +50,9 @@ This function is used in update_agents to determine the system choice when curre
 }
 \examples{
 params <- scenario_params(sD,2025)
-heat_pump_savings(4,"gas",2010,"detached",2,1995,"Munster",120,params)
+heat_pump_savings(2,"gas",2010,"detached",2,1995,"Munster",120,params)
 params$beta. <- 1
-heat_pump_savings(3,"solid_fuel",2010,"detached",2,1995,"Munster",100,params)
+heat_pump_savings(2,"solid_fuel",2010,"detached",2,1995,"Munster",100,params)
 
-heat_pump_savings(4,"heat_pump",2010,"detached",2,1995,"Munster",120,params)
+heat_pump_savings(2,"heat_pump",2010,"detached",2,1995,"Munster",120,params)
 }
