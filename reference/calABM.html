@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -53,7 +53,8 @@
 <span>  p <span class="op">=</span> <span class="fl">0.0022</span>,</span>
 <span>  r <span class="op">=</span> <span class="fl">0.04</span>,</span>
 <span>  beta <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span>  eta <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  eta <span class="op">=</span> <span class="fl">0.02</span>,</span>
+<span>  tau <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  rho <span class="op">=</span> <span class="fl">0.3</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -98,6 +99,10 @@
 <dd><p>OSS sludge/hassle</p></dd>
 
 
+<dt id="arg-tau">tau<a class="anchor" aria-label="anchor" href="#arg-tau"></a></dt>
+<dd><p>sludge (transaction cost)</p></dd>
+
+
 <dt id="arg-rho">rho<a class="anchor" aria-label="anchor" href="#arg-rho"></a></dt>
 <dd><p>rebound</p></dd>
 
@@ -112,6 +117,12 @@
 <p>return heat pump uptake</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#calABM(sD,4,2,use_parallel=T,0.5,0.0022,0.05,0.7,1,0.3)</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

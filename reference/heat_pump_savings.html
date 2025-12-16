@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -111,23 +111,23 @@
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2025</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">heat_pump_savings</span><span class="op">(</span><span class="fl">4</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">1995</span>,<span class="st">"Munster"</span>,<span class="fl">120</span>,<span class="va">params</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">heat_pump_savings</span><span class="op">(</span><span class="fl">2</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">1995</span>,<span class="st">"Munster"</span>,<span class="fl">120</span>,<span class="va">params</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   eac_stick eac_switch savings hp_grant_type     heat_pump_grant</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   eac_stick eac_switch savings grant_type        heat_pump_grant</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     <span style="text-decoration: underline;">4</span>140.      <span style="text-decoration: underline;">5</span>545.   0.339 BetterEnergyHomes               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      <span style="text-decoration: underline;">2</span>273       <span style="text-decoration: underline;">2</span>708   0.191 BetterEnergyHomes            <span style="text-decoration: underline;">6</span>500</span>
 <span class="r-in"><span><span class="va">params</span><span class="op">$</span><span class="va">beta.</span> <span class="op">&lt;-</span> <span class="fl">1</span></span></span>
-<span class="r-in"><span><span class="fu">heat_pump_savings</span><span class="op">(</span><span class="fl">3</span>,<span class="st">"solid_fuel"</span>,<span class="fl">2010</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">1995</span>,<span class="st">"Munster"</span>,<span class="fl">100</span>,<span class="va">params</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">heat_pump_savings</span><span class="op">(</span><span class="fl">2</span>,<span class="st">"solid_fuel"</span>,<span class="fl">2010</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">1995</span>,<span class="st">"Munster"</span>,<span class="fl">100</span>,<span class="va">params</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   eac_stick eac_switch savings hp_grant_type     heat_pump_grant</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   eac_stick eac_switch savings grant_type        heat_pump_grant</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     <span style="text-decoration: underline;">2</span>707.      <span style="text-decoration: underline;">3</span>512.   0.298 BetterEnergyHomes               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      <span style="text-decoration: underline;">1</span>884       <span style="text-decoration: underline;">2</span>188   0.161 BetterEnergyHomes            <span style="text-decoration: underline;">6</span>500</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">heat_pump_savings</span><span class="op">(</span><span class="fl">4</span>,<span class="st">"heat_pump"</span>,<span class="fl">2010</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">1995</span>,<span class="st">"Munster"</span>,<span class="fl">120</span>,<span class="va">params</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">heat_pump_savings</span><span class="op">(</span><span class="fl">2</span>,<span class="st">"heat_pump"</span>,<span class="fl">2010</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">1995</span>,<span class="st">"Munster"</span>,<span class="fl">120</span>,<span class="va">params</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   eac_stick eac_switch savings hp_grant_type     heat_pump_grant</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   eac_stick eac_switch savings grant_type        heat_pump_grant</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     <span style="text-decoration: underline;">4</span>733.      <span style="text-decoration: underline;">4</span>223.  -<span style="color: #BB0000;">0.108</span> BetterEnergyHomes               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      <span style="text-decoration: underline;">2</span>706       <span style="text-decoration: underline;">2</span>279  -<span style="color: #BB0000;">0.158</span> BetterEnergyHomes               0</span>
 </code></pre></div>
     </div>
   </div>
