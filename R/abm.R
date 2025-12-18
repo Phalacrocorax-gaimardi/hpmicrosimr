@@ -63,6 +63,7 @@ scenario_params <- function(sD,yeartime){
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="present_bias_threshold",  value=dplyr::filter(sD, parameter=="present_bias_threshold")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="rebound_threshold",  value=dplyr::filter(sD, parameter=="rebound_threshold")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_target_ber",  value=dplyr::filter(sD, parameter=="warmer_homes_target_ber")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="minimum_fabric_grant",  value=dplyr::filter(sD, parameter=="minimum_fabric_grant")$value))
 
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_labour_cost_share",  value=dplyr::filter(sD, parameter=="ber_upgrade_labour_cost_share")$value))
 
@@ -344,7 +345,7 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   ######################
   # each agent chooses between (1) optimum fabric upgrade + sticking with current heating tech
   # (2) fabric upgrade and switching to heat pump
-  # (3) ree=ject upgrade do nothing
+  # (3) reject upgrade do nothing
   ######################
 
   b_s2$upgrade <- TRUE
@@ -614,15 +615,14 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
 
 }
 
-
-
-#' calABM
+#' @title calABM
 #'
-#' macro-calibration of hpmicrosimr
-#'
-#' Windows version
-#'
-#' return heat pump uptake
+#' @description
+#' macro-calibration of hpmicrosimr. This is the Windows version.\cr
+#' \cr
+#' based on heat pump uptake, grant uptake and number of b2s on 1 nov 2025\cr
+#' \cr
+#' The output is summarised using summarise_cal()
 #'
 #' @param sD base scenario (historical)
 #' @param Nrun number of runs
@@ -641,7 +641,7 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
 #' @export
 #'
 #' @examples
-#' #calABM(sD,4,2,use_parallel=T,0.5,0.0022,0.05,0.7,1,0.3)
+#' #calABM(sD,4,2,use_parallel=T,nu=0.4,p=0.0022,r=0.035,beta=0.7,eta=0.02,tau=0.02,rho=0.3)
 #'
 calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022,r=0.04,beta=0.8,eta=0.02,tau=0.02,rho=0.3){
   #
@@ -661,7 +661,7 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
 
   lambda <- 0
   #calibration params:: MOVED TO SYSTDATA WHEN CALIBRATION COMPLETE
-  print(paste("beta.=",beta,"eta.=",eta,"p.=",p,"nu.=",nu,"rho.=",rho,"r.",r))
+  print(paste("beta.=",beta,"eta.=",eta,"p.=",p,"nu.=",nu,"tau.=",tau,"rho.=",rho,"r.",r))
   #bi-monthly runs
   Nt <- round((simulation_end-year_zero+1)*6)
   #annual runs
@@ -684,7 +684,7 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
       #create a new artificial society for each run
       #print(paste("Generating network for run",j,"...."))
       microcal_run <- sample(1:100,1)
-      u_empirical <- hp_empirical_utils %>% dplyr::filter(calibration_run==microcal_run) %>% dplyr::select(-calibration_run)
+      u_empirical <- hpmicrosimr::hp_empirical_utils %>% dplyr::filter(calibration_run==microcal_run) %>% dplyr::select(-calibration_run)
       agents_in <- initialise_agents(sD_cal,year_zero,microcal_run)
 
       if(!resample_society) social <- make_artificial_society(hp_society_oo  %>% dplyr::filter(serial %in% agents_in$serial),homophily,4.5)
@@ -718,51 +718,37 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
       agent_ts
     }
     parallel::stopCluster(cl)
+    closeAllConnections()
 
-    meta <- tibble::tibble(parameter=c("Nrun","end_year","nu.","p.","r.","beta.","eta.","rho."),value=c(Nrun,simulation_end,nu,p,r,beta,eta,rho))
-    abm <- abm %>% dplyr::mutate(date=lubridate::ymd(paste(year_zero,"-02-01",sep="")) %m+% months((t-1)*2)) %>% dplyr::arrange(simulation,date) %>% dplyr::select(-t)
-
-    print(abm)
-    housing_stock_oo <- 1147552 #2016 census
-    cal0 <- abm %>% dplyr::filter(date==lubridate::ymd("2025/11/01")) %>% dplyr::group_by(simulation) %>% dplyr::summarise(n0=dplyr::n())
-    cal <-  abm %>% dplyr::filter(date <= lubridate::ymd("2025/11/01")) %>% dplyr::group_by(simulation,date,tech) %>% dplyr::summarise(n=dplyr::n())
-    cal <- cal %>% dplyr::inner_join(cal0) %>% dplyr::mutate(n=n/n0*housing_stock_oo) %>% dplyr::select(-n0)
-    cal <- cal %>% dplyr::group_by(tech,date) %>% dplyr::summarise(n=mean(n))
+    meta <- tibble::tibble(parameter=c("Nrun","end_year","nu.","p.","r.","beta.","eta.","tau.","rho."),value=c(Nrun,simulation_end,nu,p,r,beta,eta,tau,rho))
+    abm <- abm %>% dplyr::mutate(date=lubridate::ymd(paste(year_zero,"-01-01",sep="")) %m+% months((t-1)*2)) %>% dplyr::arrange(simulation,date) %>% dplyr::select(-t)
+    cal_date <- "2025-11-01"
+    start_date <- "2025-11-01"
+    test <- summarise_abm_cal(abm,cal_date)
+    n_heat_pump <- test$tech %>% dplyr::filter(date==ymd(cal_date),tech=="heat_pump") %>% dplyr::pull(n_tech)
+    n_heat_pump_0 <- test$tech %>% dplyr::filter(date==ymd("2015-01-01"),tech=="heat_pump") %>% dplyr::pull(n_tech)
     #
-    cal1 <- abm %>% dplyr::filter(date <= lubridate::ymd("2025/11/01")) %>% dplyr::group_by(simulation,date) %>% dplyr::summarise(n_b2=sum(ber < 125))
-    cal1 <- cal1 %>% dplyr::inner_join(cal0) %>% dplyr::mutate(n_b2=n_b2/n0*housing_stock_oo) %>% dplyr::select(-n0)
-    cal1 <- cal1 %>% dplyr::group_by(date) %>% dplyr::summarise(n_b2=mean(n_b2))
+    n_oss <- test$grants %>% dplyr::filter(date==ymd(cal_date), grant_type=="OSS") %>% dplyr::pull(n_grant)
+    n_betterenergy <- test$grants %>% dplyr::filter(date==ymd(cal_date), grant_type=="BetterEnergyHomes") %>% dplyr::pull(n_grant)
+    n_warmerhomes <- test$grants %>% dplyr::filter(date==ymd(cal_date), grant_type=="WarmerHomes") %>% dplyr::pull(n_grant)
+    n_grant <- n_oss + n_warmerhomes+n_betterenergy
     #
-    #cal <-  abm %>% dplyr::filter(date <= lubridate::ymd("2025/11/01"),tech=="heat_pump", heat_pump_grant > 0) %>% dplyr::group_by(simulation,date) %>% dplyr::summarise(n=dplyr::n())
-    #cal <- cal %>% dplyr::inner_join(cal0) %>% dplyr::mutate(n=n/n0*housing_stock_oo) %>% dplyr::select(-n0)
-    #print("Cals1")
-    n_heat_pump <- cal %>% dplyr::filter(date==lubridate::ymd("2025/11/01"), tech=="heat_pump") %>% dplyr::pull(n) - cal %>% dplyr::filter(date==lubridate::ymd("2015/03/01"), tech=="heat_pump") %>% dplyr::pull(n)
-    #grant assisted heat pumps
-    n_b2 <- cal1 %>% dplyr::filter(date==lubridate::ymd("2025/11/01")) %>% dplyr::pull(n_b2) - cal1 %>% dplyr::filter(date==lubridate::ymd("2015/03/01")) %>% dplyr::pull(n_b2)
-    #grants
-    cal2 <-  abm %>% dplyr::filter(date <= lubridate::ymd("2025/11/01"), !is.na(grant_type), grant_type != "None") %>% dplyr::group_by(simulation,grant_type) %>% dplyr::summarise(grant=sum(heat_pump_grant+upgrade_grant))
-    cal2 <- cal2 %>% dplyr::inner_join(cal0) %>% dplyr::mutate(grant=grant/n0*housing_stock_oo) %>% dplyr::select(-n0)
-    cal2 <- cal2 %>% dplyr::group_by(grant_type) %>% dplyr::summarise(grant=mean(grant))
-    cost_warmerhomes <- cal2 %>% dplyr::filter(grant_type=="WarmerHomes") %>% dplyr::pull(grant)/1e+6
-    cost_oss <- cal2 %>% dplyr::filter(grant_type=="OSS") %>% dplyr::pull(grant)/1e+6
-    cost_betterenergy <- cal2 %>% dplyr::filter(grant_type=="BetterEnergyHomes") %>% dplyr::pull(grant)/1e+6
-    #print(paste("cost BetterEnergy",cost_betterenergy))
-    #print(paste("cost WarmerHomes",cost_warmerhomes))
-    #print(paste("cost OSS",cost_oss))
-    #print(paste("n_heat=",n_heat_pump))
-    #print(paste("number_b2=",n_b2))
-    #cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r, n_heat=n_heat_pump,number_b2=n_b2, oss_cost=cost_oss,betterenergy_cost=cost_betterenergy,
-    #               warmerhomes_cost=cost_warmerhomes)
-    #print(cals)
-    cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r,n_heat=n_heat_pump,number_b2=n_b2,oss_total=cost_oss,warmerhomes_total=cost_warmerhomes)#,betterenergy_total=cost_betterenergy)
+    cost_oss <- test$grants %>% dplyr::filter(date==ymd(cal_date), grant_type=="OSS") %>% dplyr::pull(grants_Meuro)
+    cost_betterenergy <- test$grants %>% dplyr::filter(date==ymd(cal_date), grant_type=="BetterEnergyHomes") %>% dplyr::pull(grants_Meuro)
+    cost_warmerhomes <- test$grants %>% dplyr::filter(date==ymd(cal_date), grant_type=="WarmerHomes") %>% dplyr::pull(grants_Meuro)
+    #
+    n_b2 <- test$efficiency %>% dplyr::filter(date==ymd(cal_date)) %>% dplyr::pull(n_b2)
+    n_b2_0 <- test$efficiency %>% dplyr::filter(date==ymd(start_date)) %>% dplyr::pull(n_b2)
+    cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r)
+    cals <- cals %>% dplyr::bind_cols(tibble(n_heat=n_heat_pump-n_heat_pump_0,number_b2=n_b2,
+                                             oss_total=cost_oss,warmerhomes_total=cost_warmerhomes,betterenergy_total=cost_betterenergy,
+                                              n_oss = n_oss,n_warmerhomes=n_warmerhomes,n_betterenergy=n_betterenergy))
     #print(cals)
     #print(cals %>% dplyr::bind_cols(tibble::tibble(betterenergy_cost=cost_betterenergy)))
-    #closeAllConnections()
-    return(cals)
-
-    #return(list("abm"=abm,"scenario"=sD,"system"=meta))
-  }
-  print("DEBUG: We left the parallel block without returning!")
+    closeAllConnections()
+    cals %>% return()
+    }
+  #print("DEBUG: We left the parallel block without returning!")
   #don't use parallel
   #comment in next two lines for parallel
   if(!use_parallel){

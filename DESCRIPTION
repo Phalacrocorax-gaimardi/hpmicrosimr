@@ -1,15 +1,15 @@
 Package: hpmicrosimr
 Type: Package
-Title: Agent-based simulation of the uptake of heat pumps and energy efficiency upgrades by Irish households
-Version: 0.2.0
+Title: Agent-based simulation of the uptake of heat pumps and energy efficiency upgrades by households
+Version: 0.2.1
 Authors@R: c(
-    person("Na", "Li", email = "na.li1@ucd.ie", role = c("aut","ctb")),
-    person("Lisa", "Ryan", email = "lisa.ryan@ucd.ie", role = c("ctb")),
+    person("Na", "Li", email = "na.li1@ucd.ie", role = c("aut","ctb"),comment= c(ORCID ="0009-0002-9491-8076") ),
+    person("Lisa", "Ryan", email = "lisa.ryan@ucd.ie", role = c("ctb"),comment= c(ORCID ="0000-0002-6097-7900")),
     person("Joseph", "Wheatley", email = "joe.wheatley@ucd.ie", role = c("aut", "cre"),
     comment= c(ORCID = "0000-0001-5932-1683") )
     )
 Maintainer: Joseph Wheatley <joe.wheatley@ucd.ie>
-Description: Models energy heating system and efficiency upgrades using agent-based approaches. Allows users to simulate the interactions between utilities and consumers under various tariff and technology adoption scenarios.
+Description: Models energy heating system and efficiency upgrades using agent-based model. Agents optimise their utility including financial return and the effects of disruption,time preferences and other barriers.
 License: Apache License (>= 2)
 Encoding: UTF-8
 LazyData: true

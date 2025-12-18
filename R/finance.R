@@ -2,7 +2,6 @@
 #params <- scenario_params(sD,2026)
 #tech_params <- tech_params_fun()
 
-
 # finance functions for hpmicrosimr
 #
 #' crf
@@ -993,11 +992,10 @@ grant_eligibility <- function(ber_old, ber_new, construction_year, is_fuel_allow
 
 #' fabric_grant
 #'
-#' find the grant amount available from SEAI for energy efficiency upgrades. This function *excludes* grants for heat pumps and associated works.
-#'
-#' The fabric grant is expressed in terms of ber_old and ber_new. HLI values are calculated
-#'
-#' the fabric grant depends on eligility for OSS and therefore on ber scores and uplift. This means that it depends also on tech_old and tech_new.
+#' \emph{fabric_grant} finds the grant amount available from SEAI for building fabric energy efficiency upgrades. This function \emph{excludes} grants for heat pumps and associated works.
+#' The fabric grant is expressed in terms of ber_old and ber_new. HLI values are calculated.
+#' the fabric grant depends on eligility for OSS and therefore on ber scores and uplift. This means that it depends also on tech_old and tech_new. A minimum
+#' fabric upgrdae grant of euro700 applies.
 #'
 #' @param ber_old old hli, double
 #' @param ber_new new hli, double
@@ -1030,6 +1028,9 @@ grant_eligibility <- function(ber_old, ber_new, construction_year, is_fuel_allow
 #'
 #' fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,"logistic",params,randomise=TRUE)
 #'
+#' fabric_grant(300,280,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,"logistic",params,randomise=TRUE)
+#'
+
 fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,construction_year,region,house_type,storeys,floor_area = 100,is_fuel_allowance = FALSE,cost_model="logistic",params,randomise=FALSE) {
 
   #Input validation with more informative messages
@@ -1039,7 +1040,8 @@ fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,
   hli_new <- heat_loss_indicator(ber_new,tech_new,params$yeartime,params)
   cost_estimate <- retrofit_cost_model(hli_old,hli_new,house_type,storeys,region,floor_area,cost_model,params)
   scheme0 <- grant_eligibility(ber_old,ber_new,construction_year,is_fuel_allowance,params)
-  #(print(scheme0)
+
+  if(cost_estimate < params$minimum_fabric_grant) scheme0 <- "None"
   if(scheme0=="None") return(list(scheme=scheme0,grant_value=0,cost_estimate=cost_estimate, grant_share=0))
   #if(scheme0=="None") return(list(scheme=scheme0,grant_value=0)
   #print(cost_estimate)

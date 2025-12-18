@@ -45,14 +45,13 @@ calABM(
 calibration run data
 }
 \description{
-macro-calibration of hpmicrosimr
-}
-\details{
-Windows version
-
-return heat pump uptake
+macro-calibration of hpmicrosimr. This is the Windows version.\cr
+\cr
+based on heat pump uptake, grant uptake and number of b2s on 1 nov 2025\cr
+\cr
+The output is summarised using summarise_cal()
 }
 \examples{
-#calABM(sD,4,2,use_parallel=T,0.5,0.0022,0.05,0.7,1,0.3)
+#calABM(sD,4,2,use_parallel=T,nu=0.4,p=0.0022,r=0.035,beta=0.7,eta=0.02,tau=0.02,rho=0.3)
 
 }

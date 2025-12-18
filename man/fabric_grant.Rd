@@ -54,12 +54,10 @@ fabric_grant(
 list(scheme, grant)
 }
 \description{
-find the grant amount available from SEAI for energy efficiency upgrades. This function *excludes* grants for heat pumps and associated works.
-}
-\details{
-The fabric grant is expressed in terms of ber_old and ber_new. HLI values are calculated
-
-the fabric grant depends on eligility for OSS and therefore on ber scores and uplift. This means that it depends also on tech_old and tech_new.
+\emph{fabric_grant} finds the grant amount available from SEAI for building fabric energy efficiency upgrades. This function \emph{excludes} grants for heat pumps and associated works.
+The fabric grant is expressed in terms of ber_old and ber_new. HLI values are calculated.
+the fabric grant depends on eligility for OSS and therefore on ber scores and uplift. This means that it depends also on tech_old and tech_new. A minimum
+fabric upgrdae grant of euro700 applies.
 }
 \examples{
 
@@ -73,5 +71,7 @@ fabric_grant(300,100,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,"log
 fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,"logistic",params,randomise=TRUE)
 
 fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,"logistic",params,randomise=TRUE)
+
+fabric_grant(300,280,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,"logistic",params,randomise=TRUE)
 
 }
