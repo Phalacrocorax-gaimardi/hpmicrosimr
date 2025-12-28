@@ -368,8 +368,8 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
     # Efficiency upgrade where there is an existing heat pump
     #################################################################
   b_s2_hp <- b_s2 %>% dplyr::filter(tech=="heat_pump")
-  print(paste("b_s2_bp"))
-  print(b_s2_hp)
+  #print(paste("b_s2_bp"))
+  #print(b_s2_hp)
   if(nrow(b_s2_hp) == 0) b_s2_hp <- b_s2_hp %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
   if(nrow(b_s2_hp) > 0){
     b_s2_hp_switch <- b_s2_hp %>% dplyr::filter(savings > 0)
@@ -763,8 +763,8 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
                                              n_fabric_total=n_upgrade))
     #print(cals)
     #print(cals %>% dplyr::bind_cols(tibble::tibble(betterenergy_cost=cost_betterenergy)))
-    print(cals)
-    closeAllConnections()
+    #print(cals)
+    #closeAllConnections()
     #return(cals)
   }
   print("exited loop")
@@ -848,11 +848,11 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
     cost_warmerhomes <- cal2 %>% dplyr::filter(grant_type=="WarmerHomes") %>% dplyr::pull(grant)/1e+6
     cost_oss <- cal2 %>% dplyr::filter(grant_type=="OSS") %>% dplyr::pull(grant)/1e+6
     cost_betterenergy <- cal2 %>% dplyr::filter(grant_type=="BetterEnergyHomes") %>% dplyr::pull(grant)/1e+6
-    print(paste("cost BetterEnergy",cost_betterenergy))
-    print(paste("cost WarmerHomes",cost_warmerhomes))
-    print(paste("cost OSS",cost_oss))
-    print(paste("n_heat=",n_heat_pump))
-    print(paste("number_b2=",n_b2))
+    #print(paste("cost BetterEnergy",cost_betterenergy))
+    #print(paste("cost WarmerHomes",cost_warmerhomes))
+    #print(paste("cost OSS",cost_oss))
+    #print(paste("n_heat=",n_heat_pump))
+    #print(paste("number_b2=",n_b2))
     #cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r, n_heat=n_heat_pump,number_b2=n_b2, oss_cost=cost_oss,betterenergy_cost=cost_betterenergy,
     #               warmerhomes_cost=cost_warmerhomes)
     #print(cals)
@@ -889,8 +889,9 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
 #' @export
 #'
 #' @examples
+#' #test <- calABM2(sD,2,2,F)
 
-calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu,p,beta,r,eta,tau,rho){
+calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.4,p=0.004,beta=0.8,r=0.03,eta=0.03,tau=0.02,rho=0.3){
   #
   year_zero <- 2015
   simulation_end <- 2025
@@ -917,9 +918,17 @@ calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu,p,beta,r,eta
   run_simulation <- function(j) {
     # Create a new artificial society for each run
     print(paste("Generating network for run", j, "...."))
+    microcal_run <- sample(1:100,1)
+    u_empirical <- hpmicrosimr::hp_empirical_utils %>% dplyr::filter(calibration_run==microcal_run) %>% dplyr::select(-calibration_run)
+    agents_in <- initialise_agents(sD_cal,year_zero,microcal_run)
+
+
+
 
     if (!resample_society) {
-      social <- make_artificial_society(hpmicrosimr::hp_society_oo, hpmicrosimr::homophily, 5)
+      #social <- make_artificial_society(hpmicrosimr::hp_society_oo, hpmicrosimr::homophily, 5)
+      social <- make_artificial_society(hpmicrosimr::hp_society_oo %>% dplyr::filter(serial %in% agents_in$serial),hpmicrosimr::homophily,4.5)
+
     } else {
       agent_resample <- sample(1:dim(hpmicrosimr::hp_society_oo)[1], replace = TRUE)
       society_new <- society[agent_resample, ]
@@ -928,12 +937,6 @@ calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu,p,beta,r,eta
     }
 
     # Randomize ICEV emissions assignment
-    microcal_run <- sample(1:100, 1)
-    u_empirical <- hp_empirical_utils %>% dplyr::filter(calibration_run==microcal_run) %>% dplyr::select(-calibration_run)
-
-    agents_in <- initialise_agents(sD_cal, year_zero, microcal_run)
-    #agents_in$transaction <- FALSE
-
     agent_ts <- vector("list", Nt)
     agent_ts[[1]] <- agents_in  # Agent parameters with regularized weights
 
@@ -958,7 +961,9 @@ calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu,p,beta,r,eta
   number_of_cores <- parallel::detectCores() - n_unused_cores
 
   # Run simulations in parallel using mclapply
-  abm_list <- parallel::mclapply(1:Nrun, run_simulation, mc.cores = number_of_cores)
+   if(use_parallel) abm_list <- parallel::mclapply(1:Nrun, run_simulation, mc.cores = number_of_cores)
+   if(!use_parallel) abm_list <- lapply(1:Nrun, run_simulation)
+
   #closeAllConnections()
   # Combine results into a single tibble
   abm <- dplyr::bind_rows(abm_list)
@@ -1002,7 +1007,7 @@ calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu,p,beta,r,eta
   #print(cals)
   #print(cals %>% dplyr::bind_cols(tibble::tibble(betterenergy_cost=cost_betterenergy)))
   closeAllConnections()
-  return(cals)
+  return(list(parameters=cals,efficiency=efficiencies,grants=grants))
   #observations 2023 60,000 households 208 MW 2024 94,000 households 373 MW
 }
 

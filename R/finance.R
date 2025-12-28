@@ -704,10 +704,10 @@ optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,store
      hli_max <- ifelse(hli_max < params$hli_heat_pump_threshold,hli_max,params$hli_heat_pump_threshold)
      result <- optim(par=hli_old,fn=fun,lower=0.7,upper=hli_max,method="Brent")
      hli_new <- result$par
-     print(hli_new)
-     print(fun(hli_new)-params$warmer_homes_cost_cap)
-     print(result$value-fun(hli_new))
-     print(fun(hli_old)-params$warmer_homes_cost_cap)
+     #print(hli_new)
+     #print(fun(hli_new)-params$warmer_homes_cost_cap)
+     #print(result$value-fun(hli_new))
+     #print(fun(hli_old)-params$warmer_homes_cost_cap)
      if(result$value > params$warmer_homes_cost_cap & fun(hli_old) <= params$warmer_homes_cost_cap){
      #back calculate
        fun1 <- function(hli) fun(hli)-params$warmer_homes_cost_cap

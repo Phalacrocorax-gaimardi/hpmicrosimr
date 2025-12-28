@@ -9,13 +9,13 @@ calABM2(
   Nrun = 4,
   n_unused_cores = 2,
   use_parallel = T,
-  nu,
-  p,
-  beta,
-  r,
-  eta,
-  tau,
-  rho
+  nu = 0.4,
+  p = 0.004,
+  beta = 0.8,
+  r = 0.03,
+  eta = 0.03,
+  tau = 0.02,
+  rho = 0.3
 )
 }
 \arguments{
@@ -45,4 +45,7 @@ calABM2(
 macro-calibration of hpmicrosimr using mclapply on linux systems\cr
 \cr
 returns the same calibration data as calABM
+}
+\examples{
+#test <- calABM2(sD,2,2,F)
 }
