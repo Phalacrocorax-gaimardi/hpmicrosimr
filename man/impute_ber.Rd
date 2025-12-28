@@ -21,7 +21,9 @@ impute_ber(house_type, q2_0, region, q5_0, q3_0)
 double, ber rating
 }
 \description{
-generate a missing Ber rating (double) based on household characteristics
+generate a missing Ber rating (double) based on household characteristics\cr
+\cr
+this current does not currently use heating tech and installation time as an input
 }
 \examples{
 impute_ber("semi-detached",2,"Dublin",4,4)

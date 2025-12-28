@@ -74,4 +74,5 @@ fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_al
 
 fabric_grant(300,280,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,"logistic",params,randomise=TRUE)
 
+fabric_grant(175,155,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,"logistic",params,randomise=TRUE)
 }

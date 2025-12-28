@@ -15,6 +15,8 @@ summarise_abm_cal(abm, cal_date = "2025-11-01")
 a list fo summary dataframes
 }
 \description{
-A function to summarise the tech and energy efficiency adoption. The summarise quantities are useful for calibration. A list of three dataframes is returned summarise by
+A function to summarise the tech and energy efficiency adoption. Used for calibration but also general summaries of uptake.\cr
+\cr
+The summarise quantities are useful for calibration. A list of three dataframes is returned summarise by
 (1) technology (2) grant totals and (c) building efficiency.
 }

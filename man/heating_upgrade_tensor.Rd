@@ -61,16 +61,15 @@ list
 }
 \description{
 This is a core function of hpmicrosimr. heating_upgrade_tensor calculates an element of the heating system upgrade cost tensor
-i.e. the costs and cost savings (relative to prebious system) for (hli_old,tech_old) -> (hli_new,tech_new)
-}
-\details{
-fabric upgrade costs are discounted with infinite lifetime based on the risk-free interest rate (params$r.)
-
+i.e. the costs and cost savings (relative to prebious system) for (hli_old,tech_old) -> (hli_new,tech_new)\cr
+\cr
+Fabric upgrade costs are discounted with infinite lifetime based on the risk-free interest rate (params$r.)\cr
+\cr
 Behavioural factors are priced at their default in *params*.
 Present bias (params$beta.) is applied to the after grant capex. A hassle disutility (params$eta) describing disruption is applied before grant capex
 A sludge disutility (params$tau.) is applied to the grant amount. These can be turned off by beta params$beta. = 1, params$eta.=0 and params$tau.=0.
-
-
+}
+\details{
 The new tech is installed at current time (params$yeartime). The old tech installation time is also specified.
 
 Eligible grants are applied by default, the effects of grants can optionally be excluded by setting include_grants=FALSE

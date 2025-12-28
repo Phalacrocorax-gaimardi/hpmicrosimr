@@ -54,14 +54,14 @@ optimise_upgrade(
 a two row dataframe. The new EAC "new_cost"
 }
 \description{
-optimise_upgrade finds the financially optimum household energy efficiency upgrade (fabric and replacement heating technology)
-}
-\details{
-The potential new heating technologies (tech_new) considered are current tech and a heat pump. Choices such as gas to oil are not considered,
-
+optimise_upgrade finds the financially optimum household energy efficiency upgrade (fabric and replacement heating technology).\cr
+\cr
+The potential new heating technologies (tech_new) considered are current tech and a heat pump. Choices such as gas to oil are not considered. This tends to lead to
+a lot of swithcing from electricity to heat_pump.\cr
+\cr
 If fuel_allowance is TRUE and the household qualifies for WarmerHomes. It is assumed that the property is upgraded to B2 (120 kWh/m2/y) standard.
-Therefore WarmerHomes does not requires BER optimisation.
-
+Therefore WarmerHomes does not requires BER optimisation. A cap of params$warmer_homes_cost_cap of 35k is currentlu implented.\cr
+\cr
 Returns a 2 row dataframe with tech_new the existing tech or a heat pump. If the existing tech is a heat pump, reversion to gas is also evaluated.
 }
 \examples{
@@ -81,11 +81,11 @@ optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 100,"logistic",
 
 optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 200,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
 
-optimise_upgrade(1.8,"gas",2000,"detached",2,1990,"Munster",100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE)
+optimise_upgrade(1.39,"gas",2020,"detached",2,1990,"Munster",100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE)
 
 #WarmerHomes
 
-optimise_upgrade(2.2,"heat_pump", 2000, "detached",2, 2003, "Munster", 100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
-optimise_upgrade(1.8,"gas", 2000, "detached",2, 2003, "Munster", 100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
+optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
+optimise_upgrade(3.8,"gas", 2003, "detached",2, 2003, "Dublin", 240,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
 
 }

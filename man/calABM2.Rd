@@ -39,8 +39,7 @@ calABM2(
 \item{delta}{finance_rate calibration parameter}
 }
 \description{
-macro-calibration of hpmicrosimr using mclapply on linux systems
-}
-\details{
+macro-calibration of hpmicrosimr using mclapply on linux systems\cr
+\cr
 return uptake (number of households and installed capacity) in june 2023 and 2024 for comparison with ISEA reports
 }

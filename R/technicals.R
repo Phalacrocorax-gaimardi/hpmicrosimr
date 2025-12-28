@@ -108,7 +108,9 @@ impute_floor_area <- Vectorize(impute_floor_area)
 
 #' impute_ber
 #'
-#' generate a missing Ber rating (double) based on household characteristics
+#' generate a missing Ber rating (double) based on household characteristics\cr
+#' \cr
+#' this current does not currently use heating tech and installation time as an input
 #'
 #' @param house_type property type
 #' @param q2_0 number of storeys
@@ -130,7 +132,7 @@ impute_ber <- function(house_type,q2_0,region,q5_0,q3_0){
   mu <- ber_params %>% dplyr::pull(mu)
   sigma <- ber_params %>% dplyr::pull(sigma)
   #exp(rnorm(1,mean=mu,sd=sigma)) %>% as.numeric() %>% return()
-  x <- rlnorm(1,mu,sigma)
+  x <- rlnorm(1,mu,sigma)+ 75 #bias upwards - households that dont know are likley to be inefficient
   return(x)
 }
 
@@ -809,9 +811,9 @@ heat_loss_indicator <- function(ber,tech,install_time,params) {
 ber_from_hli <- function(hli,tech,install_time,params){
   #
   pef <- ifelse(tech %in% c("electricity","heat_pump"), params$pef_electricity, 1.1)
-  primary_heat <- hli*params$hdd*24*pef/(1000*heating_system_efficiency(tech,install_time))
+  primary_space_heat <- hli*params$hdd*24*pef/(1000*heating_system_efficiency(tech,install_time))
   #ber <- ifelse(primary_heat > params$q_hotwater+params$q_lighting,primary_heat+params$q_hotwater+params$q_lighting,runif(1,params$q_passive,params$q_hotwater+params$q_lighting)) #add back non-space heating contributions to BER
-  ber <- primary_heat+params$q_hotwater+params$q_lighting
+  ber <- primary_space_heat+params$q_hotwater+params$q_lighting
   return(ber)
 
 }

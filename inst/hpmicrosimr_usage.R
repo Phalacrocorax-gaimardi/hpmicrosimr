@@ -14,7 +14,7 @@ optimise_upgrade(5.42,"oil",2004,"semi_detached",2,1939,region = "Dublin",floor_
 params <- scenario_params(sD_cal,2026)
 params$night_rate_usage_factor
 
-calABM(sD_cal,4,2,FALSE,0.5,0.0022,0.05,0.7,1,0.3)
+test <- calABM(sD,4,2,TRUE,nu=0.4,p=0.006,beta = 0.8,r = 0.03,eta = 0.02,tau = 0.02,rho=0.3)
 
 calABM(sD_cal,4,2,FALSE,0.2,0,0.006,0.05,0.7,0.7,0.3)
 
