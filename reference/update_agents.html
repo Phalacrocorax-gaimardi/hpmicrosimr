@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.3</span>
       </span>
     </div>
 
@@ -111,6 +111,15 @@ utilities. If these exceed their individual threshold an optimal PV_BESS system 
 <span class="r-err co"><span class="r-pr">#&gt;</span>   libglpk.so.40: cannot open shared object file: No such file or directory</span>
 <span class="r-in"><span><span class="va">agents_1</span> <span class="op">&lt;-</span> <span class="fu">update_agents</span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">+</span><span class="fl">1</span><span class="op">/</span><span class="fl">6</span>,<span class="va">agents_in</span>,<span class="va">social_network</span>,cal_run<span class="op">=</span><span class="fl">10</span>,quiet<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "0 upgrades rejected"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b_s2_bp"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 0 × 40</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 40 variables: serial &lt;chr&gt;, w_q52 &lt;dbl&gt;, w_q13 &lt;dbl&gt;, w_theta &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   region &lt;chr&gt;, house_type &lt;chr&gt;, storeys &lt;int&gt;, construction_year &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ber &lt;dbl&gt;, hli &lt;dbl&gt;, floor_area &lt;dbl&gt;, tech &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   heating_install_time &lt;dbl&gt;, income &lt;dbl&gt;, fuel_allowance &lt;lgl&gt;, kW &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   q52 &lt;dbl&gt;, eac &lt;dbl&gt;, eac_actual &lt;dbl&gt;, upgrade &lt;lgl&gt;, failure &lt;lgl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   upgrade_cost &lt;dbl&gt;, grant_type &lt;chr&gt;, tech_cost &lt;dbl&gt;, upgrade_grant &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   hli_stick &lt;dbl&gt;, eac_stick &lt;dbl&gt;, upgrade_cost_stick &lt;dbl&gt;, …</span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dyn.load(file, DLLpath = DLLpath, ...):</span> unable to load shared object '/home/runner/work/_temp/Library/igraph/libs/igraph.so':</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span>   libglpk.so.40: cannot open shared object file: No such file or directory</span>
 <span class="r-in"><span><span class="va">agents_2</span> <span class="op">&lt;-</span> <span class="fu">update_agents</span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">+</span><span class="fl">1</span><span class="op">/</span><span class="fl">3</span>,<span class="va">agents_1</span>,<span class="va">social_network</span>,cal_run<span class="op">=</span><span class="fl">10</span>,quiet<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
