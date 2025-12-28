@@ -368,8 +368,10 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
     # Efficiency upgrade where there is an existing heat pump
     #################################################################
   b_s2_hp <- b_s2 %>% dplyr::filter(tech=="heat_pump")
-  #
-  if(dim(b_s2_hp)[1] != 0){
+  print(paste("b_s2_bp"))
+  print(b_s2_hp)
+  if(nrow(b_s2_hp) == 0) b_s2_hp <- b_s2_hp %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
+  if(nrow(b_s2_hp) > 0){
     b_s2_hp_switch <- b_s2_hp %>% dplyr::filter(savings > 0)
     b_s2_hp_stick <- b_s2_hp %>% dplyr::filter(savings <= 0)
   #
@@ -385,44 +387,48 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
 
     b_s2_hp <- b_s2_hp_stick %>% dplyr::bind_rows(b_s2_hp_switch)
   }
-  b_s2_hp <- b_s2_hp %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
-    #####################################################################
+      #####################################################################
     # Efficiency upgrade where existing heating tech is not a heat pump
     #####################################################################
     #Are financial savings are strong enough?
   b_s2_nhp <- b_s2 %>% dplyr::filter(tech!="heat_pump")
-  b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_fin = -params$nu.*w_q13*savings) #financial
-  b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_social = w_q52*du_social[q52]) #social influence
-  b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_theta = w_theta*theta) #barrier
-  #sum and include a possible hypothetical bias correction (default is zero but you might need it)
-  b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_tot = du_fin+du_social+du_theta + params$lambda.)
-  #adopters
-  b_s2_nhp_switch <- b_s2_nhp %>% dplyr::filter(du_tot > 0)
-  #non-adopters
-  b_s2_nhp_stick <- b_s2_nhp %>% dplyr::filter(is.na(du_tot) | du_tot <= 0)
-  #clean up non-adopters e.g. remove redundant "switch" data
-  b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot,-savings)
-  b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::mutate(hli = hli_stick,eac = eac_stick,upgrade_cost=upgrade_cost_stick,
+  #what happens if b_s2_nhp is empty?
+  if(nrow(b_s2_nhp)==0)  b_s2_nhp <- b_s2_nhp %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
+
+  if(nrow(b_s2_nhp) > 0) {
+   b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_fin = -params$nu.*w_q13*savings) #financial
+   b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_social = w_q52*du_social[q52]) #social influence
+   b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_theta = w_theta*theta) #barrier
+   #sum and include a possible hypothetical bias correction (default is zero but you might need it)
+   b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_tot = du_fin+du_social+du_theta + params$lambda.)
+   #adopters
+   b_s2_nhp_switch <- b_s2_nhp %>% dplyr::filter(du_tot > 0)
+   #non-adopters
+   b_s2_nhp_stick <- b_s2_nhp %>% dplyr::filter(is.na(du_tot) | du_tot <= 0)
+   #clean up non-adopters e.g. remove redundant "switch" data
+   b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot,-savings)
+   b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::mutate(hli = hli_stick,eac = eac_stick,upgrade_cost=upgrade_cost_stick,
                                                      heating_sys_cost=heating_sys_cost_stick, grant_type=grant_type_stick,
                                                      upgrade_grant=upgrade_grant_stick,heat_pump_grant=heat_pump_grant_stick)
-  b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::select(!dplyr::matches("switch|stick"))
-  #
-  #clean up adopters e.g. remove redundant "stick" data
-  b_s2_nhp_switch <- b_s2_nhp_switch %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot,-savings)
-  b_s2_nhp_switch <- b_s2_nhp_switch %>% dplyr::mutate(hli = hli_switch,eac = eac_switch,upgrade_cost=upgrade_cost_switch,
+   b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::select(!dplyr::matches("switch|stick"))
+   #
+   #clean up adopters e.g. remove redundant "stick" data
+   b_s2_nhp_switch <- b_s2_nhp_switch %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot,-savings)
+   b_s2_nhp_switch <- b_s2_nhp_switch %>% dplyr::mutate(hli = hli_switch,eac = eac_switch,upgrade_cost=upgrade_cost_switch,
                                                      heating_sys_cost=heating_sys_cost_switch, grant_type=grant_type_switch,
                                                      upgrade_grant=upgrade_grant_switch,heat_pump_grant=heat_pump_grant_switch)
-  b_s2_nhp_switch <- b_s2_nhp_switch %>% dplyr::select(!dplyr::matches("switch|stick"))
-  b_s2_nhp_switch$tech <- "heat_pump"
-  #combine adopters and non-adopters
-  b_s2_nhp <- b_s2_nhp_stick %>% dplyr::bind_rows(b_s2_nhp_switch) %>% dplyr::mutate(heating_install_time = params$yeartime)
+   b_s2_nhp_switch <- b_s2_nhp_switch %>% dplyr::select(!dplyr::matches("switch|stick"))
+   b_s2_nhp_switch$tech <- "heat_pump"
+   #combine adopters and non-adopters
+   b_s2_nhp <- b_s2_nhp_stick %>% dplyr::bind_rows(b_s2_nhp_switch) %>% dplyr::mutate(heating_install_time = params$yeartime)
+  }
   #combine all upgrades whether existing heat pump or not and update to the new kW installed capacities
   b_s2 <-  b_s2_hp %>% dplyr::bind_rows(b_s2_nhp) %>% dplyr::mutate(kW=heating_system_size(ber*floor_area))
 
-  b_s2 <- b_s2 %>% dplyr::select(!dplyr::matches("switch|stick"))
+  b_s2 <- b_s2 %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
 
   stopifnot(dim(b_s2_nhp)[1] + dim(b_s2_hp)[1] == dim(b_s2)[1])
-  stopifnot(dim(b_s2_nhp_stick)[1]+dim(b_s2_nhp_switch)[1] == dim(b_s2_nhp)[1])
+  if(dim(b_s2_nhp)[1] != 0) stopifnot(dim(b_s2_nhp_stick)[1]+dim(b_s2_nhp_switch)[1] == dim(b_s2_nhp)[1])
   if(dim(b_s2_hp)[1] != 0) stopifnot(dim(b_s2_hp_stick)[1]+dim(b_s2_hp_switch)[1] == dim(b_s2_hp)[1])
 
   #combine == dim(b_s2)[1])
@@ -665,15 +671,10 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
 
   lambda <- 0
   #calibration params:: MOVED TO SYSTDATA WHEN CALIBRATION COMPLETE
-  print(paste("nu.=",nu,"p.=",p,"beta.=",beta,"r.",r, "eta.=",eta,"tau.=",tau,"rho.=",rho))
+  print(paste("nu.=",nu,"p.=",p,"beta.=",beta,"r.=",r, "eta.=",eta,"tau.=",tau,"rho.=",rho))
   #bi-monthly runs
   Nt <- round((simulation_end-year_zero+1)*6)
-  #annual runs
-  #Nt <- round((simulation_end-year_zero+1))
-  #agents0 <- agents_i
-  #cal_run <- sample(1:100,1)
-  #u_empirical <- empirical_utils_o o %>% dplyr::filter(calibration==cal_run) %>% dplyr::select(-calibration)
-  #
+
   if(use_parallel){
 
     number_of_cores <- parallel::detectCores() - n_unused_cores
@@ -767,6 +768,7 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
     #return(cals)
   }
   print("exited loop")
+  closeAllConnections()
   if(use_parallel) return(list(parameters=cals,efficiency=efficiencies,grants=grants))
   #print("DEBUG: We left the parallel block without returning!")
   #don't use parallel
@@ -868,40 +870,45 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
 #'
 #' macro-calibration of hpmicrosimr using mclapply on linux systems\cr
 #'\cr
-#' return uptake (number of households and installed capacity) in june 2023 and 2024 for comparison with ISEA reports
+#' returns the same calibration data as calABM
 #'
 #' @param sD base scenario (historical)
 #' @param Nrun number of runs
 #' @param n_unused_cores unsued cores default 2
 #' @param use_parallel TRUE or FALSE
-#' @param beta financial utility scale (drawn from financial_utility_scale)
-#' @param lambda bias correction parameter
-#' @param p rate parameter default 0.085
-#' @param nu usable roof fraction for solar
-#' @param rho rho_solstice parameter
-#' @param delta finance_rate calibration parameter
+#' @param nu financial utility scale factor
+#' @param p rate parameter
+#' @param beta present bias
+#' @param r finance rate
+#' @param eta disruption
+#' @param tau sludge
+#' @param rho rebound
+
 #'
 #' @returns
 #' @export
 #'
 #' @examples
 
-calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, beta,lambda,p,nu,rho,delta){
+calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu,p,beta,r,eta,tau,rho){
   #
   year_zero <- 2015
-  simulation_end <- 2024
+  simulation_end <- 2025
   resample_society=F
   ignore_social=F
-  #the calibration parameters
+  #the 6-7 calibration parameters
   sD_cal <- sD
-  sD_cal[sD_cal$parameter=="beta.","value"] <- beta #financial partial utility scale
-  sD_cal[sD_cal$parameter=="lambda.","value"] <- lambda #additional hypothetical bias correction
-  sD_cal[sD_cal$parameter=="nu.","value"] <- nu #usable roof fraction for solar
-  sD_cal[sD_cal$parameter=="rho.","value"] <- rho
-  sD_cal[sD_cal$parameter=="delta.","value"] <- delta
+  sD_cal[sD_cal$parameter=="nu.","value"] <- nu #financial partial utility scale
+  sD_cal[sD_cal$parameter=="p.","value"] <- p #additional hypothetical bias correction
+  sD_cal[sD_cal$parameter=="beta.","value"] <- beta #present bias
+  sD_cal[sD_cal$parameter=="eta.","value"] <- eta #hassle/sludge
+  sD_cal[sD_cal$parameter=="rho.","value"] <- rho #rebound effect
+  sD_cal[sD_cal$parameter=="r.","value"] <- r #risk-free or bare discount rate
+  sD_cal[sD_cal$parameter=="tau.","value"] <- tau  #sludge
 
+  lambda <- 0
   #calibration params:: MOVED TO SYSTDATA WHEN CALIBRATION COMPLETE
-  print(paste("beta.=",beta,"lambda.=",lambda,"p.=",p,"nu.=",nu,"rho.=",rho,"delta.",delta))
+  print(paste("nu.=",nu,"p.=",p,"beta.=",beta,"r.=",r, "eta.=",eta,"tau.=",tau,"rho.=",rho))
   #bi-monthly runs
   Nt <- round((simulation_end-year_zero+1)*6)
 
@@ -922,10 +929,10 @@ calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, beta,lambda,p,n
 
     # Randomize ICEV emissions assignment
     microcal_run <- sample(1:100, 1)
-    u_empirical <- empirical_utils_oo %>% dplyr::filter(calibration == microcal_run) %>% dplyr::select(-calibration)
+    u_empirical <- hp_empirical_utils %>% dplyr::filter(calibration_run==microcal_run) %>% dplyr::select(-calibration_run)
 
     agents_in <- initialise_agents(sD_cal, year_zero, microcal_run)
-    agents_in$transaction <- FALSE
+    #agents_in$transaction <- FALSE
 
     agent_ts <- vector("list", Nt)
     agent_ts[[1]] <- agents_in  # Agent parameters with regularized weights
@@ -942,7 +949,7 @@ calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, beta,lambda,p,n
 
     # Add vertex degree
     degrees <- tibble::tibble(serial=social %>% tibble::as_tibble() %>% dplyr::pull(serial),degree=igraph::degree(social))
-    agent_ts <- agent_ts %>% dplyr::inner_join(degrees, by = "ID")
+    agent_ts <- agent_ts %>% dplyr::inner_join(degrees)
 
     return(agent_ts)
   }
@@ -952,30 +959,50 @@ calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, beta,lambda,p,n
 
   # Run simulations in parallel using mclapply
   abm_list <- parallel::mclapply(1:Nrun, run_simulation, mc.cores = number_of_cores)
-  closeAllConnections()
+  #closeAllConnections()
   # Combine results into a single tibble
   abm <- dplyr::bind_rows(abm_list)
 
-  # Add metadata
-  meta <- tibble::tibble(
-    parameter = c("Nrun", "end_year", "beta.", "lambda.", "p."),
-    value = c(Nrun, simulation_end, beta, lambda, p)
-  )
-
-  # Process the final ABM data
-  abm <- abm %>%
-    dplyr::mutate(date = lubridate::ymd(paste(year_zero, "-02-01", sep = "")) %m+% months((t - 1) * 2)) %>%
-    dplyr::arrange(simulation, date) %>%
-    dplyr::select(-t)
-
-  # Return the results (optional)
-  # return(list("abm" = abm, "scenario" = sD, "system" = meta))
-
-  isea_dates <- pv_retrofit_uptake %>% dplyr::filter(lubridate::year(date)>= 2016) %>% dplyr::pull(date) #scale of solar and census dates
-  cal <- abm %>% dplyr::filter(date %in% isea_dates) %>% dplyr::group_by(simulation,date) %>% dplyr::summarise(S=sum(S1_new+S2_new),adopted=sum(S1_new > 0 | S2_new>0,na.rm=T),B=sum(B_new))
-  cal <- cal %>% dplyr::ungroup() %>% dplyr::group_by(date) %>% dplyr::summarise(MW =1.21e+3/752*mean(S), n= 1.21e+6/752*mean(adopted), B=1.21e+3/752*mean(B))
+  meta <- tibble::tibble(parameter=c("Nrun","end_year","nu.","p.","r.","beta.","eta.","tau.","rho."),value=c(Nrun,simulation_end,nu,p,r,beta,eta,tau,rho))
+  abm <- abm %>% dplyr::mutate(date=lubridate::ymd(paste(year_zero,"-01-01",sep="")) %m+% months((t-1)*2)) %>% dplyr::arrange(simulation,date) %>% dplyr::select(-t)
+  cal_date <- "2025-11-01"
+  start_date <- "2015-01-01"
+  cal_dates <- c(start_date,"2021-01-01",cal_date) #two dates for calibration
+  test <- summarise_abm_cal(abm,cal_date)
+  heat_pumps <- test$tech %>% dplyr::filter(date %in% cal_dates,tech == "heat_pump") %>% dplyr::ungroup() %>% dplyr::select(date,n_tech)
+  heat_pumps <- heat_pumps %>% dplyr::rename("n_heat_pump"=n_tech)
+  efficiencies <- test$efficiency %>% dplyr::filter(date %in% cal_dates) %>% dplyr::ungroup()
+  efficiencies <- efficiencies %>% dplyr::inner_join(heat_pumps)
+  grants <- test$grants %>% dplyr::filter(date %in% cal_dates)
+  print(paste("evaluating summary"))
+  #print(test)
+  n_heat_pump <- test$tech %>% dplyr::filter(date==lubridate::ymd(cal_date),tech=="heat_pump") %>% dplyr::pull(n_tech)
+  n_heat_pump_0 <- test$tech %>% dplyr::filter(date==lubridate::ymd(start_date),tech=="heat_pump") %>% dplyr::pull(n_tech)
+  #
+  n_oss <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="OSS") %>% dplyr::pull(n_grant)
+  n_betterenergy <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="BetterEnergyHomes") %>% dplyr::pull(n_grant)
+  n_warmerhomes <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="WarmerHomes") %>% dplyr::pull(n_grant)
+  n_grant <- n_oss + n_warmerhomes+n_betterenergy
+  #print(n_grant)
+  #
+  cost_oss <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="OSS") %>% dplyr::pull(grants_Meuro)
+  cost_betterenergy <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="BetterEnergyHomes") %>% dplyr::pull(grants_Meuro)
+  cost_warmerhomes <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="WarmerHomes") %>% dplyr::pull(grants_Meuro)
+  #
+  n_b2 <- test$efficiency %>% dplyr::filter(date==lubridate::ymd(cal_date)) %>% dplyr::pull(n_b2)
+  n_b2_0 <- test$efficiency %>% dplyr::filter(date==lubridate::ymd(start_date)) %>% dplyr::pull(n_b2)
+  n_upgrade <- test$efficiency %>% dplyr::filter(date==lubridate::ymd(cal_date)) %>% dplyr::pull(n_b2)
+  #print(n_b2_0)
+  cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r)
+  #print(cals)
+  cals <- cals %>% dplyr::bind_cols(tibble::tibble(n_heat=n_heat_pump-n_heat_pump_0,n_heat_2015=n_heat_pump_0,number_b2=n_b2-n_b2_0,number_b2_2015=n_b2_0,
+                                                   oss_total=cost_oss,warmerhomes_total=cost_warmerhomes,betterenergy_total=cost_betterenergy,
+                                                   n_oss = n_oss,n_warmerhomes=n_warmerhomes,n_betterenergy=n_betterenergy,
+                                                   n_fabric_total=n_upgrade))
+  #print(cals)
+  #print(cals %>% dplyr::bind_cols(tibble::tibble(betterenergy_cost=cost_betterenergy)))
   closeAllConnections()
-  tibble::tibble(beta.=beta,lambda.=lambda,p.=p,nu.=nu,rho.=rho,delta.=delta) %>% dplyr::bind_cols(cal) %>% return()
+  return(cals)
   #observations 2023 60,000 households 208 MW 2024 94,000 households 373 MW
 }
 

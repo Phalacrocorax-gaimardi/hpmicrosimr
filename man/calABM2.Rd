@@ -9,12 +9,13 @@ calABM2(
   Nrun = 4,
   n_unused_cores = 2,
   use_parallel = T,
-  beta,
-  lambda,
-  p,
   nu,
-  rho,
-  delta
+  p,
+  beta,
+  r,
+  eta,
+  tau,
+  rho
 )
 }
 \arguments{
@@ -26,20 +27,22 @@ calABM2(
 
 \item{use_parallel}{TRUE or FALSE}
 
-\item{beta}{financial utility scale (drawn from financial_utility_scale)}
+\item{nu}{financial utility scale factor}
 
-\item{lambda}{bias correction parameter}
+\item{p}{rate parameter}
 
-\item{p}{rate parameter default 0.085}
+\item{beta}{present bias}
 
-\item{nu}{usable roof fraction for solar}
+\item{r}{finance rate}
 
-\item{rho}{rho_solstice parameter}
+\item{eta}{disruption}
 
-\item{delta}{finance_rate calibration parameter}
+\item{tau}{sludge}
+
+\item{rho}{rebound}
 }
 \description{
 macro-calibration of hpmicrosimr using mclapply on linux systems\cr
 \cr
-return uptake (number of households and installed capacity) in june 2023 and 2024 for comparison with ISEA reports
+returns the same calibration data as calABM
 }
