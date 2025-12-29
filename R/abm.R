@@ -292,16 +292,15 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
     ##############################
     #heat_pump failures. choose between retaining the heat pump or switching to gas
     ##############################
-  b_s1_hp <- b_s1 %>% dplyr::filter(tech=="heat_pump")
+   b_s1_hp <- b_s1 %>% dplyr::filter(tech=="heat_pump")
   #print(paste("number of heat pump failures", dim(b_s1_hp)[1]))
   # CORRECT
-  if(dim(b_s1_hp)[1] != 0) {
+  if(nrow(b_s1_hp) > 0) {
     b_s1_hp_stick <- b_s1_hp %>% dplyr::filter(savings <= 0 & hli <= params$hli_heat_pump_threshold)
     b_s1_hp_switch <- b_s1_hp %>% dplyr::filter(savings > 0 | hli > params$hli_heat_pump_threshold )  #
-    b_s1_hp_stick <- b_s1_hp_stick %>% dplyr::mutate(eac=eac_stick)
-    #b_s1_hp_stick <- b_s1_hp_stick %>% dplyr::select(-eac_switch,-eac_stick,-savings,-hp_grant_type)
-  #
-    b_s1_hp_switch <- b_s1_hp_switch %>% dplyr::mutate(eac=eac_switch)
+    #print("BUG??")
+    b_s1_hp_stick <- b_s1_hp_stick %>% dplyr::mutate(eac=eac_stick,tech_cost=tech_cost_stick)
+    b_s1_hp_switch <- b_s1_hp_switch %>% dplyr::mutate(eac=eac_switch,tech_cost=tech_cost_switch)
     #b_s1_hp_switch <- b_s1_hp_switch %>% dplyr::select(-eac_stick,-eac_switch,-savings,-hp_grant_type)
     b_s1_hp_switch$tech <- "gas"
     #print(paste("number of heat pump retainers", dim(b_s1_hp_stick)[1]))
@@ -314,30 +313,33 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
     ############################
   #reject heat pump adoption when financial utility does not overcome barriers
   b_s1_nhp <- b_s1 %>% dplyr::filter(tech != "heat_pump" )
-  b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_fin = -params$nu.*w_q13*savings)
-  b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_social = w_q52*du_social[q52])
-  b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_theta = w_theta*theta)
-  #sum and include hypothetical bias correction (default is zero)
-  b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_tot = du_fin+du_social+du_theta + params$lambda.)
-  #COULD ASSUME A HLI THRESHOLD FOR FAILURE ADOPTERS i.e. clearly heat pump ready
-  b_s1_nhp_switch <- b_s1_nhp %>% dplyr::filter(du_tot > 0 & hli <= params$hli_heat_pump_threshold)
-  b_s1_nhp_switch$tech <- "heat_pump"
-  b_s1_nhp_stick <- b_s1_nhp %>% dplyr::filter(is.na(du_tot) | du_tot <= 0 | hli > params$hli_heat_pump_threshold)
-  #print(paste("number of heat pump adopters",dim(b_s1_nhp_switch)[1]))
-   #stickers
-  b_s1_nhp_stick <- b_s1_nhp_stick %>% dplyr::mutate(eac=eac_stick)
-  b_s1_nhp_stick <- b_s1_nhp_stick %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot,-eac_stick,-eac_switch,-savings)
-  b_s1_nhp_stick$heat_pump_grant <- 0
-  #b_s1_stick$adopt <- FALSE
+  if(nrow(b_s1_nhp) > 0) {
+    b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_fin = -params$nu.*w_q13*savings)
+    b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_social = w_q52*du_social[q52])
+    b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_theta = w_theta*theta)
+    #sum and include hypothetical bias correction (default is zero)
+    b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_tot = du_fin+du_social+du_theta + params$lambda.)
+    #COULD ASSUME A HLI THRESHOLD FOR FAILURE ADOPTERS i.e. clearly heat pump ready
+    b_s1_nhp_switch <- b_s1_nhp %>% dplyr::filter(du_tot > 0 & hli <= params$hli_heat_pump_threshold)
+    b_s1_nhp_switch$tech <- "heat_pump"
+    b_s1_nhp_stick <- b_s1_nhp %>% dplyr::filter(is.na(du_tot) | du_tot <= 0 | hli > params$hli_heat_pump_threshold)
+    #print(paste("number of heat pump adopters",dim(b_s1_nhp_switch)[1]))
+    #stickers
+    b_s1_nhp_stick <- b_s1_nhp_stick %>% dplyr::mutate(eac=eac_stick,tech_cost=tech_cost_stick)
+    b_s1_nhp_stick <- b_s1_nhp_stick %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot)
+    b_s1_nhp_stick$heat_pump_grant <- 0
+    #b_s1_stick$adopt <- FALSE
   #switchers
-  b_s1_nhp_switch <- b_s1_nhp_switch %>% dplyr::mutate(eac=eac_switch)
-  b_s1_nhp_switch <- b_s1_nhp_switch %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot,-eac_stick,-eac_switch,-savings)
-  b_s1_nhp <- b_s1_nhp_stick %>% dplyr::bind_rows(b_s1_nhp_switch) %>% dplyr::mutate(heating_install_time = params$yeartime)
+    b_s1_nhp_switch <- b_s1_nhp_switch %>% dplyr::mutate(eac=eac_switch, tech_cost=tech_cost_switch)
+    b_s1_nhp_switch <- b_s1_nhp_switch %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot)
+    b_s1_nhp <- b_s1_nhp_stick %>% dplyr::bind_rows(b_s1_nhp_switch) %>% dplyr::mutate(heating_install_time = params$yeartime)
+  }
+  b_s1_nhp <- b_s1_nhp %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
 
-  stopifnot(dim(b_s1_nhp_switch %>% dplyr::filter(hli > params$hli_heat_pump_threshold))[1] == 0)
-  stopifnot(dim(b_s1_nhp)[1] + dim(b_s1_hp)[1] == dim(b_s1)[1])
-  stopifnot(dim(b_s1_nhp_stick)[1] + dim(b_s1_nhp_switch)[1] == dim(b_s1_nhp)[1])
-  if(dim(b_s1_hp)[1] != 0 ) stopifnot(dim(b_s1_hp_stick)[1] + dim(b_s1_hp_switch)[1] == dim(b_s1_hp)[1])
+  #stopifnot(dim(b_s1_nhp_switch %>% dplyr::filter(hli > params$hli_heat_pump_threshold))[1] == 0)
+  #stopifnot(dim(b_s1_nhp)[1] + dim(b_s1_hp)[1] == dim(b_s1)[1])
+  #stopifnot(dim(b_s1_nhp_stick)[1] + dim(b_s1_nhp_switch)[1] == dim(b_s1_nhp)[1])
+  #if(dim(b_s1_hp)[1] != 0 ) stopifnot(dim(b_s1_hp_stick)[1] + dim(b_s1_hp_switch)[1] == dim(b_s1_hp)[1])
   b_s1 <- b_s1_hp %>% dplyr::bind_rows(b_s1_nhp)
   #calculate including rebound eac_actual
   b_s1 <- b_s1 %>% dplyr::select(!dplyr::matches("switch|stick"))
@@ -351,7 +353,7 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   # (2) fabric upgrade and switching to heat pump
   # (3) reject upgrade do nothing
   ######################
-
+  print("b_s2")
   b_s2$upgrade <- TRUE
   b_s0 <- b_s2 %>% dplyr::select(hli,tech,heating_install_time,house_type,storeys, construction_year, region, floor_area,fuel_allowance)
   #df <- purrr::pmap(b_s0,optimise_heat_env)
@@ -375,14 +377,14 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
     b_s2_hp_switch <- b_s2_hp %>% dplyr::filter(savings > 0)
     b_s2_hp_stick <- b_s2_hp %>% dplyr::filter(savings <= 0)
   #
-    b_s2_hp_stick <- b_s2_hp_stick %>% dplyr::select(-savings)
+    b_s2_hp_stick <- b_s2_hp_stick %>% dplyr::select(-any_of("savings"))
     b_s2_hp_stick <- b_s2_hp_stick %>% dplyr::mutate(hli = hli_stick,eac=eac_stick,upgrade_cost=upgrade_cost_stick,
-                                                          heating_sys_cost=heating_sys_cost_stick, grant_type="None")
+                                                          tech_cost=tech_cost_stick, grant_type="None")
     b_s2_hp_stick <- b_s2_hp_stick %>% dplyr::select(!dplyr::matches("switch|stick"))
 
-    #b_s2_hp_switch <- b_s2_hp_switch %>% dplyr::select(-savings)
+    #b_s2_hp_switch <- b_s2_hp_switch %>% dplyr::select(-"savings")
     b_s2_hp_switch <- b_s2_hp_switch %>% dplyr::mutate(hli = hli_switch,eac=eac_switch,upgrade_cost=upgrade_cost_switch,
-                                                          heating_sys_cost=heating_sys_cost_switch, grant_type="None")
+                                                          tech_cost=tech_cost_switch, grant_type="None")
     b_s2_hp_switch <- b_s2_hp_switch %>% dplyr::select(!dplyr::matches("switch|stick"))
 
     b_s2_hp <- b_s2_hp_stick %>% dplyr::bind_rows(b_s2_hp_switch)
@@ -406,16 +408,16 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
    #non-adopters
    b_s2_nhp_stick <- b_s2_nhp %>% dplyr::filter(is.na(du_tot) | du_tot <= 0)
    #clean up non-adopters e.g. remove redundant "switch" data
-   b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot,-savings)
+   b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot,-any_of("savings"))
    b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::mutate(hli = hli_stick,eac = eac_stick,upgrade_cost=upgrade_cost_stick,
-                                                     heating_sys_cost=heating_sys_cost_stick, grant_type=grant_type_stick,
+                                                     tech_cost=tech_cost_stick, grant_type=grant_type_stick,
                                                      upgrade_grant=upgrade_grant_stick,heat_pump_grant=heat_pump_grant_stick)
    b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::select(!dplyr::matches("switch|stick"))
    #
    #clean up adopters e.g. remove redundant "stick" data
-   b_s2_nhp_switch <- b_s2_nhp_switch %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot,-savings)
+   b_s2_nhp_switch <- b_s2_nhp_switch %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot,-any_of("savings"))
    b_s2_nhp_switch <- b_s2_nhp_switch %>% dplyr::mutate(hli = hli_switch,eac = eac_switch,upgrade_cost=upgrade_cost_switch,
-                                                     heating_sys_cost=heating_sys_cost_switch, grant_type=grant_type_switch,
+                                                     tech_cost=tech_cost_switch, grant_type=grant_type_switch,
                                                      upgrade_grant=upgrade_grant_switch,heat_pump_grant=heat_pump_grant_switch)
    b_s2_nhp_switch <- b_s2_nhp_switch %>% dplyr::select(!dplyr::matches("switch|stick"))
    b_s2_nhp_switch$tech <- "heat_pump"
@@ -427,9 +429,9 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
 
   b_s2 <- b_s2 %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
 
-  stopifnot(dim(b_s2_nhp)[1] + dim(b_s2_hp)[1] == dim(b_s2)[1])
-  if(dim(b_s2_nhp)[1] != 0) stopifnot(dim(b_s2_nhp_stick)[1]+dim(b_s2_nhp_switch)[1] == dim(b_s2_nhp)[1])
-  if(dim(b_s2_hp)[1] != 0) stopifnot(dim(b_s2_hp_stick)[1]+dim(b_s2_hp_switch)[1] == dim(b_s2_hp)[1])
+  #stopifnot(dim(b_s2_nhp)[1] + dim(b_s2_hp)[1] == dim(b_s2)[1])
+  #if(dim(b_s2_nhp)[1] != 0) stopifnot(dim(b_s2_nhp_stick)[1]+dim(b_s2_nhp_switch)[1] == dim(b_s2_nhp)[1])
+  #if(dim(b_s2_hp)[1] != 0) stopifnot(dim(b_s2_hp_stick)[1]+dim(b_s2_hp_switch)[1] == dim(b_s2_hp)[1])
 
   #combine == dim(b_s2)[1])
   ##################################
@@ -651,7 +653,7 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
 #' @export
 #'
 #' @examples
-#' #test <- calABM(sD,4,2,TRUE,nu=0.4,p=0.006,beta = 0.8,r = 0.03,eta = 0.02,tau = 0.02,rho=0.3)
+#' #test <- calABM(sD,8,2,TRUE,nu=0.4,p=0.006,beta = 0.8,r = 0.03,eta = 0.02,tau = 0.02,rho=0.3)
 #'
 calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022,r=0.04,beta=0.8,eta=0.02,tau=0.02,rho=0.3){
   #

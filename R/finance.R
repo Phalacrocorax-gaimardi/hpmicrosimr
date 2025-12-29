@@ -881,11 +881,13 @@ heat_pump_savings <- function(hli,tech_old,installation_time,house_type,storeys,
   df <- optimise_heat(hli,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,params,include_rebound=FALSE)
   stick_cost <- df %>% dplyr::filter(tech_old==tech_new) %>% dplyr::pull(new_cost)
   switch_cost <- df %>% dplyr::filter(tech_old!=tech_new) %>% dplyr::pull(new_cost)
+  tech_cost_stick <- df %>% dplyr::filter(tech_old==tech_new) %>% dplyr::pull(heating_sys_cost)
+  tech_cost_switch <- df %>% dplyr::filter(tech_old!=tech_new) %>% dplyr::pull(heating_sys_cost)
   #switch_cost <- ifelse(tech_old=="heat_pump",NA,df %>% dplyr::filter(tech_old!=tech_new) %>% dplyr::pull(new_cost))
   #savings <- ifelse(tech_old=="heat_pump",NA, switch_cost/stick_cost -1)
   grant <- df %>% dplyr::filter(tech_new=="heat_pump") %>% dplyr::pull(heat_pump_grant)
   grant_type <- df %>% dplyr::filter(tech_new=="heat_pump") %>% dplyr::pull(grant_type)
-  tibble::tibble(eac_stick=stick_cost, eac_switch=switch_cost,savings=switch_cost/stick_cost -1, grant_type=grant_type,heat_pump_grant = grant) %>% return()
+  tibble::tibble(tech_cost_stick=tech_cost_stick,tech_cost_switch=tech_cost_switch,eac_stick=stick_cost, eac_switch=switch_cost,savings=switch_cost/stick_cost -1, grant_type=grant_type,heat_pump_grant = grant) %>% return()
 }
 
 
@@ -934,6 +936,8 @@ heat_pump_upgrade_savings <-  function(hli_old,tech_old,installation_time,house_
   df_switch <- df_switch %>% dplyr::rename("hli"=hli_new,"eac"=new_cost)
   df_stick <- df_stick %>% dplyr::rename_with(~ paste0(.x,"_stick"))
   df_switch <- df_switch %>% dplyr::rename_with(~ paste0(.x,"_switch"))
+  df_stick <- df_stick %>% dplyr::rename("tech_cost_stick"=heating_sys_cost_stick)
+  df_switch <- df_switch %>% dplyr::rename("tech_cost_switch"=heating_sys_cost_switch)
   df1 <- df_stick %>% dplyr::bind_cols(df_switch)
   df1 <- df1 %>% dplyr::mutate(savings=eac_switch/eac_stick-1)}
   else {
@@ -943,6 +947,8 @@ heat_pump_upgrade_savings <-  function(hli_old,tech_old,installation_time,house_
     df_switch <- df_switch %>% dplyr::rename("hli"=hli_new,"eac"=new_cost)
     df_stick <- df_stick %>% dplyr::rename_with(~ paste0(.x,"_stick"))
     df_switch <- df_switch %>% dplyr::rename_with(~ paste0(.x,"_switch"))
+    df_stick <- df_stick %>% dplyr::rename("tech_cost_stick"=heating_sys_cost_stick)
+    df_switch <- df_switch %>% dplyr::rename("tech_cost_switch"=heating_sys_cost_switch)
     df1 <- df_stick %>% dplyr::bind_cols(df_switch)
     #for early dates heat pumps are not used in the basis of "fabric first"
     df1 <- df1 %>% dplyr::mutate(savings=ifelse(params$yeartime > params$warmer_homes_heat_pump,(upgrade_cost_switch+heating_sys_cost_switch)/(upgrade_cost_stick+heating_sys_cost_stick)-1,

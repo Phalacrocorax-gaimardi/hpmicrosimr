@@ -52,6 +52,6 @@ based on heat pump uptake, grant uptake and number of b2s on 1 nov 2025\cr
 The output is summarised using summarise_cal()
 }
 \examples{
-#test <- calABM(sD,4,2,TRUE,nu=0.4,p=0.006,beta = 0.8,r = 0.03,eta = 0.02,tau = 0.02,rho=0.3)
+#test <- calABM(sD,8,2,TRUE,nu=0.4,p=0.006,beta = 0.8,r = 0.03,eta = 0.02,tau = 0.02,rho=0.3)
 
 }
