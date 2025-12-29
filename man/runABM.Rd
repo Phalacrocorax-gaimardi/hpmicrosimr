@@ -38,10 +38,9 @@ a three component list - simulation output, scenario setup, meta-parameters
 \description{
 Runs home energy efficiency system adoption simulation on artificial society of ~792 agents.
 Each run is performed on an independently generated social network with randomisation from initialise_agents() and
-with a random micro_calibration run (index 1..100)
-}
-\details{
-Bi-monthly timesteps.
-
+with a random micro_calibration run (index 1..100)\cr
+\cr
+Bi-monthly \cr
+\cr
 Good luck.
 }

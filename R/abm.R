@@ -353,7 +353,7 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   # (2) fabric upgrade and switching to heat pump
   # (3) reject upgrade do nothing
   ######################
-  print("b_s2")
+  #print("b_s2")
   b_s2$upgrade <- TRUE
   b_s0 <- b_s2 %>% dplyr::select(hli,tech,heating_install_time,house_type,storeys, construction_year, region, floor_area,fuel_allowance)
   #df <- purrr::pmap(b_s0,optimise_heat_env)
@@ -382,7 +382,7 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
                                                           tech_cost=tech_cost_stick, grant_type="None")
     b_s2_hp_stick <- b_s2_hp_stick %>% dplyr::select(!dplyr::matches("switch|stick"))
 
-    #b_s2_hp_switch <- b_s2_hp_switch %>% dplyr::select(-"savings")
+    b_s2_hp_switch <- b_s2_hp_switch %>% dplyr::select(-any_of("savings"))
     b_s2_hp_switch <- b_s2_hp_switch %>% dplyr::mutate(hli = hli_switch,eac=eac_switch,upgrade_cost=upgrade_cost_switch,
                                                           tech_cost=tech_cost_switch, grant_type="None")
     b_s2_hp_switch <- b_s2_hp_switch %>% dplyr::select(!dplyr::matches("switch|stick"))
@@ -471,10 +471,10 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
 #'
 #' Runs home energy efficiency system adoption simulation on artificial society of ~792 agents.
 #' Each run is performed on an independently generated social network with randomisation from initialise_agents() and
-#' with a random micro_calibration run (index 1..100)
-#'
-#' Bi-monthly timesteps.
-#'
+#' with a random micro_calibration run (index 1..100)\cr
+#' \cr
+#' Bi-monthly \cr
+#' \cr
 #' Good luck.
 #'
 #' @param sD scenario set-up dataframe, typically read with readr::read_xlxs(...,sheet=scenario)
@@ -520,7 +520,8 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
     number_of_cores <- parallel::detectCores() - n_unused_cores
     doParallel::registerDoParallel(number_of_cores)
 
-    abm <- foreach::foreach(j = 1:Nrun, .packages = "dplyr", .combine=dplyr::bind_rows,.export = c("initialise_agents","update_agents","make_artificial_society")) %dopar% {
+    abm <- foreach::foreach(j = 1:Nrun, .packages = "dplyr", .combine=dplyr::bind_rows,
+                            .export = c("initialise_agents","update_agents","make_artificial_society","heat_pump_upgrade_savings")) %dopar% {
       #abm <- foreach::foreach(j = 1:Nrun, .errorhandling = "pass",.export = c("initialise_agents","update_agents4")) %dopar% {
 
             #randomiise ICEV emissions assignment
@@ -683,9 +684,11 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
     cl <- parallel::makeCluster(number_of_cores)
     doParallel::registerDoParallel(cl)
 
+
     #abm <- foreach::foreach(j = 1:Nrun, .packages = "dplyr", .final = function(x) { parallel::stopCluster(cl); x },
     abm <- foreach::foreach(j = 1:Nrun, .packages = "dplyr",
-                            .combine=dplyr::bind_rows,.export = c("initialise_agents","update_agents","make_artificial_society")) %dopar% {
+                            .combine=dplyr::bind_rows,.export = c("initialise_agents","update_agents",
+                                                                  "make_artificial_society","heat_pump_upgrade_savings")) %dopar% {
       #abm <- foreach::foreach(j = 1:Nrun, .errorhandling = "pass",.export = c("initialise_agents","update_agents4")) %dopar% {
 
       #create a new artificial society for each run

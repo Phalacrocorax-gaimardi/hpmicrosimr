@@ -920,39 +920,61 @@ heat_pump_savings <- function(hli,tech_old,installation_time,house_type,storeys,
 #' @examples
 #'
 #' params <- scenario_params(sD,2026)
-#' heat_pump_upgrade_savings(2.5,"gas",2000,"semi_detached",2,1990,"Munster",106,"logistic",params,is_fuel_allowance=TRUE,include_grants=TRUE)
+#' heat_pump_upgrade_savings(2.5,"gas",2000,"semi_detached",2,1990,"Munster",106,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE)
 #'
 #' heat_pump_upgrade_savings(1.1,"gas",2000,"semi_detached",2,1990,"Munster",106,"logistic",params,is_fuel_allowance=TRUE,include_grants=TRUE)
 #'
 heat_pump_upgrade_savings <-  function(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,cost_model="logistic",params,is_fuel_allowance,include_grants){
   #
   df <- optimise_upgrade(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,cost_model,params,upgrade_heat=TRUE,is_fuel_allowance,include_grants,include_rebound=FALSE)
+  stopifnot(dim(df)[1]==2)
+  stopifnot(dim(df)[2]==14)
   #
   old_cost <- df$old_cost[1]
   if(df$grant_type[1] != "WarmerHomes"){
   df_stick <- df %>% dplyr::filter(tech_new == tech_old) %>% dplyr::select(hli_new,new_cost,upgrade_cost,heating_sys_cost, grant_type,upgrade_grant, heat_pump_grant)
   df_switch <- df %>% dplyr::filter(tech_new != tech_old) %>% dplyr::select(hli_new,new_cost,upgrade_cost,heating_sys_cost, grant_type,upgrade_grant, heat_pump_grant)
-  df_stick <- df_stick %>% dplyr::rename("hli"=hli_new,"eac"=new_cost)
-  df_switch <- df_switch %>% dplyr::rename("hli"=hli_new,"eac"=new_cost)
-  df_stick <- df_stick %>% dplyr::rename_with(~ paste0(.x,"_stick"))
-  df_switch <- df_switch %>% dplyr::rename_with(~ paste0(.x,"_switch"))
-  df_stick <- df_stick %>% dplyr::rename("tech_cost_stick"=heating_sys_cost_stick)
-  df_switch <- df_switch %>% dplyr::rename("tech_cost_switch"=heating_sys_cost_switch)
+  df_stick <- df_stick %>%
+    dplyr::rename(
+      hli = hli_new,
+      eac = new_cost,
+      tech_cost = heating_sys_cost
+    ) %>%
+    dplyr::rename_with(~ paste0(.x, "_stick"))
+
+  df_switch <- df_switch %>%
+    dplyr::rename(
+      hli = hli_new,
+      eac = new_cost,
+      tech_cost = heating_sys_cost
+    ) %>%
+    dplyr::rename_with(~ paste0(.x, "_switch"))
+
   df1 <- df_stick %>% dplyr::bind_cols(df_switch)
   df1 <- df1 %>% dplyr::mutate(savings=eac_switch/eac_stick-1)}
-  else {
+  else { #WarmerHomes
     df_stick <- df %>% dplyr::filter(tech_new == tech_old) %>% dplyr::select(hli_new,new_cost,upgrade_cost,heating_sys_cost, grant_type,upgrade_grant, heat_pump_grant)
     df_switch <- df %>% dplyr::filter(tech_new != tech_old) %>% dplyr::select(hli_new,new_cost,upgrade_cost,heating_sys_cost, grant_type,upgrade_grant, heat_pump_grant)
-    df_stick <- df_stick %>% dplyr::rename("hli"=hli_new,"eac"=new_cost)
-    df_switch <- df_switch %>% dplyr::rename("hli"=hli_new,"eac"=new_cost)
-    df_stick <- df_stick %>% dplyr::rename_with(~ paste0(.x,"_stick"))
-    df_switch <- df_switch %>% dplyr::rename_with(~ paste0(.x,"_switch"))
-    df_stick <- df_stick %>% dplyr::rename("tech_cost_stick"=heating_sys_cost_stick)
-    df_switch <- df_switch %>% dplyr::rename("tech_cost_switch"=heating_sys_cost_switch)
+
+    df_stick <- df_stick %>%
+      dplyr::rename(
+        hli = hli_new,
+        eac = new_cost,
+        tech_cost = heating_sys_cost
+      ) %>% dplyr::rename_with(~ paste0(.x, "_stick"))
+
+    df_switch <- df_switch %>%
+      dplyr::rename(
+        hli = hli_new,
+        eac = new_cost,
+        tech_cost = heating_sys_cost
+      ) %>% dplyr::rename_with(~ paste0(.x, "_switch"))
+
     df1 <- df_stick %>% dplyr::bind_cols(df_switch)
     #for early dates heat pumps are not used in the basis of "fabric first"
-    df1 <- df1 %>% dplyr::mutate(savings=ifelse(params$yeartime > params$warmer_homes_heat_pump,(upgrade_cost_switch+heating_sys_cost_switch)/(upgrade_cost_stick+heating_sys_cost_stick)-1,
-                                 NA))
+    #retain existing tech (with replacement) during the calibration period
+    print("warmer homes optimise")
+    df1 <- df1 %>% dplyr::mutate(savings=dplyr::if_else(params$yeartime > params$warmer_homes_heat_pump,-1,1)) #1 assures heat pump is never chosen before warmer_homes_heat_pump
   }
   df1$eac_old <- df$old_cost[1]
   return(df1)
