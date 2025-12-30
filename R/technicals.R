@@ -439,31 +439,90 @@ recode_construction_year <- function(q5){
 #' @returns
 #' @export
 #'
-#' @examples  heating_system_efficiency("heat_pump",2003)
+#' @examples
+#'
+#' heating_system_efficiency("oil",2023)
+#' heating_system_efficiency(c("oil","gas"),2023)
+#'
+#'
 heating_system_efficiency <- function(tech, install_time) {
 
-  switch(tech,
-         "electricity" = {
-           return(tech_params[["electricity_efficiency"]])
-         },
+  eff <- numeric(length(tech))
 
-         "solid_fuel" = {
-           return(tech_params[["solid_fuel_efficiency"]])
-         },
+  # electricity
+  idx <- tech == "electricity"
+  eff[idx] <- tech_params[["electricity_efficiency"]]
 
-         "heat_pump" = {
-           values <- c(tech_params[["heat_pump_cop_2010"]],tech_params[["heat_pump_cop_2020"]])
-           return(approx(x = c(2010.5, 2020.5), y = values, xout = install_time, rule = 2)$y)
-         },
+  # solid fuel
+  idx <- tech == "solid_fuel"
+  eff[idx] <- tech_params[["solid_fuel_efficiency"]]
 
-         "oil" = ,
-         "gas" = {
-           values <- c(tech_params[["boiler_efficiency_2005"]],tech_params[["boiler_efficiency_2010"]],tech_params[["boiler_efficiency_2015"]])
-           return(approx(x = c(2005.5, 2010.5, 2015.5), y = values, xout = install_time, rule = 2)$y)
-         },
+  # heat pump
+  idx <- tech == "heat_pump"
+  if (any(idx)) {
+    eff[idx] <- approx(
+      x = c(2010.5, 2020.5),
+      y = c(tech_params[["heat_pump_cop_2010"]],
+            tech_params[["heat_pump_cop_2020"]]),
+      xout = install_time[idx],
+      rule = 2
+    )$y
+  }
 
-         stop("Unknown technology type: ", tech)
-  )
+  # oil / gas
+  idx <- tech %in% c("oil", "gas")
+  if (any(idx)) {
+    eff[idx] <- approx(
+      x = c(2005.5, 2010.5, 2015.5),
+      y = c(tech_params[["boiler_efficiency_2005"]],
+            tech_params[["boiler_efficiency_2010"]],
+            tech_params[["boiler_efficiency_2015"]]),
+      xout = install_time[idx],
+      rule = 2
+    )$y
+  }
+
+  eff
+}
+
+heating_system_efficiency <- function(tech, install_time) {
+
+  eff <- numeric(length(tech))
+
+  # electricity
+  idx <- tech == "electricity"
+  eff[idx] <- tech_params[["electricity_efficiency"]]
+
+  # solid fuel
+  idx <- tech == "solid_fuel"
+  eff[idx] <- tech_params[["solid_fuel_efficiency"]]
+
+  # heat pump
+  idx <- tech == "heat_pump"
+  if (any(idx)) {
+    eff[idx] <- approx(
+      x = c(2010.5, 2020.5),
+      y = c(tech_params[["heat_pump_cop_2010"]],
+            tech_params[["heat_pump_cop_2020"]]),
+      xout = install_time[idx],
+      rule = 2
+    )$y
+  }
+
+  # oil / gas
+  idx <- tech %in% c("oil", "gas")
+  if (any(idx)) {
+    eff[idx] <- approx(
+      x = c(2005.5, 2010.5, 2015.5),
+      y = c(tech_params[["boiler_efficiency_2005"]],
+            tech_params[["boiler_efficiency_2010"]],
+            tech_params[["boiler_efficiency_2015"]]),
+      xout = install_time[idx],
+      rule = 2
+    )$y
+  }
+
+  eff
 }
 
 

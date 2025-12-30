@@ -1,0 +1,27 @@
+#!/bin/bash -l
+#SBATCH --job-name=pvbess_cal
+#SBATCH -N 1
+# specifiy gpu
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:2
+# SBATCH --nodelist=sonic63
+# specify number of cores per node
+#SBATCH --ntasks-per-node=32
+# walltime if required
+#SBATCH -t 6:00:00
+
+export R_ENABLE_JIT=0
+export R_COMPILE_PKGS=0
+export R_KEEP_PKG_SOURCE=no
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export VECLIB_MAXIMUM_THREADS=1
+
+ulimit -s unlimited
+
+cd $SLURM_SUBMIT_DIR
+module load R
+R --version
+set -x
+Rscript --vanilla /home/people/jwheatley/hpretrofit/calibration/hpmicrosimr_calibration_usage_sonic.R

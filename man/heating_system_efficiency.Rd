@@ -18,5 +18,9 @@ efficiency of heating system technology as a function of installtion time.
 there was a sharp improvement in oil and gas tech with the introduction of condensing boilers
 }
 \examples{
- heating_system_efficiency("heat_pump",2003)
+
+heating_system_efficiency("oil",2023)
+heating_system_efficiency(c("oil","gas"),2023)
+
+
 }

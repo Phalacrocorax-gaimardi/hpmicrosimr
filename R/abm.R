@@ -183,7 +183,7 @@ initialise_agents <- function(sD,yeartime=2015,cal_run=10){
   #bias HLI upwards (upgrades & survey bias)
   agents <- agents %>% dplyr::mutate(hli = pmax(hli,0.7)) #don't allow hli values less than 0.7
   #re-compute BER
-  agents <- agents %>% dplyr::rowwise() %>% dplyr::mutate(ber=ber_from_hli(hli,primary_heat,heating_install_time,params))
+  agents <- agents %>% dplyr::mutate(ber=ber_from_hli(hli,primary_heat,heating_install_time,params))
   #annualised heating cost
   agents <- agents %>% dplyr::rowwise() %>% dplyr::mutate(eac = annualised_heating_system_cost(hli,primary_heat,
                                       heating_install_time,"new",floor_area,house_type,construction_year,"None",params))
@@ -270,6 +270,8 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   b_s3 <- b_s1 %>% dplyr::filter(serial %in% b_s2$serial)
   #exclude failure where upgrade is being implemented => just two categories failure and upgr
   b_s1 <- b_s1 %>% dplyr::filter(!(serial %in% b_s3$serial))
+
+  if(nrow(b_s1)==0 & nrow(b_s2)==0) return(a_s)
 
   hp_savings_env <- function(hli,tech, house_type,storeys, construction_year, region, floor_area) {
     heat_pump_savings(hli,tech, params$yeartime, house_type, storeys,construction_year, region, floor_area, params)
@@ -437,9 +439,11 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   ##################################
   #combine failures and upgraders
   #################################
-  b_s <- b_s1 %>% dplyr::bind_rows(b_s2)
+  b_s <- b_s1 %>% dplyr::bind_rows(b_s2) %>% dplyr::ungroup()
   #compute new bers
-  b_s <- b_s %>% dplyr::rowwise() %>% dplyr::mutate(ber=ber_from_hli(hli,tech,install_time = params$yeartime,params))
+  #stopifnot(nrow(b_s %>% dplyr::filter(lengths(tech) != 1)) != 0)
+  #print(b_s)
+  b_s <- b_s  %>% dplyr::mutate(ber=ber_from_hli(hli,tech,install_time = params$yeartime,params))
 
   #update agents
   a_s <- dplyr::filter(a_s, !(serial %in% b_s$serial))
@@ -521,7 +525,8 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
     doParallel::registerDoParallel(number_of_cores)
 
     abm <- foreach::foreach(j = 1:Nrun, .packages = "dplyr", .combine=dplyr::bind_rows,
-                            .export = c("initialise_agents","update_agents","make_artificial_society","heat_pump_upgrade_savings")) %dopar% {
+                            .export = c("initialise_agents","update_agents","make_artificial_society","heat_pump_upgrade_savings",
+                                        "heating_system_efficiency","ber_from_hli")) %dopar% {
       #abm <- foreach::foreach(j = 1:Nrun, .errorhandling = "pass",.export = c("initialise_agents","update_agents4")) %dopar% {
 
             #randomiise ICEV emissions assignment
@@ -688,7 +693,9 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
     #abm <- foreach::foreach(j = 1:Nrun, .packages = "dplyr", .final = function(x) { parallel::stopCluster(cl); x },
     abm <- foreach::foreach(j = 1:Nrun, .packages = "dplyr",
                             .combine=dplyr::bind_rows,.export = c("initialise_agents","update_agents",
-                                                                  "make_artificial_society","heat_pump_upgrade_savings")) %dopar% {
+                                                                  "make_artificial_society","heat_pump_upgrade_savings",
+                                                                  "heating_system_efficiency",
+                                                                  "ber_from_hli")) %dopar% {
       #abm <- foreach::foreach(j = 1:Nrun, .errorhandling = "pass",.export = c("initialise_agents","update_agents4")) %dopar% {
 
       #create a new artificial society for each run

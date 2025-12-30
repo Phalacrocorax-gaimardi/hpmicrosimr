@@ -1,6 +1,6 @@
 #load params and tech_params to run examples
 #params <- scenario_params(sD,2026)
-#tech_params <- tech_params_fun()
+tech_params <- tech_params_fun()
 
 # finance functions for hpmicrosimr
 #
