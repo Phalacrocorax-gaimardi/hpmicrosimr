@@ -248,6 +248,8 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   a_s$tech_cost <- 0
   a_s$upgrade_grant <-0
   a_s$heat_pump_grant <- 0
+  #re-evalute BER to capture PEF drift
+  a_s <- a_s %>% dplyr::mutate(ber=ber_from_hli(hli,tech,heating_install_time,params))
   #calculate updated eac and eac_actual
   a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,"None",params,include_rebound = FALSE))
   a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac_actual = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,"None",params,include_rebound = TRUE))
@@ -338,13 +340,12 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   }
   b_s1_nhp <- b_s1_nhp %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
 
-  #stopifnot(dim(b_s1_nhp_switch %>% dplyr::filter(hli > params$hli_heat_pump_threshold))[1] == 0)
-  #stopifnot(dim(b_s1_nhp)[1] + dim(b_s1_hp)[1] == dim(b_s1)[1])
-  #stopifnot(dim(b_s1_nhp_stick)[1] + dim(b_s1_nhp_switch)[1] == dim(b_s1_nhp)[1])
   #if(dim(b_s1_hp)[1] != 0 ) stopifnot(dim(b_s1_hp_stick)[1] + dim(b_s1_hp_switch)[1] == dim(b_s1_hp)[1])
   b_s1 <- b_s1_hp %>% dplyr::bind_rows(b_s1_nhp)
   #calculate including rebound eac_actual
   b_s1 <- b_s1 %>% dplyr::select(!dplyr::matches("switch|stick"))
+  #recompute BER - there will be an improvement
+  if(nrow(b_s1)>0) b_s1 <- b_s1 %>% dplyr::mutate(ber=ber_from_hli(hli,tech,heating_install_time,params))
 
   ################################
   # Energy Efficiency upgrades
@@ -430,7 +431,7 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   b_s2 <-  b_s2_hp %>% dplyr::bind_rows(b_s2_nhp) %>% dplyr::mutate(kW=heating_system_size(ber*floor_area))
 
   b_s2 <- b_s2 %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
-
+  if(nrow(b_s2) > 0 ) b_s2 <- b_s2 %>% dplyr::mutate(ber=ber_from_hli(hli,tech,heating_install_time,params))
   #stopifnot(dim(b_s2_nhp)[1] + dim(b_s2_hp)[1] == dim(b_s2)[1])
   #if(dim(b_s2_nhp)[1] != 0) stopifnot(dim(b_s2_nhp_stick)[1]+dim(b_s2_nhp_switch)[1] == dim(b_s2_nhp)[1])
   #if(dim(b_s2_hp)[1] != 0) stopifnot(dim(b_s2_hp_stick)[1]+dim(b_s2_hp_switch)[1] == dim(b_s2_hp)[1])
@@ -443,7 +444,7 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   #compute new bers
   #stopifnot(nrow(b_s %>% dplyr::filter(lengths(tech) != 1)) != 0)
   #print(b_s)
-  b_s <- b_s  %>% dplyr::mutate(ber=ber_from_hli(hli,tech,install_time = params$yeartime,params))
+  #b_s <- b_s  %>% dplyr::mutate(ber=ber_from_hli(hli,tech,install_time = params$yeartime,params))
 
   #update agents
   a_s <- dplyr::filter(a_s, !(serial %in% b_s$serial))
@@ -735,7 +736,7 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
       agent_ts
     }
     parallel::stopCluster(cl)
-    #closeAllConnections()
+    closeAllConnections()
 
     meta <- tibble::tibble(parameter=c("Nrun","end_year","nu.","p.","r.","beta.","eta.","tau.","rho."),value=c(Nrun,simulation_end,nu,p,r,beta,eta,tau,rho))
     abm <- abm %>% dplyr::mutate(date=lubridate::ymd(paste(year_zero,"-01-01",sep="")) %m+% months((t-1)*2)) %>% dplyr::arrange(simulation,date) %>% dplyr::select(-t)
