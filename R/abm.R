@@ -523,7 +523,8 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
   if(use_parallel){
     #
     number_of_cores <- parallel::detectCores() - n_unused_cores
-    doParallel::registerDoParallel(number_of_cores)
+    cl <- parallel::makeCluster(number_of_cores)
+    doParallel::registerDoParallel(cl)
 
     abm <- foreach::foreach(j = 1:Nrun, .packages = "dplyr", .combine=dplyr::bind_rows,
                             .export = c("initialise_agents","update_agents","make_artificial_society","heat_pump_upgrade_savings",
@@ -565,6 +566,10 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
       agent_ts <- agent_ts %>% dplyr::inner_join(degrees)
       agent_ts
     }
+    doParallel::stopImplicitCluster()  # 1. Unregister from doParallel
+    parallel::stopCluster(cl)
+    cl <- NULL
+    #gc(full = TRUE, verbose = FALSE)
 
     meta <- tibble::tibble(parameter=c("Nrun","end_year","p.","nu.","rho.","r.","beta.","eta.","tau."),value=c(Nrun,simulation_end,p,nu,rho,r,beta,eta,tau))
     abm <- abm %>% dplyr::mutate(date=lubridate::ymd(paste(year_zero,"-01-01",sep="")) %m+% months((t-1)*2)) %>% dplyr::arrange(simulation,date) %>% dplyr::select(-t)
@@ -628,11 +633,11 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
     meta <- tibble::tibble(parameter=c("Nrun","end_year","beta.","p.","nu.","rho.","r.","eta.","tau."),value=c(Nrun,simulation_end,beta,p,nu,rho,r,eta,tau))
     #replace "t" with dates
     abm <- abm %>% dplyr::mutate(date=lubridate::ymd(paste(year_zero,"-01-01",sep="")) %m+% months((t-1)*2)) %>% dplyr::arrange(simulation,date) %>% dplyr::select(-t)
-    closeAllConnections()
     return(list("abm"=abm,"scenario"=sD,"system"=meta))
   }
 
 }
+
 
 #' @title calABM
 #'
@@ -654,16 +659,16 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
 #' @param eta OSS sludge/hassle
 #' @param tau sludge (transaction cost)
 #' @param rho rebound
-
-
+#'
 #' @returns calibration run data
 #' @export
 #'
 #' @examples
-#' #test <- calABM(sD,8,2,TRUE,nu=0.4,p=0.006,beta = 0.8,r = 0.03,eta = 0.02,tau = 0.02,rho=0.3)
 #'
-calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022,r=0.04,beta=0.8,eta=0.02,tau=0.02,rho=0.3){
-  #
+#' #test <- calABM(sD,4,2,T)
+
+calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,beta=0.8,r=0.03,eta=0.02,tau=0.02,rho=0.3){
+
   year_zero <- 2015
   simulation_end <- 2025
   resample_society=F
@@ -697,46 +702,48 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
                                                                   "make_artificial_society","heat_pump_upgrade_savings",
                                                                   "heating_system_efficiency",
                                                                   "ber_from_hli")) %dopar% {
-      #abm <- foreach::foreach(j = 1:Nrun, .errorhandling = "pass",.export = c("initialise_agents","update_agents4")) %dopar% {
+                                                                    #abm <- foreach::foreach(j = 1:Nrun, .errorhandling = "pass",.export = c("initialise_agents","update_agents4")) %dopar% {
 
-      #create a new artificial society for each run
-      #print(paste("Generating network for run",j,"...."))
-      microcal_run <- sample(1:100,1)
-      u_empirical <- hpmicrosimr::hp_empirical_utils %>% dplyr::filter(calibration_run==microcal_run) %>% dplyr::select(-calibration_run)
-      agents_in <- initialise_agents(sD_cal,year_zero,microcal_run)
+                                                                    #create a new artificial society for each run
+                                                                    #print(paste("Generating network for run",j,"...."))
+                                                                    microcal_run <- sample(1:100,1)
+                                                                    u_empirical <- hpmicrosimr::hp_empirical_utils %>% dplyr::filter(calibration_run==microcal_run) %>% dplyr::select(-calibration_run)
+                                                                    agents_in <- initialise_agents(sD_cal,year_zero,microcal_run)
 
-      if(!resample_society) social <- make_artificial_society(hp_society_oo  %>% dplyr::filter(serial %in% agents_in$serial),homophily,4.5)
+                                                                    if(!resample_society) social <- make_artificial_society(hp_society_oo  %>% dplyr::filter(serial %in% agents_in$serial),homophily,4.5)
 
-      if(resample_society){
-        agent_resample <- sample(1:dim(hp_society_oo)[1],replace=T)
-        society_new <- society[agent_resample,]
-        society_new$ID <- 1:dim(hp_society_oo)[1]
-        social <- make_artificial_society(society_new,hpmicrosimr::homophily,4.5)
-      }
-      #randomiise ICEV emissions assignment
-      #choose segments
-      #no transactions
-      #agents_in$transaction <- FALSE
-      agent_ts<- vector("list",Nt)
-      agent_ts[[1]] <- agents_in #agent parameters with regularized weights
+                                                                    if(resample_society){
+                                                                      agent_resample <- sample(1:dim(hp_society_oo)[1],replace=T)
+                                                                      society_new <- society[agent_resample,]
+                                                                      society_new$ID <- 1:dim(hp_society_oo)[1]
+                                                                      social <- make_artificial_society(society_new,hpmicrosimr::homophily,4.5)
+                                                                    }
+                                                                    #randomiise ICEV emissions assignment
+                                                                    #choose segments
+                                                                    #no transactions
+                                                                    #agents_in$transaction <- FALSE
+                                                                    agent_ts<- vector("list",Nt)
+                                                                    agent_ts[[1]] <- agents_in #agent parameters with regularized weights
 
-      for(t in seq(2,Nt)){
-        #bi-monthly
-        yeartime <- year_zero+(t-1)/6
-        agent_ts[[t]] <- update_agents(sD_cal,yeartime,agent_ts[[t-1]],social_network=social,ignore_social,cal_run=microcal_run,quiet=TRUE) #static social network, everything else static
-        #agent_ts[[t]] <- tibble::tibble(t=t)
-      }
+                                                                    for(t in seq(2,Nt)){
+                                                                      #bi-monthly
+                                                                      yeartime <- year_zero+(t-1)/6
+                                                                      agent_ts[[t]] <- update_agents(sD_cal,yeartime,agent_ts[[t-1]],social_network=social,ignore_social,cal_run=microcal_run,quiet=TRUE) #static social network, everything else static
+                                                                      #agent_ts[[t]] <- tibble::tibble(t=t)
+                                                                    }
 
-      for(t in 1:Nt) agent_ts[[t]]$t <- t
-      agent_ts <- tibble::as_tibble(data.table::rbindlist(agent_ts,fill=T))
-      agent_ts$simulation <- j
-      #add vertex degree
-      degrees <- tibble::tibble(serial=social %>% tibble::as_tibble() %>% dplyr::pull(serial),degree=igraph::degree(social))
-      agent_ts <- agent_ts %>% dplyr::inner_join(degrees)
-      agent_ts
-    }
+                                                                    for(t in 1:Nt) agent_ts[[t]]$t <- t
+                                                                    agent_ts <- tibble::as_tibble(data.table::rbindlist(agent_ts,fill=T))
+                                                                    agent_ts$simulation <- j
+                                                                    #add vertex degree
+                                                                    degrees <- tibble::tibble(serial=social %>% tibble::as_tibble() %>% dplyr::pull(serial),degree=igraph::degree(social))
+                                                                    agent_ts <- agent_ts %>% dplyr::inner_join(degrees)
+                                                                    agent_ts
+                                                                  }
+    doParallel::stopImplicitCluster()
     parallel::stopCluster(cl)
-    closeAllConnections()
+    cl <- NULL
+    #gc(full = TRUE, verbose = FALSE)
 
     meta <- tibble::tibble(parameter=c("Nrun","end_year","nu.","p.","r.","beta.","eta.","tau.","rho."),value=c(Nrun,simulation_end,nu,p,r,beta,eta,tau,rho))
     abm <- abm %>% dplyr::mutate(date=lubridate::ymd(paste(year_zero,"-01-01",sep="")) %m+% months((t-1)*2)) %>% dplyr::arrange(simulation,date) %>% dplyr::select(-t)
@@ -771,9 +778,9 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
     cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r)
     #print(cals)
     cals <- cals %>% dplyr::bind_cols(tibble::tibble(n_heat=n_heat_pump-n_heat_pump_0,n_heat_2015=n_heat_pump_0,number_b2=n_b2-n_b2_0,number_b2_2015=n_b2_0,
-                                             oss_total=cost_oss,warmerhomes_total=cost_warmerhomes,betterenergy_total=cost_betterenergy,
-                                              n_oss = n_oss,n_warmerhomes=n_warmerhomes,n_betterenergy=n_betterenergy,
-                                             n_fabric_total=n_upgrade))
+                                                     oss_total=cost_oss,warmerhomes_total=cost_warmerhomes,betterenergy_total=cost_betterenergy,
+                                                     n_oss = n_oss,n_warmerhomes=n_warmerhomes,n_betterenergy=n_betterenergy,
+                                                     n_fabric_total=n_upgrade))
     #print(cals)
     #print(cals %>% dplyr::bind_cols(tibble::tibble(betterenergy_cost=cost_betterenergy)))
     #print(cals)
@@ -781,7 +788,6 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
     #return(cals)
   }
   print("exited loop")
-  closeAllConnections()
   if(use_parallel) return(list(parameters=cals,efficiency=efficiencies,grants=grants))
   #print("DEBUG: We left the parallel block without returning!")
   #don't use parallel
@@ -810,7 +816,7 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
         social <- make_artificial_society(society_new,homophily,5)
 
       }
-        #no transactions
+      #no transactions
       #agents_in$transaction <- FALSE
       agent_ts <- vector("list",Nt)
       agent_ts[[1]] <- agents_in #agent parameters with regularized weights
@@ -872,12 +878,12 @@ calABM <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.27,p=0.0022
     cals <- tibble::tibble(beta.=beta,eta.=eta,p.=p,nu.=nu,rho.=rho,r.=r,n_heat=n_heat_pump,number_b2=n_b2,oss_total=cost_oss,warmerhomes_total=cost_warmerhomes)#,betterenergy_total=cost_betterenergy)
     #print(cals)
     #print(cals %>% dplyr::bind_cols(tibble::tibble(betterenergy_cost=cost_betterenergy)))
-    closeAllConnections()
     cals %>% return()
 
   }
   if(!use_parallel) return(cals)
 }
+
 
 #' calABM2
 #'

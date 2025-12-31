@@ -9,10 +9,10 @@ calABM(
   Nrun = 4,
   n_unused_cores = 2,
   use_parallel = T,
-  nu = 0.27,
-  p = 0.0022,
-  r = 0.04,
+  nu = 0.4,
+  p = 0.004,
   beta = 0.8,
+  r = 0.03,
   eta = 0.02,
   tau = 0.02,
   rho = 0.3
@@ -31,9 +31,9 @@ calABM(
 
 \item{p}{upgrade rate parameter default}
 
-\item{r}{risk neutral rate}
-
 \item{beta}{present bias}
+
+\item{r}{risk neutral rate}
 
 \item{eta}{OSS sludge/hassle}
 
@@ -52,6 +52,6 @@ based on heat pump uptake, grant uptake and number of b2s on 1 nov 2025\cr
 The output is summarised using summarise_cal()
 }
 \examples{
-#test <- calABM(sD,8,2,TRUE,nu=0.4,p=0.006,beta = 0.8,r = 0.03,eta = 0.02,tau = 0.02,rho=0.3)
 
+#test <- calABM(sD,4,2,T)
 }
