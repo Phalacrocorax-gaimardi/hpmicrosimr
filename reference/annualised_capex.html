@@ -108,22 +108,22 @@ to the intuition that older systems that continue to operate are "free".</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">2010</span><span class="op">:</span><span class="fl">2040</span>, <span class="kw">function</span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="fu">annualised_capex</span><span class="op">(</span><span class="st">"heat_pump"</span>,<span class="fl">18</span>,<span class="fl">2010</span>,<span class="st">"swap"</span>,<span class="st">"detached"</span>,<span class="fl">2003</span>,<span class="st">"WarmerHomes"</span>,<span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 1501.44072 1503.36350 1503.32632 1500.02491 1492.18340 1478.58783</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 1459.41728 1433.63655 1399.15003 1355.43337 1302.27839 1239.83660</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [13] 1168.64685 1089.64169 1004.12812  913.74090  818.96993  722.35597</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [19]  627.53670  536.48222  450.94521  372.36462  301.79586  239.87363</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [25]  186.81007  142.42653  106.21325   77.40840   55.08631   38.24459</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [31]   25.88163</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 1868.32008 1870.94198 1871.12038 1867.23084 1857.68359 1840.96527</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 1817.40740 1785.71108 1743.14733 1689.05593 1623.17040 1545.67271</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13] 1457.22824 1358.99418 1252.59601 1140.06965 1021.90796  901.32248</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19]  782.98295  669.34787  562.60401  464.54640  376.49111  299.22912</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [25]  233.02401  177.65174  132.47521   96.54294   68.69920   47.69279</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [31]   32.27367</span>
 <span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span><span class="fl">100</span>,<span class="fu">annualised_capex</span><span class="op">(</span><span class="st">"heat_pump"</span>,<span class="fl">13</span>,<span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="st">"detached"</span>,<span class="fl">2003</span>,<span class="st">"None"</span>,<span class="va">params</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> .</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1715.80408497979 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2153.70557954844 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              100 </span>
 <span class="r-in"><span><span class="va">params</span><span class="op">$</span><span class="va">beta.</span> <span class="op">&lt;-</span> <span class="fl">0.5</span></span></span>
 <span class="r-in"><span><span class="fu">annualised_capex</span><span class="op">(</span><span class="st">"gas"</span>,<span class="fl">8</span>,<span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="st">"detached"</span>,<span class="fl">2003</span>,<span class="st">"None"</span>,<span class="va">params</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 285.5938</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 241.6343</span>
 <span class="r-in"><span><span class="fu">annualised_capex</span><span class="op">(</span><span class="st">"heat_pump"</span>,<span class="fl">8</span>,<span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="st">"detached"</span>,<span class="fl">2003</span>,<span class="st">"BetterEnergyHomes"</span>,<span class="va">params</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 861.2664</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 687.002</span>
 </code></pre></div>
     </div>
   </div>
