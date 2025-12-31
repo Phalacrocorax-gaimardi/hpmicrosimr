@@ -177,7 +177,8 @@ heating_system_operating_cost <- function(hli,tech,installation_time,floor_area,
   heating_req <- ifelse(include_rebound, space_heating_requirement(hli,floor_area,params$rho.,params),space_heating_requirement(hli,floor_area,0,params))
   opex <- heating_req*params[[paste(fuel_type,"price",sep="_")]]/(100*efficiency) #prices given in cents per kWh
   #electric heating may be primarily used at night. The night usage fraction is a fixed parameter at the moment
-  if(tech %in% c("heat_pump","electricity")) opex <- opex*(params$night_rate_usage_factor*(1-params$night_rate_discount) + (1-params$night_rate_usage_factor))
+  if(tech == "heat_pump") opex <- opex*(params$hp_night_rate_usage_factor*(1-params$night_rate_discount) + (1-params$hp_night_rate_usage_factor))
+  if(tech == "electricity") opex <- opex*(params$electric_night_rate_usage_factor*(1-params$night_rate_discount) + (1-params$electric_night_rate_usage_factor))
   opex + params[[paste(tech,"system_maintenance",sep="_")]]
 }
 

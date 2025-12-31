@@ -5,6 +5,7 @@
 #hp_questions <- readr::read_csv("C:/Users/joe/pkgs/hpmicrosimr/inst/extdata/hp_questions.csv")
 #hp_qanda <- readr::read_csv("C:/Users/joe/pkgs/hpmicrosimr/inst/extdata/hp_qanda.csv")
 #sD <- readxl::read_xlsx("C:/Users/joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WEM")
+#use_data(sD,overwrite=TRUE)
 
 
 #' scenario_params
@@ -54,7 +55,8 @@ scenario_params <- function(sD,yeartime){
   }
   #night rate vs day rate
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="night_rate_discount", value =  night_discount_fun(sD,yeartime)))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="night_rate_usage_factor",  value=dplyr::filter(sD, parameter=="night_rate_usage_factor")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hp_night_rate_usage_factor",  value=dplyr::filter(sD, parameter=="hp_night_rate_usage_factor")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="electric_night_rate_usage_factor",  value=dplyr::filter(sD, parameter=="electric_night_rate_usage_factor")$value))
   #space heating
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="q_passive",  value=dplyr::filter(sD, parameter=="q_passive")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="q_hotwater",  value=dplyr::filter(sD, parameter=="q_hotwater")$value))
@@ -521,6 +523,11 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
   #u_empirical <- empirical_utils_oo %>% dplyr::filter(calibration==cal_run) %>% dplyr::select(-calibration)
   #
   if(use_parallel){
+    #clean exit
+    on.exit({
+      parallel::stopCluster(cl)
+      foreach::registerDoSEQ()
+    }, add = TRUE)
     #
     number_of_cores <- parallel::detectCores() - n_unused_cores
     cl <- parallel::makeCluster(number_of_cores)
@@ -568,6 +575,7 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
     }
     doParallel::stopImplicitCluster()  # 1. Unregister from doParallel
     parallel::stopCluster(cl)
+    foreach::registerDoSEQ()
     cl <- NULL
     #gc(full = TRUE, verbose = FALSE)
 
@@ -690,6 +698,11 @@ calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,beta
   Nt <- round((simulation_end-year_zero+1)*6)
 
   if(use_parallel){
+    #ensure clean exit
+    on.exit({
+      parallel::stopCluster(cl)
+      foreach::registerDoSEQ()
+    }, add = TRUE)
 
     number_of_cores <- parallel::detectCores() - n_unused_cores
     cl <- parallel::makeCluster(number_of_cores)
@@ -742,6 +755,7 @@ calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,beta
                                                                   }
     doParallel::stopImplicitCluster()
     parallel::stopCluster(cl)
+    foreach::registerDoSEQ()
     cl <- NULL
     #gc(full = TRUE, verbose = FALSE)
 
