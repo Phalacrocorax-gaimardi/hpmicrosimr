@@ -524,14 +524,17 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
   #
   if(use_parallel){
     #clean exit
-    on.exit({
-      parallel::stopCluster(cl)
-      foreach::registerDoSEQ()
-    }, add = TRUE)
     #
     number_of_cores <- parallel::detectCores() - n_unused_cores
     cl <- parallel::makeCluster(number_of_cores)
     doParallel::registerDoParallel(cl)
+
+    on.exit({
+      doParallel::stopImplicitCluster()  # 1. Unregister from doParallel
+            parallel::stopCluster(cl)
+            foreach::registerDoSEQ()
+            cl <- NULL}
+    )
 
     abm <- foreach::foreach(j = 1:Nrun, .packages = "dplyr", .combine=dplyr::bind_rows,
                             .export = c("initialise_agents","update_agents","make_artificial_society","heat_pump_upgrade_savings",
@@ -573,11 +576,7 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
       agent_ts <- agent_ts %>% dplyr::inner_join(degrees)
       agent_ts
     }
-    doParallel::stopImplicitCluster()  # 1. Unregister from doParallel
-    parallel::stopCluster(cl)
-    foreach::registerDoSEQ()
-    cl <- NULL
-    #gc(full = TRUE, verbose = FALSE)
+        #gc(full = TRUE, verbose = FALSE)
 
     meta <- tibble::tibble(parameter=c("Nrun","end_year","p.","nu.","rho.","r.","beta.","eta.","tau."),value=c(Nrun,simulation_end,p,nu,rho,r,beta,eta,tau))
     abm <- abm %>% dplyr::mutate(date=lubridate::ymd(paste(year_zero,"-01-01",sep="")) %m+% months((t-1)*2)) %>% dplyr::arrange(simulation,date) %>% dplyr::select(-t)
@@ -698,16 +697,17 @@ calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,beta
   Nt <- round((simulation_end-year_zero+1)*6)
 
   if(use_parallel){
-    #ensure clean exit
-    on.exit({
-      parallel::stopCluster(cl)
-      foreach::registerDoSEQ()
-    }, add = TRUE)
 
     number_of_cores <- parallel::detectCores() - n_unused_cores
     cl <- parallel::makeCluster(number_of_cores)
     doParallel::registerDoParallel(cl)
 
+    # Add on.exit for cleanup
+    on.exit({
+      try(doParallel::stopImplicitCluster(), silent = TRUE)
+      try(parallel::stopCluster(cl), silent = TRUE)
+      foreach::registerDoSEQ()
+    })
 
     #abm <- foreach::foreach(j = 1:Nrun, .packages = "dplyr", .final = function(x) { parallel::stopCluster(cl); x },
     abm <- foreach::foreach(j = 1:Nrun, .packages = "dplyr",
