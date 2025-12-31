@@ -21,7 +21,7 @@ The output is summarised using summarise_cal()"><meta property="og:image" conten
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -55,10 +55,10 @@ The output is summarised using summarise_cal()</p>
 <span>  Nrun <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  n_unused_cores <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  use_parallel <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>  nu <span class="op">=</span> <span class="fl">0.27</span>,</span>
-<span>  p <span class="op">=</span> <span class="fl">0.0022</span>,</span>
-<span>  r <span class="op">=</span> <span class="fl">0.04</span>,</span>
+<span>  nu <span class="op">=</span> <span class="fl">0.4</span>,</span>
+<span>  p <span class="op">=</span> <span class="fl">0.004</span>,</span>
 <span>  beta <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  r <span class="op">=</span> <span class="fl">0.03</span>,</span>
 <span>  eta <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  tau <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  rho <span class="op">=</span> <span class="fl">0.3</span></span>
@@ -93,12 +93,12 @@ The output is summarised using summarise_cal()</p>
 <dd><p>upgrade rate parameter default</p></dd>
 
 
-<dt id="arg-r">r<a class="anchor" aria-label="anchor" href="#arg-r"></a></dt>
-<dd><p>risk neutral rate</p></dd>
-
-
 <dt id="arg-beta">beta<a class="anchor" aria-label="anchor" href="#arg-beta"></a></dt>
 <dd><p>present bias</p></dd>
+
+
+<dt id="arg-r">r<a class="anchor" aria-label="anchor" href="#arg-r"></a></dt>
+<dd><p>risk neutral rate</p></dd>
 
 
 <dt id="arg-eta">eta<a class="anchor" aria-label="anchor" href="#arg-eta"></a></dt>
@@ -120,8 +120,8 @@ The output is summarised using summarise_cal()</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#test &lt;- calABM(sD,8,2,TRUE,nu=0.4,p=0.006,beta = 0.8,r = 0.03,eta = 0.02,tau = 0.02,rho=0.3)</span></span></span>
-<span class="r-in"><span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#test &lt;- calABM(sD,4,2,T)</span></span></span>
 </code></pre></div>
     </div>
   </div>
