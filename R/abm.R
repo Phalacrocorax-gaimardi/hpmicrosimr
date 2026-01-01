@@ -665,6 +665,7 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
 #' @param beta present bias
 #' @param eta OSS sludge/hassle
 #' @param tau sludge (transaction cost)
+#' @param lambda hypothetical bias adjustment
 #' @param rho rebound
 #'
 #' @returns calibration run data
@@ -674,7 +675,7 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
 #'
 #' #test <- calABM(sD,4,2,T)
 
-calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,r=0.03,beta=0.8,eta=0.02,tau=0.02,rho=0.3){
+calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,r=0.03,beta=0.8,eta=0.02,tau=0.02,lambda=0,rho=0.3){
 
   year_zero <- 2015
   simulation_end <- 2025
@@ -688,11 +689,12 @@ calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,r=0.
   sD_cal[sD_cal$parameter=="beta.","value"] <- beta #present bias
   sD_cal[sD_cal$parameter=="eta.","value"] <- eta #hassle/sludge
   sD_cal[sD_cal$parameter=="tau.","value"] <- tau  #sludge
+  sD_cal[sD_cal$parameter=="lambda.","value"] <- lambda #hypothetical bias & mis-pricings
   sD_cal[sD_cal$parameter=="rho.","value"] <- rho #rebound effect
 
 
   #calibration params:: MOVED TO SYSTDATA WHEN CALIBRATION COMPLETE
-  #print(paste("nu.=",nu,"p.=",p,"beta.=",beta,"r.=",r, "eta.=",eta,"tau.=",tau,"rho.=",rho))
+  print(paste("nu.=",nu,"p.=",p,"beta.=",beta,"r.=",r, "eta.=",eta,"tau.=",tau,"lambda.=",lambda,"rho.=",rho))
   #bi-monthly runs
   Nt <- round((simulation_end-year_zero+1)*6)
 

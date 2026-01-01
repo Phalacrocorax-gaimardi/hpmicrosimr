@@ -28,15 +28,15 @@ grants_cal <- grants_cal %>% mutate(date=lubridate::dmy(date))
 
 data(sD)
 
-min_fun2 <- function(nu,p,r,beta,eta,tau) {
+min_fun2 <- function(nu,p,r,beta,eta,tau,lambda) {
 
   #flush.console()
   #on.exit(closeAllConnections(),add=TRUE)
 
   cal_dates <- c("2025-11-01","2021-01-01")
   out <- suppressWarnings(
-        suppressMessages(
-          capture.output(df <- calABM(sD, Nrun=n_run, 2, TRUE, nu=nu, p=p,r=r, beta=beta, eta=eta, tau=tau, rho=0.3))))
+          suppressMessages(
+          capture.output(df <- calABM(sD, Nrun=n_run, 2, TRUE, nu=nu, p=p,r=r, beta=beta, eta=eta, tau=tau, lambda=lambda, rho=0.3))))
 
   df_eff <- df$efficiency %>% dplyr::inner_join(efficiency_cal, by="date") %>% suppressMessages()
   n_heat_pump0 <- df_eff %>% filter(date=="2015-01-01") %>% pull(n_heat_pump)
@@ -62,8 +62,20 @@ min_fun2 <- function(nu,p,r,beta,eta,tau) {
   return(list(Score=-err_2025))
 }
 
-params  <- scenario_params(sD,2015)
-min_fun2(params$nu.,params$p.,params$r.,params$beta.,params$eta.,params$tau.)
+
+min_fun2_safe <- function(nu,p,r,beta,eta,tau,lambda) {
+  #
+  result <- tryCatch({
+    min_fun2(nu,p,r,beta,eta,tau,lambda)
+  }, error = function(e) {
+    message("Failed with params: nu=", nu, "p=",p,"r=",r,"beta=",beta,"eta=",eta,"tau=",tau,"lambda=",lambda)
+    message("Error: ", e$message)
+    list(Score = -1e6)  # Return very poor score
+  })
+}
+
+#params  <- scenario_params(sD,2015)
+#min_fun2(params$nu.,params$p.,params$r.,params$beta.,params$eta.,params$tau.)
 
 # Set bounds
 bounds <- list(
@@ -72,7 +84,8 @@ bounds <- list(
   beta = c(0.3, 1),
   r = c(0.01, 0.1),
   eta = c(0, 0.1),
-  tau = c(0, 0.1)
+  tau = c(0, 0.1),
+  lambda =c(-0.1,0.1)
 )
 
 # Run optimization
@@ -80,7 +93,7 @@ bounds <- list(
 foreach::registerDoSEQ()
 
 result <- bayesOpt(
-  FUN = min_fun2,
+  FUN = min_fun2_safe,
   bounds = bounds,
   initPoints = n_design,
   iters.n = n_iter,
@@ -89,7 +102,7 @@ result <- bayesOpt(
 )
 
 # Extract all results
-calib <- results$scoreSummary %>% tibble::as_tibble() %>% dplyr::select(Epoch,Iteration,nu,p,r,beta,eta,tau,Score) %>% dplyr::mutate(error=-Score)
+calib <- result$scoreSummary %>% tibble::as_tibble() %>% dplyr::select(Epoch,Iteration,nu,p,r,beta,eta,tau,lambda,Score) %>% dplyr::mutate(error=-Score)
 calib <- calib %>% arrange(error) %>% select(-Score)
 
 # Save results

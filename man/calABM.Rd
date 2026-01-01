@@ -15,6 +15,7 @@ calABM(
   beta = 0.8,
   eta = 0.02,
   tau = 0.02,
+  lambda = 0,
   rho = 0.3
 )
 }
@@ -38,6 +39,8 @@ calABM(
 \item{eta}{OSS sludge/hassle}
 
 \item{tau}{sludge (transaction cost)}
+
+\item{lambda}{hypothetical bias adjustment}
 
 \item{rho}{rebound}
 }
