@@ -674,7 +674,7 @@ runABM <- function(sD, Nrun=1,simulation_end=2030,resample_society=F,n_unused_co
 #'
 #' #test <- calABM(sD,4,2,T)
 
-calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,beta=0.8,r=0.03,eta=0.02,tau=0.02,rho=0.3){
+calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,r=0.03,beta=0.8,eta=0.02,tau=0.02,rho=0.3){
 
   year_zero <- 2015
   simulation_end <- 2025
@@ -684,15 +684,15 @@ calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,beta
   sD_cal <- sD
   sD_cal[sD_cal$parameter=="nu.","value"] <- nu #financial partial utility scale
   sD_cal[sD_cal$parameter=="p.","value"] <- p #additional hypothetical bias correction
+  sD_cal[sD_cal$parameter=="r.","value"] <- r #risk-free or bare discount rate
   sD_cal[sD_cal$parameter=="beta.","value"] <- beta #present bias
   sD_cal[sD_cal$parameter=="eta.","value"] <- eta #hassle/sludge
-  sD_cal[sD_cal$parameter=="rho.","value"] <- rho #rebound effect
-  sD_cal[sD_cal$parameter=="r.","value"] <- r #risk-free or bare discount rate
   sD_cal[sD_cal$parameter=="tau.","value"] <- tau  #sludge
+  sD_cal[sD_cal$parameter=="rho.","value"] <- rho #rebound effect
 
-  lambda <- 0
+
   #calibration params:: MOVED TO SYSTDATA WHEN CALIBRATION COMPLETE
-  print(paste("nu.=",nu,"p.=",p,"beta.=",beta,"r.=",r, "eta.=",eta,"tau.=",tau,"rho.=",rho))
+  #print(paste("nu.=",nu,"p.=",p,"beta.=",beta,"r.=",r, "eta.=",eta,"tau.=",tau,"rho.=",rho))
   #bi-monthly runs
   Nt <- round((simulation_end-year_zero+1)*6)
 
@@ -770,7 +770,7 @@ calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,beta
     efficiencies <- test$efficiency %>% dplyr::filter(date %in% cal_dates) %>% dplyr::ungroup()
     efficiencies <- efficiencies %>% dplyr::inner_join(heat_pumps)
     grants <- test$grants %>% dplyr::filter(date %in% cal_dates)
-    print(paste("evaluating summary"))
+    #print(paste("evaluating summary"))
     #print(test)
     n_heat_pump <- test$tech %>% dplyr::filter(date==lubridate::ymd(cal_date),tech=="heat_pump") %>% dplyr::pull(n_tech)
     n_heat_pump_0 <- test$tech %>% dplyr::filter(date==lubridate::ymd(start_date),tech=="heat_pump") %>% dplyr::pull(n_tech)
@@ -801,7 +801,7 @@ calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,beta
     #closeAllConnections()
     #return(cals)
   }
-  print("exited loop")
+  #print("exited loop")
   if(use_parallel) return(list(parameters=cals,efficiency=efficiencies,grants=grants))
   #print("DEBUG: We left the parallel block without returning!")
   #don't use parallel

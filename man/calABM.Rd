@@ -11,8 +11,8 @@ calABM(
   use_parallel = T,
   nu = 0.4,
   p = 0.004,
-  beta = 0.8,
   r = 0.03,
+  beta = 0.8,
   eta = 0.02,
   tau = 0.02,
   rho = 0.3
@@ -31,9 +31,9 @@ calABM(
 
 \item{p}{upgrade rate parameter default}
 
-\item{beta}{present bias}
-
 \item{r}{risk neutral rate}
+
+\item{beta}{present bias}
 
 \item{eta}{OSS sludge/hassle}
 
