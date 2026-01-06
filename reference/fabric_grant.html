@@ -20,7 +20,7 @@ fabric upgrdae grant of euro700 applies."><meta property="og:image" content="htt
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.3</span>
       </span>
     </div>
 
@@ -64,7 +64,7 @@ fabric upgrdae grant of euro700 applies.</p>
 <span>  is_fuel_allowance <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  cost_model <span class="op">=</span> <span class="st">"logistic"</span>,</span>
 <span>  <span class="va">params</span>,</span>
-<span>  randomise <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  randomise <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -136,7 +136,7 @@ fabric upgrdae grant of euro700 applies.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2025</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2028</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">300</span>,<span class="fl">200</span>,<span class="st">"gas"</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, <span class="cn">FALSE</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $scheme</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "BetterEnergyHomes"</span>
@@ -145,10 +145,10 @@ fabric upgrdae grant of euro700 applies.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10450</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cost_estimate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 17973.97</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 18064.29</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $grant_share</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5813963</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5784893</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">300</span>,<span class="fl">150</span>,<span class="st">"gas"</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, <span class="cn">FALSE</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
@@ -159,10 +159,10 @@ fabric upgrdae grant of euro700 applies.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10450</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cost_estimate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 53476.73</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 53745.46</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $grant_share</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1954121</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.194435</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">300</span>,<span class="fl">100</span>,<span class="st">"gas"</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, <span class="cn">FALSE</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
@@ -170,13 +170,13 @@ fabric upgrdae grant of euro700 applies.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "OSS"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $grant_value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 18150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 11850</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cost_estimate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 101701.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 102212.7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $grant_share</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1784633</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1159348</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">300</span>,<span class="fl">150</span>,<span class="st">"gas"</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, is_fuel_allowance<span class="op">=</span><span class="cn">TRUE</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
@@ -187,10 +187,10 @@ fabric upgrdae grant of euro700 applies.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 35000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cost_estimate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 42781.38</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 42996.36</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $grant_share</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8181129</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8140223</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">300</span>,<span class="fl">150</span>,<span class="st">"gas"</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
@@ -198,13 +198,13 @@ fabric upgrdae grant of euro700 applies.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "BetterEnergyHomes"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $grant_value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4150</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cost_estimate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 53476.73</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 53745.46</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $grant_share</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1954121</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.07721583</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">300</span>,<span class="fl">280</span>,<span class="st">"gas"</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
@@ -226,10 +226,10 @@ fabric upgrdae grant of euro700 applies.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "WarmerHomes"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $grant_value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5777.875</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5806.909</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $cost_estimate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5777.875</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5806.909</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $grant_share</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
