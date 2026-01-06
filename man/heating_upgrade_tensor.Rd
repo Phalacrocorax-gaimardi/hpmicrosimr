@@ -80,11 +80,11 @@ Used with optimise_upgrade to determine the optimal upgrade path tech_old -> tec
 }
 \examples{
 
-params <- scenario_params(sD,2026)
+params <- scenario_params(sD,2028)
 
 heating_upgrade_tensor(1.8,1.8,"gas",2005,"heat_pump","semi_detached",2,1990,"Dublin",100,cost_model="logistic",params,TRUE,FALSE,TRUE)
 
-heating_upgrade_tensor(4,3,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,"logistic",params,TRUE,FALSE,TRUE,include_rebound=TRUE)
+heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
 
 heating_upgrade_tensor(2,1.2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
 

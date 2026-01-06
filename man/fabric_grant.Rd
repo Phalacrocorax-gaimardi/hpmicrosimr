@@ -18,7 +18,7 @@ fabric_grant(
   is_fuel_allowance = FALSE,
   cost_model = "logistic",
   params,
-  randomise = FALSE
+  randomise = TRUE
 )
 }
 \arguments{
@@ -61,7 +61,7 @@ fabric upgrdae grant of euro700 applies.
 }
 \examples{
 
-params <- scenario_params(sD,2025)
+params <- scenario_params(sD,2028)
 fabric_grant(300,200,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,"logistic",params,randomise=TRUE)
 
 fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,"logistic",params,randomise=TRUE)

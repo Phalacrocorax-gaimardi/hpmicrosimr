@@ -508,11 +508,11 @@ gen_upgrade_cost_matrix <- function(house_type,storeys,region="Dublin",floor_are
 #'
 #' @examples
 #'
-#' params <- scenario_params(sD,2026)
+#' params <- scenario_params(sD,2028)
 #'
 #' heating_upgrade_tensor(1.8,1.8,"gas",2005,"heat_pump","semi_detached",2,1990,"Dublin",100,cost_model="logistic",params,TRUE,FALSE,TRUE)
 #'
-#' heating_upgrade_tensor(4,3,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,"logistic",params,TRUE,FALSE,TRUE,include_rebound=TRUE)
+#' heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
 #'
 #' heating_upgrade_tensor(2,1.2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
 #'
@@ -1053,7 +1053,7 @@ grant_eligibility <- function(ber_old, ber_new, construction_year, is_fuel_allow
 #'
 #' @examples
 #'
-#' params <- scenario_params(sD,2025)
+#' params <- scenario_params(sD,2028)
 #' fabric_grant(300,200,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,"logistic",params,randomise=TRUE)
 #'
 #' fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,"logistic",params,randomise=TRUE)
@@ -1068,11 +1068,11 @@ grant_eligibility <- function(ber_old, ber_new, construction_year, is_fuel_allow
 #'
 #' fabric_grant(175,155,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,"logistic",params,randomise=TRUE)
 
-fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,construction_year,region,house_type,storeys,floor_area = 100,is_fuel_allowance = FALSE,cost_model="logistic",params,randomise=FALSE) {
+fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,construction_year,region,house_type,storeys,floor_area = 100,is_fuel_allowance = FALSE,cost_model="logistic",params,randomise=TRUE) {
 
   #Input validation with more informative messages
   stopifnot(house_type %in% c("semi_detached", "detached", "apartment", "terraced","apartment"))
-  set.seed(as.integer(Sys.time()))
+  #set.seed(as.integer(Sys.time()))
   hli_old <- heat_loss_indicator(ber_old,tech_old,heating_install_time,params)
   hli_new <- heat_loss_indicator(ber_new,tech_new,params$yeartime,params)
   cost_estimate <- retrofit_cost_model(hli_old,hli_new,house_type,storeys,region,floor_area,cost_model,params)
@@ -1121,7 +1121,8 @@ fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,
    relevant_grants <-  relevant_grants %>% dplyr::filter(!stringr::str_detect(measure,"heat_pump"))
    #relevant_grants_mean <- relevant_grants %>% dplyr::mutate(measure=replace(measure, str_detect(measure,"attic|rafter"),"roof"))
    #relevant_grants_mean <- relevant_grants %>% dplyr::mutate(measure=replace(measure, str_detect(measure,"wall"),"wall"))
-   max_grant <- pmin(cost_estimate,pmax(0,sum(relevant_grants$grant)-2000))  #manual adjustment
+   grant_scale <- ifelse(params$yeartime < params$grant_increase_date,1,params$grant_increase_factor)
+   max_grant <- pmin(cost_estimate,pmax(0,grant_scale*(sum(relevant_grants$grant)-2000)))  #manual adjustment for missing elements
    #print(max_grant/cost_estimate)
    return(list(scheme=scheme0,grant_value=max_grant,cost_estimate=cost_estimate, grant_share=max_grant/cost_estimate)) #factor of 0.8 because not all measures will apply
   }
@@ -1149,6 +1150,7 @@ fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,
 #' heat_pump_grant("new","apartment",2003,"WarmerHomes",scenario_params(sD,2025.5))
 #'
 #' heat_pump_grant("new","apartment",2003,"BetterEnergyHomes",scenario_params(sD,2024))
+#'
 #' params <- scenario_params(sD,2025)
 #' heat_pump_grant("new","semi_detached",1997,"OSS",params)
 #' heat_pump_grant("new","semi_detached",1997,"BetterEnergyHomes",params)
@@ -1173,10 +1175,12 @@ heat_pump_grant <- function(installation_type,house_type,construction_year,grant
     # Original grant scheme: flat rates, same for all dwelling types
     return(3500)
   }
-  hp_grants <- seai_grants %>% dplyr::filter(building_type==house_type, stringr::str_detect(measure,"heat_pump"),scheme==grant_type)
-  grant <- hp_grants$grant
-  grant <- ifelse(length(grant)==1,return(grant), return(grant[1]+sample(c(1,0),1)*grant[2]+grant[3]))
-  grant_scale <- ifelse(params$yeartime < params$grant_increase_date,1,params$grant_increase_factor)
-  return(grant_scale*grant)
+  if(grant_type %in% c("BetterEnergyHomes","OSS") & params$yeartime >= params$hp_grant_increase){
+    hp_grants <- seai_grants %>% dplyr::filter(building_type==house_type, stringr::str_detect(measure,"heat_pump"),scheme==grant_type)
+    grant <- hp_grants$grant
+    grant_scale <- ifelse(params$yeartime < params$grant_increase_date,1,params$grant_increase_factor)
+    grant <- ifelse(length(grant)==1,grant, grant[1]+sample(c(1,0),1)*grant[2]+grant[3])
+    return(grant_scale*grant)
+  }
 }
 

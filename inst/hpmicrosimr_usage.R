@@ -4,12 +4,15 @@ sessionInfo()
 library(tidyverse)
 
 sD_wem <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WEM")
-sD_wem[sD_wem$parameter=="warmer_homes_introduction","value"] <- 2050
-sD_wem[sD_wem$parameter=="better_energy_introduction","value"] <- 2050
-sD_wem[sD_wem$parameter=="oss_introduction","value"] <- 2050
+sD_wam <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WAM")
 
-test <- runABM(sD_wem,16,2040)
+sD_wam[sD_wem$parameter=="grant_increase_date","value"]
+sD_wam[sD_wem$parameter=="grant_increase_factor","value"]
+#sD_wem[sD_wem$parameter=="better_energy_introduction","value"] <- 2050
+#sD_wem[sD_wem$parameter=="oss_introduction","value"] <- 2050
 
+test <- runABM(sD_wam,4,2040)
+wam <- test
 
 params <- scenario_params(sD_wem,2026)
 params$warmer_homes_introduction
@@ -29,8 +32,10 @@ sD_cal[sD_cal$parameter=="lambda.","value"] <- 0
 #test <- runABM(sD_cal,4,2040)
 
 wem <- readRDS("~/Policy/CAMG/EED/Heat/data/wem.RData")
-abm <- wem[[1]]
-n_run <- wem[[3]] %>% filter(parameter=="Nrun") %>% pull(value)
+abm <- wam[[1]]
+n_run <- wem_ex[[3]] %>% filter(parameter=="Nrun") %>% pull(value)
+df0 <- abm %>% group_by(simulation,date) %>% summarise(n0=n())
+housing_stock_oo <- 1147552 #census
 
 
 test2 <- abm %>% group_by(simulation,date,tech) %>% summarise(n=n()) %>% inner_join(df0)
@@ -46,12 +51,15 @@ g
 #annual year end number fo heat pumps
 ntech <- test2 %>% filter(tech=="heat_pump",str_detect(date,"-01-01")) %>% mutate(year_end=year(date)) %>% select(-date)
 #write_csv(ntech,"~/Policy/CAMG/EED/Heat/data/wem_ntech.csv")
+ntech_wem <- read_csv("~/Policy/CAMG/EED/Heat/data/wem_ntech.csv")
+
 
 #number of b2
 nb2 <- abm %>% filter(ber <= 125) %>% group_by(simulation,date) %>% summarise(n_b2 = n()) %>% inner_join(df0)
 nb2 <- nb2 %>% mutate(n_b2=n_b2/n0*housing_stock_oo) %>% select(-n0)
-nb2 %>% ggplot(aes(date,n_b2,colour=factor(simulation)))+geom_line() + theme_minimal() + theme(legend.position = "none")
 
+g2 <- nb2 %>% ggplot(aes(date,n_b2,colour=factor(simulation)))+geom_line() + theme_minimal() + theme(legend.position = "none")
+g1+g2
 
 nb2 <- nb2 %>% group_by(date) %>% summarise(n_b2=mean(n_b2)) %>% filter(str_detect(date,"-01-01")) %>% mutate(year_end=year(date)) %>% select(-date)
 
