@@ -3,37 +3,59 @@ library(hpmicrosimr)
 sessionInfo()
 library(tidyverse)
 
-sD_cal <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WEM")
-sD_cal[sD_cal$parameter=="night_rate_usage_factor","value"] <- 0
-sD_cal[sD_cal$parameter=="nu.","value"] <- 0.2
+sD_wem <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WEM")
+sD_wem[sD_wem$parameter=="warmer_homes_introduction","value"] <- 2050
+sD_wem[sD_wem$parameter=="better_energy_introduction","value"] <- 2050
+sD_wem[sD_wem$parameter=="oss_introduction","value"] <- 2050
 
-params <- scenario_params(sD,2026)
-optimise_upgrade(5.42,"oil",2004,"semi_detached",2,1939,region = "Dublin",floor_area=158,cost_model = "logistic",params,TRUE,FALSE,include_grants = TRUE,include_rebound = FALSE)
-optimise_upgrade(5.42,"oil",2004,"semi_detached",2,1939,region = "Dublin",floor_area=158,cost_model = "logistic",params,TRUE,FALSE,include_grants = TRUE,include_rebound = FALSE)
+test <- runABM(sD_wem,16,2040)
 
-params <- scenario_params(sD_cal,2026)
-params$night_rate_usage_factor
 
-test <- calABM(sD,4,2,TRUE,nu=0.4,p=0.006,beta = 0.8,r = 0.03,eta = 0.02,tau = 0.02,rho=0.3)
-
-calABM(sD_cal,4,2,FALSE,0.2,0,0.006,0.05,0.7,0.7,0.3)
+params <- scenario_params(sD_wem,2026)
+params$warmer_homes_introduction
 
 ########
 sD_cal <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WEM")
-sD_cal[sD_cal$parameter=="night_rate_usage_factor","value"] <- 0
-sD_cal[sD_cal$parameter=="nu.","value"] <- 0.4
-sD_cal[sD_cal$parameter=="p.","value"] <- 0.0062
 
-test <- runABM(sD_cal,1,2040,F,2,F,F,F)
+sD_cal[sD_cal$parameter=="nu.","value"] <- calib$nu
+sD_cal[sD_cal$parameter=="p.","value"] <- calib$p
+sD_cal[sD_cal$parameter=="r.","value"] <- 0.03
+sD_cal[sD_cal$parameter=="beta.","value"] <- calib$beta
+sD_cal[sD_cal$parameter=="eta.","value"] <- calib$eta
+sD_cal[sD_cal$parameter=="tau.","value"] <- calib$tau
+sD_cal[sD_cal$parameter=="lambda.","value"] <- 0
 
-test2 <- test[[1]] %>% group_by(date,tech) %>% summarise(n=n()/4)
+
+#test <- runABM(sD_cal,4,2040)
+
+wem <- readRDS("~/Policy/CAMG/EED/Heat/data/wem.RData")
+abm <- wem[[1]]
+n_run <- wem[[3]] %>% filter(parameter=="Nrun") %>% pull(value)
+
+
+test2 <- abm %>% group_by(simulation,date,tech) %>% summarise(n=n()) %>% inner_join(df0)
+test2 <- test2 %>% mutate(n=n/n0*housing_stock_oo) %>% select(-n0)
+test2 <- test2 %>% group_by(tech,date) %>% summarise(n=mean(n))
 test2 <- test2 %>% ungroup() %>% arrange(date,factor(tech,levels = c("heat_pump","electricity","oil","gas","solid_fuel")))
 test2 <- test2 %>% mutate(tech=factor(tech,levels=rev(c("heat_pump","electricity","oil","gas","solid_fuel"))))
-housing_stock_oo <- 611877+535675
-n_0 <- length(test[[1]]$serial %>% unique())
-g <- test2 %>% ggplot(aes(date,n/n_0*housing_stock_oo,fill=tech))+geom_area()
+
+g <- test2 %>% ggplot(aes(date,n,fill=tech))+geom_area()
 g <- g + theme_minimal() + scale_fill_viridis_d()
-#export::graph2ppt(g,"~/Policy/CAMG/EED/Heat/test_uptake2.ppt")
+g
+#export::graph2ppt(g,"~/Policy/CAMG/EED/Heat/wem_uptake.ppt")
+#annual year end number fo heat pumps
+ntech <- test2 %>% filter(tech=="heat_pump",str_detect(date,"-01-01")) %>% mutate(year_end=year(date)) %>% select(-date)
+#write_csv(ntech,"~/Policy/CAMG/EED/Heat/data/wem_ntech.csv")
+
+#number of b2
+nb2 <- abm %>% filter(ber <= 125) %>% group_by(simulation,date) %>% summarise(n_b2 = n()) %>% inner_join(df0)
+nb2 <- nb2 %>% mutate(n_b2=n_b2/n0*housing_stock_oo) %>% select(-n0)
+nb2 %>% ggplot(aes(date,n_b2,colour=factor(simulation)))+geom_line() + theme_minimal() + theme(legend.position = "none")
+
+
+nb2 <- nb2 %>% group_by(date) %>% summarise(n_b2=mean(n_b2)) %>% filter(str_detect(date,"-01-01")) %>% mutate(year_end=year(date)) %>% select(-date)
+
+
 
 test2 <- test[[1]] %>% group_by(date,tech) %>% summarise(ber=mean(ber),hli=mean(hli))
 test2 <- test2 %>% ungroup() %>% arrange(date,factor(tech,levels = c("heat_pump","electricity","oil","gas","solid_fuel")))
@@ -60,22 +82,101 @@ test2 <- test[[1]] %>% filter(heat_pump_grant > 0) %>% group_by(year = year(date
 test2 <- test2 %>% group_by(grant_type, failure) %>% mutate(n=cumsum(n))
 test2 %>% ggplot(aes(year,n,colour=grant_type, linetype=failure))+geom_line()
 
-
-
-############
-# tests
-###########
-params <- scenario_params(sD,2026)
-heating_upgrade_tensor(5.4,2.3,"oil",2005,"heat_pump","semi_detached",2,1990,"Dublin",100,cost_model="logistic",params,TRUE,FALSE,TRUE)
+#################
+# annual means or end of year
+##############
+#tech installed
+df0 <- abm %>% group_by(simulation,date) %>% summarise(n0=n())
+test2 <- abm %>% group_by(simulation,date,tech) %>% summarise(n=n()) %>% inner_join(df0)
+test2 <- test2 %>% mutate(n=n/n0*housing_stock_oo) %>% select(-n0)
+test2 <- test2 %>% group_by(tech,date) %>% summarise(n=mean(n))
+test2 %>% filter(date %in% c("2015-01-01","2026-01-01","2031-01-01","2036-01-01","2040-01-01"))
+#grant type
+df0 <- abm %>% group_by(simulation,date) %>% summarise(n0=n())
+test2 <- abm %>% group_by(simulation,date,grant_type) %>% summarise(n=n()) %>% inner_join(df0)
+test2 <- test2 %>% mutate(n=n/n0*housing_stock_oo) %>% select(-n0)
+test2 <- test2 %>% group_by(grant_type,date) %>% summarise(n=mean(n))
+test2 %>% filter(!is.na(grant_type)) %>% ggplot(aes(date,n,colour=grant_type))+geom_line()
 
 #
+g1 <- abm %>% group_by(simulation,date) %>% summarise(eac_actual=mean(eac)) %>% ggplot(aes(date,eac_actual,colour=factor(simulation)))+geom_line() + theme(legend.position="none")
+g2 <- abm %>% group_by(simulation,date) %>% summarise(eac_actual=mean(eac_actual)) %>% ggplot(aes(date,eac_actual,colour=factor(simulation)))+geom_line() + theme(legend.position="none")
+g1+g2
+
+######################
+# FEC
+##########################
+# FEC is different from space heating requirement
+# adjust for heat pump energy use
+########################################
+
+params0 <- scenario_params(sD,2025)
+abm <- abm %>% mutate(space_heating_requirement_actual = space_heating_requirement(hli,floor_area,rebound=0.4,params0))
+abm <- abm %>% mutate(space_heating_requirement_theory = space_heating_requirement(hli,floor_area,rebound=0,params0))
+abm <- abm %>% mutate(temperature_deficit = (space_heating_requirement_theory-space_heating_requirement_actual)/(8.76*hli*floor_area))
+
+heat <- abm %>% group_by(simulation,date) %>% summarise(space_heating_requirement = sum(space_heating_requirement_theory))
+heat %>% ggplot(aes(date,space_heating_requirement,colour=factor(simulation))) + geom_line() + theme(legend.position="none")
+
+temperature <- abm %>% filter(income < 37500) %>% group_by(simulation,date) %>% summarise(degree_deficit = mean(temperature_deficit))
+g1 <- temperature %>% ggplot(aes(date,degree_deficit,colour=factor(simulation))) + geom_line()
+g1 <- g1 + scale_y_continuous(limits=c(0.65,1.2)) + theme_minimal() + theme(legend.position="none")
+
+temperature <- abm %>% filter(income > 62400) %>% group_by(simulation,date) %>% summarise(degree_deficit = mean(temperature_deficit))
+g2 <- temperature %>% ggplot(aes(date,degree_deficit,colour=factor(simulation))) + geom_line()
+g2 <- g2 + scale_y_continuous(limits=c(0.65,1.2))  + theme_minimal() + theme(legend.position="none")
+#
+temperature <- abm %>% filter(income <= 62400 & income >= 37500) %>% group_by(simulation,date) %>% summarise(degree_deficit = mean(temperature_deficit))
+g3 <- temperature %>% ggplot(aes(date,degree_deficit,colour=factor(simulation))) + geom_line()
+g3 <- g3 + scale_y_continuous(limits=c(0.65,1.2)) + theme_minimal() + theme(legend.position="none")
 
 
-df <- tibble()
-for(i in 1:100)
-df <-  df %>% bind_rows(heating_upgrade_tensor(5.4,2.3,"oil",2005,"heat_pump","semi_detached",2,1990,"Dublin",100,cost_model="logistic",params,TRUE,FALSE,TRUE))
+#
+library(patchwork)
+g1+g3+g2
+
+###############################
+# space-heating FEC households
+###############################
+
+abm <- abm %>% mutate(efficiency = heating_system_efficiency(tech,heating_install_time))
+df <- abm %>% group_by(tech,date) %>% summarise(efficiency=mean(efficiency))
+df %>% ggplot(aes(date,efficiency,colour=tech))+geom_line()
+#FEC
+abm <- abm %>% mutate(fec_prebound=space_heating_requirement_actual/efficiency, fec_theory=space_heating_requirement_theory/efficiency)
+#totals
+fec <- abm %>% group_by(simulation,date) %>% summarise(fec_prebound=sum(fec_prebound),fec_theory=sum(fec_theory)) %>% inner_join(df0)
+fec <- fec %>% mutate(fec_prebound=fec_prebound/n0*housing_stock_oo, fec_theory=fec_theory/n0*housing_stock_oo)
+fec <- fec %>% select(-n0) %>% group_by(simulation,year=year(date)) %>% summarise(fec_prebound=mean(fec_prebound),fec_theory=mean(fec_theory))
+g1 <- fec %>% ggplot(aes(year,fec_theory/10^9,colour=factor(simulation)))+geom_line() + theme_minimal() + theme(legend.position="none")
+g1 <- g1 + scale_y_continuous(limits=c(15,32))
+
+g2 <- fec %>% ggplot(aes(year,fec_prebound/10^9,colour=factor(simulation)))+geom_line() + theme_minimal() + theme(legend.position="none")
+g2 <- g2 + scale_y_continuous(limits=c(15,32))
+g1+g2
+#EED
+fec %>% filter(year==2022) %>% pull(fec_prebound) %>% mean()/1e+9 #20TWh
+fec %>% filter(year==2030) %>% pull(fec_prebound) %>% mean()/1e+9 #17.9 TWh
+#1-17.9/20 -10.5 vs -12.6% target - inadequate
+
+##################################
+# co2 emissions
+################################
+
+emissions_factors <- read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/tech_emissions_factors.csv")
+abm <- abm %>% inner_join(emissions_factors)
+abm <- abm %>% mutate(tco2=gCO2_per_kWh*space_heating_requirement_actual/1e+6)
+#
+df <- abm %>% group_by(simulation,date) %>% summarise(tco2=sum(tco2)) %>% inner_join(df0) %>% mutate(Mtco2=tco2/n0*housing_stock_oo/1e+6)
+#
+g <- df %>% ggplot(aes(date,Mtco2,colour=factor(simulation)))+geom_line()
+g <- g + theme_minimal() + theme(legend.position="none")
+g
 
 
-x <- seq(3,0.2,by=-.05)
-y <- sapply(x, function(h) heating_upgrade_tensor(1.8,h,"gas",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)$new_cost)
-plot(x,y)
+###############################
+# grants, upgrades, failures
+###############################
+
+abm %>% filter(failure) %>% group_by(simulation,tech,date) %>% summarise(n=n()) %>% ggplot(aes(date,n,colour=tech))+geom_line()
+

@@ -551,7 +551,8 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
   #hli_upgrade_capex_after_grant <- hli_upgrade_capex - fabric_grants$grant_value
   #include present bias (no threshold is applied) and disruption disutility
   hli_upgrade_annualised_capex <- hli_upgrade_capex*(params$r./params$beta. + params$eta.)
-  #include bias correct (which increases the vaue of the grrant) and sludge effect (which lowers the value of the grant).
+  #include bias correct (which increases the value of the grrant) and sludge effect (which lowers the value of the grant).
+  #the effective grant cannot be negative!
   hli_upgrade_annualised_grant <- ifelse(include_grants,fabric_grants$grant_value*(params$r./params$beta.-params$tau.),0)
   #ber_upgrade_annualised_capex <- ber_upgrade_capex*params$r.
   #grant_type <- ifelse(include_grants,upgrade_grants$scheme,"None")
@@ -1109,7 +1110,8 @@ fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,
 
   #print(relevant_grants)
   #print(dim(relevant_grants))
-  max_grant <- pmin(cost_estimate,sum(relevant_grants$grant))  #assume 75% of grant measures are applicable
+  grant_scale <- ifelse(params$yeartime < params$grant_increase_date,1,params$grant_increase_factor)
+  max_grant <- pmin(cost_estimate,grant_scale*sum(relevant_grants$grant))  #assume 75% of grant measures are applicable
   #print(max_grant/cost_estimate)
   return(list(scheme=scheme0,grant_value=max_grant,cost_estimate=cost_estimate, grant_share=max_grant/cost_estimate)) #factor of 0.8 because not all measures will apply
   #return(list(scheme=scheme0,grant_value=max_grant)) #factor of 0.8 because not all measures will apply
@@ -1173,6 +1175,8 @@ heat_pump_grant <- function(installation_type,house_type,construction_year,grant
   }
   hp_grants <- seai_grants %>% dplyr::filter(building_type==house_type, stringr::str_detect(measure,"heat_pump"),scheme==grant_type)
   grant <- hp_grants$grant
-  ifelse(length(grant)==1,return(grant), return(grant[1]+sample(c(1,0),1)*grant[2]+grant[3]))
+  grant <- ifelse(length(grant)==1,return(grant), return(grant[1]+sample(c(1,0),1)*grant[2]+grant[3]))
+  grant_scale <- ifelse(params$yeartime < params$grant_increase_date,1,params$grant_increase_factor)
+  return(grant_scale*grant)
 }
 

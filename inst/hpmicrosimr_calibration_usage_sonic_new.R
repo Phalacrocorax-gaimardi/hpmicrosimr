@@ -54,7 +54,7 @@ min_fun2 <- function(nu,p,r,beta,eta,tau,lambda) {
   err_2025 <- err_2025 + sum((df_grant %>% filter(date=="2025-11-01") %>% pull(euro_error))^2)
 
   df_eff <- df_eff %>% filter(date=="2025-11-01")
-  err_2025 <- err_2025 + 3*sum(df_eff$n_heat_pump_err^2 + df_eff$n_b2_err^2)
+  err_2025 <- err_2025 + sum(df_eff$n_heat_pump_err^2 + df_eff$n_b2_err^2)
 
   #print(paste("evaluated at nu. =", nu, "p. = ", p, "beta.=", beta,
   #          "r.=", r, "eta=", eta, "tau=", tau, "error=", err_2025))
@@ -75,7 +75,9 @@ min_fun2_safe <- function(nu,p,r,beta,eta,tau,lambda) {
 }
 
 #params  <- scenario_params(sD,2015)
-#min_fun2(params$nu.,params$p.,params$r.,params$beta.,params$eta.,params$tau.)
+#calib <- read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/macro_calibration_parbayes_test.csv")
+#calib <- calib[1,]
+#min_fun2(nu=calib$nu,p=calib$p,r=calib$r,beta=calib$beta,eta=calib$eta,tau=calib$tau,lambda=calib$lambda)
 
 # Set bounds
 bounds <- list(

@@ -5,9 +5,13 @@ library(hpmicrosimr)
 library(mlrMBO)
 library(ParamHelpers)
 library(smoof)
-library(DiceKriging)
+#library(DiceKriging)
 library(tidyverse)
-library(rgenoud)
+#library(rgenoud)
+
+n_design <- 30
+n_iter <- 30
+n_run <- 4
 
 sD <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WEM")
 
@@ -27,7 +31,7 @@ min_fun2 <- function(x){
   cal_dates <- c("2025-11-01","2021-01-01")
   #x[1] beta. x[2] lambda. x[3] p.
   #df <- calABM(sD,Nrun=8,beta=x[1],lambda=0,p=x[2],nu=x[3],rho=x[4],delta=x[5])
-  df <- calABM(sD,4,2,TRUE,nu=x[1],p=x[2],beta = x[3],r = x[4],eta = x[5],tau = x[6],rho=0.3)
+  df <- calABM(sD,n_run,2,TRUE,nu=x[1],p=x[2],beta = x[3],r = x[4],eta = x[5],tau = x[6],rho=0.3)
 
   df_eff <- df$efficiency %>% dplyr::inner_join(efficiency_cal,by="date")
   n_heat_pump0 <- df_eff %>% filter(date=="2015-01-01") %>% pull(n_heat_pump)
@@ -69,7 +73,7 @@ ctrl <- makeMBOControl(
 )
 
 ctrl <- setMBOControlTermination(ctrl,
-                                 iters=10)
+                                 iters=n_iter)
 
 infill_crit <- makeMBOInfillCritEI()
 
@@ -77,7 +81,7 @@ ctrl <- setMBOControlInfill(ctrl,
                             crit=infill_crit ) #expected improvement
 #Latin Hypercube Design
 initial_design <- generateDesign(
-  n=10,
+  n=n_design,
   par.set=search_space,
   fun=lhs::randomLHS
 )
@@ -89,11 +93,14 @@ result <- mbo(
 )
 
 macro_calibration <- result$opt.path %>% as_tibble() %>% arrange(y)
-macro_calibration <- macro_calibration %>% mutate(lambda.=0)
-macro_calibration <- macro_calibration %>% select(beta.,lambda.,p.,nu.,rho.,delta.,,y)
-#write_csv(macro_calibration,paste("macro_calibration_5_parameter_25.csv",sep=""))
+macro_calibration <- macro_calibration %>% select(nu.,p.,beta.,r.,eta.,tau.,y)
+write_csv(macro_calibration,paste("C:/Users/Joe/pkgs/hpmicrosimr/inst/macro_calibration_2.csv",sep=""))
 #write_csv(macro_calibration,paste("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/macro_calibration_5_parameter_50.csv",sep=""))
 
+macro_calibration <- read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/macro_calibration_2.csv")
+mc <- macro_calibration[1,]
+min_fun2(c(nu=mc$nu.,p=mc$p.,beta=mc$beta.,r=mc$r.,eta=mc$eta.,tau=mc$tau.))
+test <- calABM(sD,4,T,nu=mc$nu.,p=mc$p.,r=mc$r.,beta=mc$beta.,eta=mc$eta.,tau=mc$tau.)
 
 
 ######################
@@ -126,6 +133,28 @@ macro_calibration_add_1 <- macro_calibration_add_1 %>% select(beta.,lambda.,p.,n
 ############################
 #
 ################################
+min_fun_check <- function(calABM_out,x){
+  #
+  cal_dates <- c("2025-11-01","2021-01-01")
+  #x[1] beta. x[2] lambda. x[3] p.
+  #df <- calABM(sD,Nrun=8,beta=x[1],lambda=0,p=x[2],nu=x[3],rho=x[4],delta=x[5])
+  df <- calABM(sD,n_run,2,TRUE,nu=x[1],p=x[2],beta = x[3],r = x[4],eta = x[5],tau = x[6],rho=0.3)
+
+  df_eff <- df$efficiency %>% dplyr::inner_join(efficiency_cal,by="date")
+  n_heat_pump0 <- df_eff %>% filter(date=="2015-01-01") %>% pull(n_heat_pump)
+  n_b2_0 <- df_eff %>% filter(date=="2015-01-01") %>% pull(n_b2)
+  df_eff <- df_eff %>% filter(date %in% cal_dates) %>% mutate(n_heat_pump_err= (n_heat_pump-n_heat_pump0-n_heat_pump_obsv)/n_heat_pump_obsv, n_b2_err = (n_b2-n_b2_0-n_b2_obsv)/n_b2_obsv)
+
+  df_grant <- df$grants %>% dplyr::inner_join(grants_cal)
+  #minimise the % error in grant totals
+  df_grant <- df_grant %>% filter(date %in% cal_dates) %>% mutate(n_error = (n_grant-n_obsv)/n_obsv, euro_error = (grants_Meuro-Meuro_obsv)/Meuro_obsv)
+  err_2025  <- sum((df_grant %>% filter(date=="2025-11-01") %>% pull(n_error))^2)
+  err_2025 <- err_2025 + sum((df_grant %>% filter(date=="2025-11-01") %>% pull(euro_error))^2)
+  df_eff <- df_eff %>% filter(date=="2025-11-01")
+  err_2025 <- err_2025 + 3*sum(df_eff$n_heat_pump_err^2 + df_eff$n_b2_err^2 )
+  print(paste("evaluated at nu. =",x[1],"p. = ",x[2],"beta.=",x[3],"r.=",x[4],"eta=",x[5],"tau=",x[6],"error=", err_2025))
+  err_2025 %>% return()
+}
 
 
 sD <- readxl::read_xlsx("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/scenario_parameters.xlsx", sheet="scenario_BASE")

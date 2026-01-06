@@ -19,14 +19,14 @@ space_heating_requirement(hli, floor_area, rebound = 0.5, params)
 kWh/m2/year
 }
 \description{
-annual space heating energy requirement in kWh based on building HLI.
-}
-\details{
-requirement is reduced if rebound > 0
+annual space heating energy requirement in kWh based on building HLI.\cr
+\cr
+requirement is reduced if rebound > 0 above a threshold equivalent to HLI ~ 1.4.
 }
 \examples{
 
 params <- scenario_params(sD,2025)
-space_heating_requirement2(3,100,0,params)
+space_heating_requirement(1.2,100,0,params)
+space_heating_requirement(1.2,100,0.4,params)
 
 }

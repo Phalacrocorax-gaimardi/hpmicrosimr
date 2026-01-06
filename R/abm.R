@@ -67,6 +67,8 @@ scenario_params <- function(sD,yeartime){
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_target_ber",  value=dplyr::filter(sD, parameter=="warmer_homes_target_ber")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_cost_cap",  value=dplyr::filter(sD, parameter=="warmer_homes_cost_cap")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="minimum_fabric_grant",  value=dplyr::filter(sD, parameter=="minimum_fabric_grant")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="grant_increase_date",  value=dplyr::filter(sD, parameter=="grant_increase_date")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="grant_increase_factor",  value=dplyr::filter(sD, parameter=="grant_increase_factor")$value))
 
 
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_labour_cost_share",  value=dplyr::filter(sD, parameter=="ber_upgrade_labour_cost_share")$value))

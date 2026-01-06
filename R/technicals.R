@@ -700,41 +700,12 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
 }
 
 
-#' space_heating_requirement
-#'
-#' This function calculates the annual space heating requirement from hli and floor area. Optionally, a rebound effect is included.
-#'
-#' The ber rating includes contributions from hot water heating and lighting. Standard of these components are removed. For A rated
-#' houses space heating energy rating is set to 15.
-#'
-#' @param ber quoted ber rating
-#' @param floor_area floor area
-#' @param rebound rebound parameter default 0.3.
-#' @param params parameters
-#'
-#' @returns heating requirement in kWh/year
-#' @export
-#'
-#' @examples
-#' params <- scenario_params(sD,2025)
-#' space_heating_requirement(400,100,0,params)
-#'
-#' space_heating_requirement(100,200,0.5,params)
-space_heating_requirement2 <- function(ber,floor_area,rebound=0.5,params) {
-
-  #offset <- params$q_passive +params$q_hotwater+params$q_lighting #minimum possible
-  ber_heat <- pmax(params$q_passive,ber-params$q_hotwater-params$q_lighting) #minimum heating requirement is q_passive
-  #rebound effect above rebound_threshold
-  ber_heat <- ifelse(ber_heat <= params$rebound_threshold, ber_heat, params$rebound_threshold + (1-rebound)*(ber_heat-params$rebound_threshold))
-  ber_heat*floor_area %>% return()
-}
-
 
 #' space_heating_requirement
 #'
-#' annual space heating energy requirement in kWh based on building HLI.
-#'
-#' requirement is reduced if rebound > 0
+#' annual space heating energy requirement in kWh based on building HLI.\cr
+#' \cr
+#' requirement is reduced if rebound > 0 above a threshold equivalent to HLI ~ 1.4.
 #'
 #' @param hli heat loss indicator
 #' @param floor_area treated floor area
@@ -747,14 +718,15 @@ space_heating_requirement2 <- function(ber,floor_area,rebound=0.5,params) {
 #' @examples
 #'
 #' params <- scenario_params(sD,2025)
-#' space_heating_requirement2(3,100,0,params)
+#' space_heating_requirement(1.2,100,0,params)
+#' space_heating_requirement(1.2,100,0.4,params)
 #'
 space_heating_requirement <- function(hli,floor_area,rebound=0.5,params) {
 
-  sh <- hli*params$hdd*24/1000*floor_area
+  sh <- hli*params$hdd*24/1000 #specific hr
   #rbound
   sh <- ifelse(sh <= params$rebound_threshold, sh, params$rebound_threshold + (1-rebound)*(sh-params$rebound_threshold))
-  sh %>% return()
+  sh*floor_area %>% return()
 }
 
 
