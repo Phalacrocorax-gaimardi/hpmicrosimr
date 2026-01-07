@@ -31,7 +31,7 @@ min_fun2 <- function(x){
   cal_dates <- c("2025-11-01","2021-01-01")
   #x[1] beta. x[2] lambda. x[3] p.
   #df <- calABM(sD,Nrun=8,beta=x[1],lambda=0,p=x[2],nu=x[3],rho=x[4],delta=x[5])
-  df <- calABM(sD,n_run,2,TRUE,nu=x[1],p=x[2],beta = x[3],r = x[4],eta = x[5],tau = x[6],rho=0.3)
+  df <- calABM(sD,n_run,2,TRUE,nu=x[1],p=x[2],r = x[3],beta = x[4],eta = x[5],tau = x[6],rho=0.3)
 
   df_eff <- df$efficiency %>% dplyr::inner_join(efficiency_cal,by="date")
   n_heat_pump0 <- df_eff %>% filter(date=="2015-01-01") %>% pull(n_heat_pump)
@@ -45,7 +45,7 @@ min_fun2 <- function(x){
   err_2025 <- err_2025 + sum((df_grant %>% filter(date=="2025-11-01") %>% pull(euro_error))^2)
   df_eff <- df_eff %>% filter(date=="2025-11-01")
   err_2025 <- err_2025 + 3*sum(df_eff$n_heat_pump_err^2 + df_eff$n_b2_err^2 )
-  print(paste("evaluated at nu. =",x[1],"p. = ",x[2],"beta.=",x[3],"r.=",x[4],"eta=",x[5],"tau=",x[6],"error=", err_2025))
+  print(paste("evaluated at nu. =",x[1],"p. = ",x[2],"r.=",x[3],"beta.=",x[4],"eta=",x[5],"tau=",x[6],"error=", err_2025))
   err_2025 %>% return()
 }
 
@@ -97,9 +97,9 @@ macro_calibration <- macro_calibration %>% select(nu.,p.,beta.,r.,eta.,tau.,y)
 write_csv(macro_calibration,paste("C:/Users/Joe/pkgs/hpmicrosimr/inst/macro_calibration_2.csv",sep=""))
 #write_csv(macro_calibration,paste("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/macro_calibration_5_parameter_50.csv",sep=""))
 
-macro_calibration <- read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/macro_calibration_2.csv")
+macro_calibration <- read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/macro_calibration_parbayes_simple_r_0.03.csv")
 mc <- macro_calibration[1,]
-min_fun2(c(nu=mc$nu.,p=mc$p.,beta=mc$beta.,r=mc$r.,eta=mc$eta.,tau=mc$tau.))
+min_fun2(c(nu=mc$nu,p=mc$p,r=0.03,beta=mc$beta,eta=mc$eta,tau=mc$tau))
 test <- calABM(sD,4,T,nu=mc$nu.,p=mc$p.,r=mc$r.,beta=mc$beta.,eta=mc$eta.,tau=mc$tau.)
 
 

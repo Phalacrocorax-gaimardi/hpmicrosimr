@@ -33,7 +33,7 @@ sD_cal[sD_cal$parameter=="lambda.","value"] <- 0
 
 wem <- readRDS("~/Policy/CAMG/EED/Heat/data/wem.RData")
 abm <- wam[[1]]
-n_run <- wem_ex[[3]] %>% filter(parameter=="Nrun") %>% pull(value)
+n_run <- wam[[3]] %>% filter(parameter=="Nrun") %>% pull(value)
 df0 <- abm %>% group_by(simulation,date) %>% summarise(n0=n())
 housing_stock_oo <- 1147552 #census
 
@@ -186,5 +186,19 @@ g
 # grants, upgrades, failures
 ###############################
 
-abm %>% filter(failure) %>% group_by(simulation,tech,date) %>% summarise(n=n()) %>% ggplot(aes(date,n,colour=tech))+geom_line()
-
+abm %>% filter(failure) %>% group_by(simulation,date) %>% summarise(n=n()) %>% mutate(n=cumsum(n)) %>% ggplot(aes(date,n,group=interaction(simulation),colour=)+geom_line()
+#upgrades
+abm %>% filter(upgrade) %>% group_by(simulation,grant_type,date) %>% summarise(n=n()) %>% mutate(n=cumsum(n)) %>% ggplot(aes(date,n,group=interaction(simulation,grant_type),colour=grant_type))+geom_line()
+#upgrades with heat pump
+abm %>% filter(upgrade,tech=="heat_pump") %>% group_by(simulation,grant_type,date) %>% summarise(n=n()) %>% mutate(n=cumsum(n)) %>% ggplot(aes(date,n,group=interaction(simulation,grant_type),colour=grant_type))+geom_line()
+#mean grant amounts
+upgrades <- abm %>% filter(upgrade) %>% mutate(grant_share=upgrade_grant/upgrade_cost)
+upgrades <- upgrades %>% group_by(grant_type,year=year(date)) %>% summarise(upgrade_cost=mean(upgrade_cost),upgrade_grant=mean(upgrade_grant), grant_share=mean(grant_share)) #%>% ggplot(aes(year,upgrda))
+#
+upgrades %>% ggplot(aes(year,grant_share,colour=grant_type))+geom_line()
+#cumulative costs
+grants_cumulative <- abm %>% filter(upgrade, grant_type != "None") %>% group_by(grant_type,year=year(date)) %>% summarise(upgrade_cost=sum(upgrade_cost)/n_run,upgrade_grant=sum(upgrade_grant)/n_run)
+grants_cumulative <- grants_cumulative %>% group_by(grant_type) %>% mutate(upgrade_cost=cumsum(upgrade_cost)/800*housing_stock_oo/1e+6,upgrade_grant=cumsum(upgrade_grant)/800*housing_stock_oo/1e+6)
+#
+grants_cumulative <- grants_cumulative %>% pivot_longer(cols=c(upgrade_cost,upgrade_grant), values_to="Meuro",names_to="component")
+grants_cumulative %>% ggplot(aes(year,Meuro,colour=grant_type,linetype=component))+geom_line()

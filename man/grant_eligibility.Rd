@@ -36,7 +36,8 @@ expressed in terms of ber_old and ber_new
 }
 \examples{
 
-grant_eligibility(175,20,2005,is_fuel_allowance=FALSE,scenario_params(sD,2026))
+params <- scenario_params(sD,2026)
+grant_eligibility(175,100,2005,is_fuel_allowance=FALSE,scenario_params(sD,2026))
 #no grants before 2015
 grant_eligibility(175,20,1990,is_fuel_allowance=TRUE,scenario_params(sD,2005))
 #warmer homes
