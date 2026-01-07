@@ -1,6 +1,7 @@
 ﻿category,variable,parameter,value,units
 technical,heat pump COP,heat_pump_cop_2010,2.25,unitless
 technical,heat pump COP,heat_pump_cop_2020,2.75,unitless
+technical,heat pump COP,heat_pump_cop_2040,3.25,unitless
 technical,gas/oil boiler efficiency,boiler_efficiency_2005,0.6,unitless
 technical,gas/oil boiler efficiency,boiler_efficiency_2010,0.85,unitless
 technical,gas/oil boiler efficiency,boiler_efficiency_2015,0.9,unitless

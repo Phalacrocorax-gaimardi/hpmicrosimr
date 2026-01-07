@@ -12,14 +12,15 @@ heating_system_efficiency(tech, install_time)
 \item{install_time}{decimal time}
 }
 \description{
-efficiency of heating system technology as a function of installtion time.
-}
-\details{
-there was a sharp improvement in oil and gas tech with the introduction of condensing boilers
+efficiency of heating system technology as a function of installation time.\cr
+\cr
+there was a sharp improvement in oil and gas tech with the introduction of condensing boilers\cr
+\cr
+A modest post-2020 improvement in heat pump SCOP is allowed for
 }
 \examples{
 
-heating_system_efficiency("oil",2023)
+heating_system_efficiency("heat_pump",2040)
 heating_system_efficiency(c("oil","gas"),2023)
 
 

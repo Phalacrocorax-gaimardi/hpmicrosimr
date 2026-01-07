@@ -6,13 +6,15 @@ library(tidyverse)
 sD_wem <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WEM")
 sD_wam <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WAM")
 
-sD_wam[sD_wem$parameter=="grant_increase_date","value"]
+sD_wam[sD_wam$parameter=="grant_increase_date","value"]
 sD_wam[sD_wem$parameter=="grant_increase_factor","value"]
 #sD_wem[sD_wem$parameter=="better_energy_introduction","value"] <- 2050
 #sD_wem[sD_wem$parameter=="oss_introduction","value"] <- 2050
 
 test <- runABM(sD_wam,4,2040)
 wam <- test
+saveRDS(wam,"~/Policy/CAMG/EED/Heat/data/wam.RData")
+
 
 params <- scenario_params(sD_wem,2026)
 params$warmer_homes_introduction
@@ -206,3 +208,28 @@ grants_cumulative %>% ggplot(aes(year,Meuro,colour=grant_type,linetype=component
 abm %>% filter(upgrade) %>%
 #num er of heat pumps by scheme
 abm %>% filter(!is.na(heat_pump_grant)) %>% pull(grant_type) %>% table()
+#mean grant sizes
+grant_sizes <- abm %>% filter(upgrade > 0 | heat_pump_grant > 0, grant_type != "None") %>% group_by(grant_type,year=year(date)) %>% summarise(mean_grant=mean(upgrade_grant+heat_pump_grant,na.rm=T))
+grant_sizes %>% ggplot(aes(year,mean_grant,colour=grant_type))+geom_point()
+#distributions of grant sizes (in a specific year range)
+grant_sizes <- abm %>% filter(upgrade > 0 | heat_pump_grant > 0, grant_type != "None", year(date)==2025) #%>% group_by(simulation,grant_type,year=year(date)) %>% summarise(grant=upgrade_grant+heat_pump_grant,na.rm=T))
+grant_sizes %>% ggplot(aes(upgrade_grant+heat_pump_grant,fill=grant_type))+geom_histogram(alpha=0.5)
+
+#########################
+# new housing stock
+#######################
+completions <- read_csv("~/Policy/CAMG/EED/Heat/data/housing_completion_projections.csv") #flow
+#convert to new_stock
+
+params <- scenario_params(sD,2025)
+#2015 and later only
+completions <- completions %>% filter(year > 2014) %>% mutate(space_heating_requirement_wem = wem*space_heating_requirement(hli,floor_area,rebound=0.4,params))
+completions <- completions %>% filter(year > 2014) %>% mutate(space_heating_requirement_wam = wam*space_heating_requirement(hli,floor_area,rebound=0.4,params))
+
+completions <- completions %>% rowwise() %>% mutate(efficiency_gas = heating_system_efficiency("gas", year+0.5), efficiency_hp=heating_system_efficiency("heat_pump", year+0.5))
+completions <- completions %>% mutate(fec_wem=heat_pump_fraction*space_heating_requirement_wem/efficiency_hp + (1-heat_pump_fraction)*space_heating_requirement_wem/efficiency_gas)
+completions <- completions %>% mutate(fec_wam=heat_pump_fraction*space_heating_requirement_wam/efficiency_hp + (1-heat_pump_fraction)*space_heating_requirement_wam/efficiency_gas)
+#TWh
+completions <- completions %>% ungroup() %>% mutate(space_heating_requirement_wem = cumsum(space_heating_requirement_wem)/1e+9,fec_wem=cumsum(fec_wem/1e+9),
+                                                    space_heating_requirement_wam = cumsum(space_heating_requirement_wam)/1e+9,fec_wam=cumsum(fec_wam/1e+9)
+                                                    )

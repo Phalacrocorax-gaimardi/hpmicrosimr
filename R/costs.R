@@ -6,6 +6,7 @@
 
 #tech_cost_params <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/technology_cost_model.csv")
 #tech_efficiency_params <-  readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/tech_efficiency_parameters.csv")
+#use_data(tech_efficiency_params,overwrite=T)
 
 #' tech_params_fun
 #'

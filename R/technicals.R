@@ -429,9 +429,11 @@ recode_construction_year <- function(q5){
 
 #' heating_system_efficiency
 #'
-#' efficiency of heating system technology as a function of installtion time.
-#'
-#' there was a sharp improvement in oil and gas tech with the introduction of condensing boilers
+#' efficiency of heating system technology as a function of installation time.\cr
+#' \cr
+#' there was a sharp improvement in oil and gas tech with the introduction of condensing boilers\cr
+#' \cr
+#' A modest post-2020 improvement in heat pump SCOP is allowed for
 #'
 #' @param tech heating technology
 #' @param install_time decimal time
@@ -441,7 +443,7 @@ recode_construction_year <- function(q5){
 #'
 #' @examples
 #'
-#' heating_system_efficiency("oil",2023)
+#' heating_system_efficiency("heat_pump",2040)
 #' heating_system_efficiency(c("oil","gas"),2023)
 #'
 #'
@@ -461,49 +463,10 @@ heating_system_efficiency <- function(tech, install_time) {
   idx <- tech == "heat_pump"
   if (any(idx)) {
     eff[idx] <- approx(
-      x = c(2010.5, 2020.5),
+      x = c(2010.5, 2020.5,2040.5),
       y = c(tech_params[["heat_pump_cop_2010"]],
-            tech_params[["heat_pump_cop_2020"]]),
-      xout = install_time[idx],
-      rule = 2
-    )$y
-  }
-
-  # oil / gas
-  idx <- tech %in% c("oil", "gas")
-  if (any(idx)) {
-    eff[idx] <- approx(
-      x = c(2005.5, 2010.5, 2015.5),
-      y = c(tech_params[["boiler_efficiency_2005"]],
-            tech_params[["boiler_efficiency_2010"]],
-            tech_params[["boiler_efficiency_2015"]]),
-      xout = install_time[idx],
-      rule = 2
-    )$y
-  }
-
-  eff
-}
-
-heating_system_efficiency <- function(tech, install_time) {
-
-  eff <- numeric(length(tech))
-
-  # electricity
-  idx <- tech == "electricity"
-  eff[idx] <- tech_params[["electricity_efficiency"]]
-
-  # solid fuel
-  idx <- tech == "solid_fuel"
-  eff[idx] <- tech_params[["solid_fuel_efficiency"]]
-
-  # heat pump
-  idx <- tech == "heat_pump"
-  if (any(idx)) {
-    eff[idx] <- approx(
-      x = c(2010.5, 2020.5),
-      y = c(tech_params[["heat_pump_cop_2010"]],
-            tech_params[["heat_pump_cop_2020"]]),
+            tech_params[["heat_pump_cop_2020"]],
+            tech_params[["heat_pump_cop_2040"]]),
       xout = install_time[idx],
       rule = 2
     )$y
