@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.4</span>
       </span>
     </div>
 
@@ -128,11 +128,11 @@ If the relative gain is sufficient, a heat pump may be adopted.</p>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">2.5</span>,<span class="st">"gas"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">2.31</span>,<span class="st">"electricity"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   hli_stick eac_stick upgrade_cost_stick tech_cost_stick grant_type_stick </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      2.47      <span style="text-decoration: underline;">2</span>810                712            <span style="text-decoration: underline;">2</span>218 BetterEnergyHomes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      2.28      <span style="text-decoration: underline;">3</span>931                708            <span style="text-decoration: underline;">1</span>339 BetterEnergyHomes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: upgrade_grant_stick &lt;dbl&gt;, heat_pump_grant_stick &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   hli_switch &lt;dbl&gt;, eac_switch &lt;dbl&gt;, upgrade_cost_switch &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   tech_cost_switch &lt;dbl&gt;, grant_type_switch &lt;chr&gt;,</span></span>
@@ -141,9 +141,9 @@ If the relative gain is sufficient, a heat pump may be adopted.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">1.1</span>,<span class="st">"gas"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="st">"logistic"</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">TRUE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 16</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hli_stick eac_stick upgrade_cost_stick tech_cost_stick grant_type_stick </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      1.10      <span style="text-decoration: underline;">1</span>498                  7            <span style="text-decoration: underline;">1</span>848 BetterEnergyHomes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hli_stick eac_stick upgrade_cost_stick tech_cost_stick grant_type_stick</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      1.10      <span style="text-decoration: underline;">1</span>498                  7            <span style="text-decoration: underline;">1</span>848 None            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: upgrade_grant_stick &lt;dbl&gt;, heat_pump_grant_stick &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   hli_switch &lt;dbl&gt;, eac_switch &lt;dbl&gt;, upgrade_cost_switch &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   tech_cost_switch &lt;dbl&gt;, grant_type_switch &lt;chr&gt;,</span></span>
@@ -160,7 +160,7 @@ If the relative gain is sufficient, a heat pump may be adopted.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Na Li, Joseph Wheatley.</p>
+  <p></p><p>Developed by Na Li, Lisa Ryan, Joseph Wheatley.</p>
 </div>
 
 <div class="pkgdown">
