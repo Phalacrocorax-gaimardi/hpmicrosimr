@@ -186,7 +186,7 @@ g
 # grants, upgrades, failures
 ###############################
 
-abm %>% filter(failure) %>% group_by(simulation,date) %>% summarise(n=n()) %>% mutate(n=cumsum(n)) %>% ggplot(aes(date,n,group=interaction(simulation),colour=)+geom_line()
+abm %>% filter(failure) %>% group_by(simulation,date) %>% summarise(n=n()) %>% mutate(n=cumsum(n)) #%>% ggplot(aes(date,n,group=interaction(simulation),colour=)+geom_line()
 #upgrades
 abm %>% filter(upgrade) %>% group_by(simulation,grant_type,date) %>% summarise(n=n()) %>% mutate(n=cumsum(n)) %>% ggplot(aes(date,n,group=interaction(simulation,grant_type),colour=grant_type))+geom_line()
 #upgrades with heat pump
@@ -201,4 +201,8 @@ grants_cumulative <- abm %>% filter(upgrade, grant_type != "None") %>% group_by(
 grants_cumulative <- grants_cumulative %>% group_by(grant_type) %>% mutate(upgrade_cost=cumsum(upgrade_cost)/800*housing_stock_oo/1e+6,upgrade_grant=cumsum(upgrade_grant)/800*housing_stock_oo/1e+6)
 #
 grants_cumulative <- grants_cumulative %>% pivot_longer(cols=c(upgrade_cost,upgrade_grant), values_to="Meuro",names_to="component")
-grants_cumulative %>% ggplot(aes(year,Meuro,colour=grant_type,linetype=component))+geom_line()
+grants_cumulative %>% ggplot(aes(year,Meuro,colour=grant_type,linetype=component))+geom_point()
+#number of grants
+abm %>% filter(upgrade) %>%
+#num er of heat pumps by scheme
+abm %>% filter(!is.na(heat_pump_grant)) %>% pull(grant_type) %>% table()
