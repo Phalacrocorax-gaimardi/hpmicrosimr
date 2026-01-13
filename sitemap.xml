@@ -13,8 +13,10 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/bill_values.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/calABM.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/calABM2.html</loc></url>
+<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/carbon_price_fun.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/crf.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/eac_weibull.html</loc></url>
+<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/ef_solid_fuel_fun.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/energy_price_fun.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/energy_prices.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/erv_weibull.html</loc></url>
@@ -83,6 +85,7 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/survey_income_ranges.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/tech_cost_params.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/tech_efficiency_params.html</loc></url>
+<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/tech_emissions_factors.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/tech_failure_params.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/tech_params_fun.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/update_agents.html</loc></url>
