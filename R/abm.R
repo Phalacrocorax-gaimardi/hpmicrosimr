@@ -66,10 +66,20 @@ scenario_params <- function(sD,yeartime){
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="rebound_threshold",  value=dplyr::filter(sD, parameter=="rebound_threshold")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_target_ber",  value=dplyr::filter(sD, parameter=="warmer_homes_target_ber")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_cost_cap",  value=dplyr::filter(sD, parameter=="warmer_homes_cost_cap")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_enhanced",  value=dplyr::filter(sD, parameter=="warmer_homes_enhanced")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_cost_cap_enhanced",  value=dplyr::filter(sD, parameter=="warmer_homes_cost_cap_enhanced")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_target_ber_enhanced",  value=dplyr::filter(sD, parameter=="warmer_homes_target_ber_enhanced")$value))
+
+
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="minimum_fabric_grant",  value=dplyr::filter(sD, parameter=="minimum_fabric_grant")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="grant_increase_date",  value=dplyr::filter(sD, parameter=="grant_increase_date")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="grant_increase_factor",  value=dplyr::filter(sD, parameter=="grant_increase_factor")$value))
+  #draconian
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="oil_boiler_ban",  value=dplyr::filter(sD, parameter=="oil_boiler_ban")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="gas_boiler_ban",  value=dplyr::filter(sD, parameter=="gas_boiler_ban")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="peat_phaseout",  value=dplyr::filter(sD, parameter=="peat_phaseout")$value))
 
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="carbon_price", value =  carbon_price_fun(sD,yeartime)))
 
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_labour_cost_share",  value=dplyr::filter(sD, parameter=="ber_upgrade_labour_cost_share")$value))
 
@@ -90,9 +100,15 @@ scenario_params <- function(sD,yeartime){
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="oss_introduction",  value=dplyr::filter(sD, parameter=="oss_introduction")$value))
 
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hli_heat_pump_threshold",  value=dplyr::filter(sD, parameter=="hli_heat_pump_threshold")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hli_heat_pump_threshold_increase_date",  value=dplyr::filter(sD, parameter=="hli_heat_pump_threshold_increase_date")$value))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hli_heat_pump_threshold_increase_value",  value=dplyr::filter(sD, parameter=="hli_heat_pump_threshold_increase_value")$value))
+
+
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_cost_scale",  value=dplyr::filter(sD, parameter=="warmer_homes_cost_scale")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_heat_pump",  value=dplyr::filter(sD, parameter=="warmer_homes_heat_pump")$value))
 
+
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ef_solid_fuel",  value =  ef_solid_fuel_fun(sD,yeartime)))
 
   #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="evening_tariff", value =  evening_tariff_fun(sD,yeartime)))
   #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="night_tariff", value =  night_tariff_fun(sD,yeartime)))
@@ -367,9 +383,9 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   df <- purrr::pmap(b_s0,hp_upgrade_savings_env)
   df <- do.call(rbind,df)
   b_s2 <- b_s2 %>% dplyr::bind_cols(df)
-  ####################################################################################
-  # households that reject efficiency upgrade because of insufficient reward relative to disruption
-  #####################################################################################
+  #############################################################################################
+  # households that reject efficiency upgrade because of insufficient reward financial relative to disruption
+  ##############################################################################################
   print(paste(dim(b_s2 %>% dplyr::filter(eac_stick >= eac_old & eac_switch >= eac_old))[1],"upgrades rejected"))
   b_s2 <- b_s2 %>% dplyr::filter(eac_stick < eac_old | eac_switch < eac_old) %>% dplyr::select(-eac_old)
   #b_s2 %>% dplyr::select(tech,hli,hli_stick,hli_switch,eac_stick,eac_switch,savings)

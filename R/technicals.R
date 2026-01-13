@@ -844,3 +844,23 @@ pef_fun <- function(sD,yeartime){
 }
 
 
+#' ef_solid_fuel_fun
+#'
+#' solid fuel emissions function. Emissions factor is assumed to fall linearly from 2026 to peat_phaseout to reflect a growing share of
+#' wood in the solid fuel mix.
+#'
+#' @param sD scenario parameters
+#' @param yeartime decimal time
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+ef_solid_fuel_fun  <- function(sD,yeartime){
+
+  ef0 <- tech_emissions_factors %>% dplyr::filter(tech=="solid_fuel") %>% dplyr::pull(gCO2_per_kWh)
+  phaseout <- dplyr::filter(sD, parameter=="peat_phaseout")$value
+  ef <- ef0*ifelse(yeartime < phaseout,1,pmax(0, (phaseout-yeartime)/(phaseout-2026)) )
+  return(ef)
+
+}

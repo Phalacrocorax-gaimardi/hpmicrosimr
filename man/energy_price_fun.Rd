@@ -7,18 +7,25 @@
 energy_price_fun(fuel_type, sD, yeartime)
 }
 \arguments{
-\item{fuel_type}{type (oil, gas, )}
+\item{fuel_type}{one of oil,gas,electricity,solid_fuel}
 
 \item{sD}{scenario dataframe}
 
 \item{yeartime}{decimal time}
 }
 \value{
-euros
+cents per kWh
 }
 \description{
-energy price model
+historical retail heating fuel prices in cents/kWh.\cr
+\cr
+prices reflect carbon pricing from carbon_Price_fun()
 }
 \examples{
-energy_price_fun("oil", sD, 2036)
+
+energy_price_fun("oil", sD, 2025)
+energy_price_fun("oil", sD, 2030)
+energy_price_fun("oil", sD, 2035)
+energy_price_fun("oil", sD, 2040)
+
 }

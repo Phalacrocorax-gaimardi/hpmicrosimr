@@ -7,6 +7,8 @@
 #tech_cost_params <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/technology_cost_model.csv")
 #tech_efficiency_params <-  readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/tech_efficiency_parameters.csv")
 #use_data(tech_efficiency_params,overwrite=T)
+#tech_emissions_factors <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/tech_emissions_factors.csv")
+#use_data(tech_emissions_factors,overwrite=T)
 
 #' tech_params_fun
 #'
@@ -84,44 +86,62 @@ labour_cost_fun <- function(sD,yeartime){
 
 #' energy_price_fun
 #'
-#' energy price model
+#' historical retail heating fuel prices in cents/kWh.\cr
+#' \cr
+#' prices reflect carbon pricing from carbon_Price_fun()
 #'
-#' @param fuel_type type (oil, gas, )
+#' @param fuel_type one of oil,gas,electricity,solid_fuel
 #' @param sD scenario dataframe
 #' @param yeartime decimal time
 #'
-#' @return euros
+#' @return cents per kWh
 #' @export
 #'
-#' @examples energy_price_fun("oil", sD, 2036)
+#' @examples
+#'
+#' energy_price_fun("oil", sD, 2025)
+#' energy_price_fun("oil", sD, 2030)
+#' energy_price_fun("oil", sD, 2035)
+#' energy_price_fun("oil", sD, 2040)
+#'
 energy_price_fun <- function(fuel_type,sD,yeartime){
   #
+  emissions_factors <- tech_emissions_factors %>% dplyr::mutate(gCO2_per_kWh=replace(gCO2_per_kWh,tech=="solid_fuel",ef_solid_fuel_fun(sD,yeartime)))
+
   stopifnot(fuel_type %in% c("oil","gas","electricity","solid_fuel"))
   prices <- energy_prices %>% dplyr::filter(fuel==fuel_type) %>% dplyr::select(-fuel)
   for(year in c(2025,2030,2035,2050)){
     prices <- prices %>% dplyr::bind_rows(tibble::tibble(year=year,price = sD %>% dplyr::filter(parameter==paste(fuel_type,"price",year,sep="_")) %>% dplyr::pull(value)))
   }
   cost <- approx(x=prices$year+0.5, y=prices$price,xout=yeartime,rule=2)$y
+  #add post 2024 carbon price increment
+  ef <- tech_emissions_factors %>% dplyr::filter(tech==fuel_type) %>% dplyr::pull(gCO2_per_kWh)
+  if(yeartime > 2025.5) cost <- cost + ef/1e+4*(carbon_price_fun(sD,yeartime) - 63.5)
   return(cost)
 }
 
 
-heat_pump_installation_grant <- function(sD, yeartime, q1,q5) {
+#' carbon_price_fun
+#'
+#' the prevailing carbon price for residential heating fuels
+#'
+#' @param sD  scenario parameters
+#' @param yeartime decimal time
+#'
+#' @returns euros per tCO2
+#' @export
+#'
+#' @examples
+#' carbon_price_fun(sD,2035)
+carbon_price_fun <- function(sD,yeartime){
 
-  # Eligibility for heat pumps__before 2021
-  # Simplify the HP type hp_type == "air to air" & built_year <= 2021 ~ 3500
-  hp_grant <- dplyr::case_when(
-    # built_year > 2021
-    q5==6 ~ 0,
-    # building_type == "apartment" & built_year <= 2021
-    q5 %in% c(1:5) & q1==1 ~ 4500,
-    # building_type != "apartment" & built_year <= 2021
-    q1 != 1 & q5 %in% c(1:5)~ 6500
-  )
+  prices <- sD %>% dplyr::filter(stringr::str_detect(parameter,"carbon_price")) %>% dplyr::pull(value)
 
-  npv_hp_grant <- PVIF(r, heating_upgrade_time) * hp_grant # + (retrofit_cost - retrofit_grant))
+  cost <- approx(x=c(2010.5,2025.5,2030.5,2040.5), y=prices,xout=yeartime,rule=2)$y
+  return(cost)
 
-  return(npv_hp_grant)
+
 }
+
 
 
