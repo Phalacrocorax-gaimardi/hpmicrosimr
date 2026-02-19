@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.7</span>
       </span>
     </div>
 
@@ -77,18 +77,119 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><em>hpmicrosimr</em> is an agent-based model simulation framework describing home energy efficiency and heating technology system upgrades by <span class="math inline">$`\approx 800`$</span> Irish owner-occupier households. Typically the model is initialised in 2015 and is run to 2040 or 2050. Agent characteristics are based on survey data collected in 2024.</p>
-<p>This is the development, but fully working, version of <em>hpmicrosimr</em>. The main functionality is (1) a detailed model of financial return on household energy investments including choice of heating technology (2) an initialiser, (3) an <strong>updater</strong> and (4) runABM. Agents live on a artificial social network to allow peer effects in heat pump adoption to be described.</p>
-<p>The heating systems included in the current version of <em>hpmicrosimr</em> are oil, solid_fuel, gas, electric and air source heat_pumps. There are two underlying space heating upgrade processes describe by <em>hpmicrosimr</em> at each time step. The most common event is failure and replacement of the current heating system.Failure probability is described by a Weibull distribution with technology-specific factors. The current version of <em>hpmicrosimr</em> assumes that the full heating requirement is supplied by the primary heating source. Backup secondary and tertiary heat sources do not play a role in the modelling. Agents choose between replacing the current fuel source with the same tech or adopting a heat pump. Risk aversion and “status quo bias” lowers the rate of adoption of heat pumps even in cases where this offers a better financial return. Possibilities such as oil <span class="math inline">$`\rightarrow`$</span> gas are excluded as this is not an option for households not near the gas network.</p>
-<p>A less common, but more significant, event from the point of view of energy efficiency is the decision by a household to carry out a home energy efficiency retrofit. The rate at which households take this option is set by a parameter <em>p.</em> fit from calibration to historical data. The household investment decision involves a choice of <span class="math inline">$`BER`$</span> upgrade from <span class="math inline">$`BER_{old} \rightarrow BER_{new}`$</span>, as well as a potential technology shift from <span class="math inline">$`tech_{old} \rightarrow tech_{new}`$</span>. The household may also choose to retain their current heating system. This choice may be advantageous if the expected residual value of the existing asset is high. A function <strong>optimise_upgrade()</strong> determines the optimum upgrade choice, including the effect of all currently applicable grants.</p>
+<p><em>hpmicrosimr</em> is an agent-based modelling framework for residential energy efficiency upgrades. It projects space heating technology system choices by <span class="math inline">$`\approx 800`$</span> Irish owner-occupier households or “agents”. Agent characteristics are based on survey data collected in late 2024. The model runs at bi-monthly time-steps over the intervals 2015-2040 or 2015-2040. <em>hpmicrosimr</em> therefore describes retrofit activity in the pre-2015 Irish housing stock (about 1.16M households).</p>
+<p>This is a development, but fully working, version of <em>hpmicrosimr</em>. The main elements are (1) a detailed financial model for household energy investments including heating technology, building fabric upgrade and state grant supports (2) an <strong>initialiser</strong> that imputes missing data and involves randomisation, (3) an <strong>updater</strong> and (4) a run module <strong>runABM</strong> where a choice scenario is specified. Agents live on a artificial social network to capture possible peer effects in heat pump adoption. The heating systems included in the current version of <em>hpmicrosimr</em> are oil, solid_fuel, gas, electric and air source heat_pumps. The current version of <em>hpmicrosimr</em> assumes that the building heating requirement is satisfied by the primary heating source. Backup secondary and tertiary heat sources do not play a role in the modelling.</p>
+<p>Two distinct processes occur at each time step in <strong>updater</strong>. Process 1 describes random failure and replacement of the current heating technology based in the system age (time of installation). Failure probability is described by a Weibull distribution with technology-specific parameters. When the current system fails, agents choose between replacemnet with the old tech or adopting a heat pump. Risk aversion and status quo bias lowers the rate of adoption of heat pumps even in cases where this appears to offer a better financial return as defined by annualised cost savings. This simplification excludes possibilities such as solid fuel <span class="math inline">$`\rightarrow`$</span> electric or oil <span class="math inline">$`\rightarrow`$</span> gas. However, when an already installed heat pump fails, <em>hpmicrosimr</em> assumes that the agents choose between replacement with a new heat pump or switching to gas. Grant support is not available for a new heat pump in this case. Note that improvement in boiler efficiencies means that process 1 leads to a steady improvement in residential energy efficiency (BER) even without the effect of heat pumps.</p>
+<p>Process 2 involves a deliberate decision by some agents make an energy efficiency improvement (Building Energy Rating, BER). This reflects a desire to save money and/or to improve comfort. The household investment decision involves a potential building fabric or Heat Loss Indicator (<span class="math inline">$`HLI`$</span>) upgrade from <span class="math inline">$`HLI_{old} \rightarrow HLI_{new}`$</span>, as well as a potential technology switch from <span class="math inline">$`tech_{old} \rightarrow tech_{new}`$</span>. The function <strong>optimise_upgrade()</strong> determines the optimum upgrade path, including state grant incentives that apply at the current time. The rate at which households choose to update the energy efficiency of their home is set by an inertia parameter <em>p.</em>. <em>.p</em> is the fraction of agents who choose to make a home energy efficiency improvement at each time step. Along with other poorly known parameters, it is found from macro-calibration to historical grant upake data. If the value of <span class="math inline">$`p.`$</span> is small and energy costs are high, most households have not yet taken advantage of energy efficiency upgrades that could reduce their costs. This is a so-called energy efficiency “gap” or “paradox”. However, there are other barriers that contribute to the energy efficiency gap. <strong>optimise_upgrade()</strong> includes the agents’ time preferences and other behavioural characteristics.</p>
+<p>Without “behavioural” parameters that describe agents risk-aversion (<span class="math inline">$`\theta`$</span>). The agents time preferences are described by two parameters-the discount rate <span class="math inline">$`r`$</span> and a present bias <span class="math inline">$`\beta`$</span>. In addition, there is an aversion to disruption <span class="math inline">$`\eta`$</span> and and aversion to grant applications <span class="math inline">$`\tau`$</span>. There is also a large “prebound” effect <span class="math inline">$`\rho`$</span>. This means tha</p>
+<table class="table">
+<colgroup>
+<col width="18%">
+<col width="10%">
+<col width="18%">
+<col width="28%">
+<col width="23%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">parameter</th>
+<th align="left">symbol</th>
+<th align="left">typical_value</th>
+<th align="left">type</th>
+<th align="left">source</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">risk aversion</td>
+<td align="left">θ</td>
+<td align="left">10-30%</td>
+<td align="left">heterogeneous barrier</td>
+<td align="left">survey (2024)</td>
+</tr>
+<tr class="even">
+<td align="left">discount rate</td>
+<td align="left">r</td>
+<td align="left">3.5%</td>
+<td align="left">homogeneous</td>
+<td align="left">macro-calibration</td>
+</tr>
+<tr class="odd">
+<td align="left">present bias</td>
+<td align="left">β</td>
+<td align="left">0.5</td>
+<td align="left">homogeneous</td>
+<td align="left">calibration</td>
+</tr>
+<tr class="even">
+<td align="left">inertia</td>
+<td align="left">p</td>
+<td align="left">0.05</td>
+<td align="left">homogeneous</td>
+<td align="left">calibration</td>
+</tr>
+<tr class="odd">
+<td align="left">disruption</td>
+<td align="left">η</td>
+<td align="left">0.16</td>
+<td align="left">homogeneous</td>
+<td align="left">calibration</td>
+</tr>
+<tr class="even">
+<td align="left">sludge</td>
+<td align="left">τ</td>
+<td align="left">0.02</td>
+<td align="left">homogeneous</td>
+<td align="left">calibration</td>
+</tr>
+<tr class="odd">
+<td align="left">prebound</td>
+<td align="left">ρ</td>
+<td align="left">0.4</td>
+<td align="left">homogeneous</td>
+<td align="left">observed FEC</td>
+</tr>
+</tbody>
+</table>
+<p>Table 1: Calibration Parameters</p>
+<p>The parameters of Table 1 are integrated into the decision rule as follows. Following a heating system breakdown, a heat pump is adopted if the annualised cost savings relative to retaining the current technology exceed <span class="math inline">$`\theta_i`$</span> where <span class="math inline">$`i`$</span> is the agent index. Heat pumps involve a significant upfront cost, therefore the agents time preferences are important.</p>
+<pre class="math"><code>
+EAC = opex + \frac{CRF(r)}{\beta} (capex-grant) \tag{1}</code></pre>
+<p>where <span class="math inline">$`EAC`$</span> is the equivalent annual cost with interest rate <span class="math inline">$`r`$</span>, present bias <span class="math inline">$`\beta`$</span>, including the effect of grants. A heat pump is adopted provided that the EAC of a heat pump is sufficiently low relative to retaining the current heating system. This is heterogeneous - more risk averse or conservative households require higher return before switching. However, if an agent has an associate who has already adopted a heat pump this is lowered.</p>
+<p>Process 2 involves the decision whether to upgrade the energy efficiency of the building. Without any corrections, a purely “rational” financial decision would minimise the annualised cost <span class="math inline">$`A`$</span> annualised investment cost with discount rate <span class="math inline">$`r`$</span>. The change in annualised cost <span class="math inline">$`\Delta A`$</span> is</p>
+<pre class="math"><code>
+\Delta EAC = \Delta opex - r(capex - grant) \tag{3}</code></pre>
+<p>If <span class="math inline">$`\Delta EAC`$</span> is negative then investment is justified, and agents may choose the optimal investment i.e. the . <span class="math inline">$`\Delta opex`$</span> is calculated from the change in space heating requirement (<span class="math inline">$`Q_{sh}`$</span>) following the upgrade, <span class="math inline">$`\Delta Q_{sh}=52.7 \times \Delta HLI`$</span>. This assumes Heating Degree Days of 2,196 <span class="math inline">$`^\circ C-days`$</span>. The change is annual heating bills is then:</p>
+<pre class="math"><code>
+\Delta opex = 52.7 \frac{\Delta HLI{\epsilon} p_{fuel} \tag{4}</code></pre>
+<p>where <span class="math inline">$`\epsilon`$</span> is the heating system efficiency (i.e. <span class="math inline">$`\epsilon &lt; 1`$</span> for boilers and <span class="math inline">$`\approx`$</span> 3 for a heat pump ) and <span class="math inline">$`p_{fuel}`$</span> is the prevailing fuel price in units <span class="math inline">$`€/kWh`$</span>. Note that no prebound effect is included in Equation (3). The reason is that some of the return from investment in building fabric upgrades is in the form of improved comfort. A reasonable approach to capturing this is to ignore the prebound effect i.e. the engineering financial return capture the full welfare gain of the agent include financial cost and comfort. On the other hand, a calculation of the impact on energy demand needs to take prebound into effect.</p>
+<p>It would not be possible to fit the observed uptake of building fabric retrofits using Equation (3). In reality, there is a significant impact of additional non-financial factors <span class="math inline">$`\beta`$</span>, <span class="math inline">$`\eta`$</span> and <span class="math inline">$`\tau`$</span>. Here <span class="math inline">$`\beta`$</span> is used to parameterise the “sticker shock” associated with higher upfront costs and <span class="math inline">$`\eta`$</span> and <span class="math inline">$`\tau`$</span> are associated with “hassle” - <span class="math inline">$`\eta`$</span> describes the disruption effect that scales with capital cost and <span class="math inline">$`\tau`$</span> describes the grant application “sludge” that is assumed to scale with grant size.</p>
+<pre class="math"><code>
+A = opex - \left(\frac{r}{\beta} + \eta \right) capex + \left(\frac{r}{\beta} - \tau \right) grant \tag{2}</code></pre>
+<p>Following a decision to explore an energy efficiency upgrade, the agents seek to optimise the upgrade taking the time preferences into. *hpmicrosimr$ assumes that HLI improvements are a long-live. The annualised savings due to a HLI upgrade are then:</p>
+<pre class="math"><code>
+A_{fabric} = \delta opex - \left(\frac{r}{\beta} + \eta \right) capex + \left(\frac{r}{\beta} - \tau \right) grant \tag{2}</code></pre>
+<div class="section level3">
+<h3 id="fabric-ugrade-cost-model">Fabric Ugrade Cost Model<a class="anchor" aria-label="anchor" href="#fabric-ugrade-cost-model"></a>
+</h3>
+<p><em>hpmicromsimr</em> uses a simplified model of <span class="math inline">$`HLI`$</span> upgrade costs. This is based on increasing marginal of improvement at lower values of <span class="math inline">$`HLI`$</span>. The marginal cost model a logistic model, that crosses over from low cost measures for inefficient buildings, to high marginal cost for a building that is already efficient. If <span class="math inline">$`C`$</span> is the upgrade cost for a 100m<span class="math inline">$`^2`$</span> heated floor area building.</p>
+<pre class="math"><code>
+\frac{d C}{d HLI} = \frac{c_{min}}{1+e^{-\left(HLI-HLI_0\right)/k}} + \frac{c_{max}}{1+e^{\left(HLI-HLI_0\right)/k}} \tag{1}</code></pre>
+<p>The values of the parameters Appropropriate values for Irish upgrade costs are currently, For example, for a two-storey semi-detached house $c_{min}= €42 { <sup>C}{m</sup>2}/W $, <span class="math inline">$`c_{max}= €465 { ^\circ C}{m^2}/W`$</span>, <span class="math inline">$`K=0.37W/{ ^\circ C}{m^2}`$</span>. The crossover scale <span class="math inline">$`HLI_0 = 2.3 W/{ ^\circ C}{m^2}`$</span> which corresponds to a BER of C2 for a house with an efficient gas boiler.</p>
+<p>Equation (1) can be integrated to find the cost for an arbitrary uppgrade from <span class="math inline">$`HLI_{old}`$</span> to <span class="math inline">$`HLI_{new}`$</span></p>
+<pre class="math"><code>
+C= c_{max} \left(HLI_{old}-HLI_{new}\right) + K\left(c_{max}-c_{min}\right) \log{\left[ \frac{1+e^{(HLI_{f}-HLI_0)/k})}{1+e^{(HLI_{i}-HLI_0)/k}} \right]} \tag{2}</code></pre>
+<p>Equation (2) is used to find the optimal upgrade path.</p>
+<figure><img src="images/upgrade_costs1.png" alt="fabric upgrade costs for two-storey semi-detached houses in Munster"><figcaption aria-hidden="true">
+fabric upgrade costs for two-storey semi-detached houses in Munster
+</figcaption></figure><p>##Scenarios</p>
 <p>Applications of <em>hpmicrosimr</em> are to project energy efficiency outcomes based on future policy scenarios (such as WEM/WAM), impacts on CO2 emissions, and associated cost-benefit analysis of generous incentive schemes.</p>
-<p>There are large behavioural preferences that influence energy efficiency outcomes. There is strong evidence (Coyne &amp; Denny) of “temperature take-back” or rebound effects following space heating efficiency upgrades. <em>hpmicrosimr</em></p>
+<p>There are large behavioural preferences that influence energy efficiency outcomes. There is strong evidence of “temperature take-back” or rebound effects following space heating efficiency upgrades. <em>hpmicrosimr</em></p>
 <p>A separate package <em>hpmicrocalibrater</em> is used to generate the model weights and thresholds and are provided in a dataset <em>agents_init</em> attached to <em>hpmicrosimr</em>.</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>To install the latest development version of <em>hpmicrosimr</em>:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"https://github.com/Phalacrocorax-gaimardi/hpmicrosimr"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -96,7 +197,7 @@
 </h2>
 <p>Householders face a complex decision when considering home energy upgrades. <em>hpmicrosimr</em> has a number of functions that determine the financially optimum upgrade, taking grantsinto account. The financial return must be sufficient to overcome any behavioural correction factors such as risk aversion, hassle, present bias, likely rebound etc before adoption occurs.</p>
 <p>First load in the technical and cost scenario parameters for 2026 <em>params</em>. A set of technology specific cost parameters are contained in <em>tech_parms</em> and are assumed to be fixed (apart from skilled labour cost).</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span>
 <span><span class="va">tech_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tech_params_fun.html">tech_params_fun</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -106,7 +207,7 @@
 <h3 id="efficiency-retrofit-cost-model">efficiency retrofit cost model<a class="anchor" aria-label="anchor" href="#efficiency-retrofit-cost-model"></a>
 </h3>
 <p>The default cost model for energy efficiency improvements used by <em>hpmicrosimr</em> does not consider specific measures such as lift insulation, new windows etc. Instead it is based on a marginal cost model <span class="math inline">$`\frac{k_0}{BER^{\alpha}}`$</span>. This reflects the steep increase in that upgrade costs required to reach the most efficient ratings A2 etc. The resulting efficiency upgrade matrix is shown below.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2025</span><span class="op">)</span></span>
 <span><span class="co">#HLI upgrades from 3.3 to 2.3 (the value of params$hli_heat_pump_threshold)</span></span>
@@ -120,7 +221,7 @@
 <h3 id="heating-system-capital-and-operating-costs">Heating system capital and operating costs<a class="anchor" aria-label="anchor" href="#heating-system-capital-and-operating-costs"></a>
 </h3>
 <p>Capital costs for each technology depend on the time of installation, the system capacity (kW), whether the system replaces an earlier system of the same fuel type, etc. For example, the influence of grants is shown in the example below.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span>
 <span><span class="va">tech_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tech_params_fun.html">tech_params_fun</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -145,18 +246,18 @@
 <span><span class="co">#&gt; $cost_after_grant</span></span>
 <span><span class="co">#&gt; [1] 15080</span></span></code></pre></div>
 <p>Annual operating costs are sensitive to HLI which determines the heat requirement of the property. These depend on the current time params$yeartime but also the efficieny (equivalent to the installation time in hpmicrosimr) of the system. This is because efficiency has changed significantly in the past e.g. with the introduction of condensing boilers.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span>
 <span><span class="va">tech_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tech_params_fun.html">tech_params_fun</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#C3 rating</span></span>
 <span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>hli<span class="op">=</span><span class="fl">4</span>,tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 4296.048</span></span>
+<span><span class="co">#&gt; [1] 4331.136</span></span>
 <span><span class="co">#B1 rating</span></span>
 <span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>hli<span class="op">=</span><span class="fl">2.4</span>,tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 2637.629</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 2658.682</span></span></code></pre></div>
 <p>The notional operating costs calculated above assume standard heating season conditions and a fully heated property (<em>include_rebound=FALSE</em>). Operating costs calculated when households trade comfort for cost should be calculated using <em>include_rebound=TRUE</em>. Assuming a default rebound of 50% ( <em>params$r.</em>):</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"default rebound"</span>,<span class="va">params</span><span class="op">$</span><span class="va">rho</span><span class="op">)</span><span class="op">)</span></span>
@@ -164,27 +265,30 @@
 <span><span class="va">tech_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tech_params_fun.html">tech_params_fun</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#C3 rating</span></span>
 <span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>hli<span class="op">=</span><span class="fl">4</span>,tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 3055.184</span></span>
+<span><span class="co">#&gt; [1] 3523.04</span></span>
 <span><span class="co">#B2 rating</span></span>
 <span><span class="fu"><a href="reference/heating_system_operating_cost.html">heating_system_operating_cost</a></span><span class="op">(</span>hli<span class="op">=</span><span class="fl">2.4</span>,tech<span class="op">=</span><span class="st">"oil"</span>,installation_time<span class="op">=</span><span class="fl">2003</span>,floor_area<span class="op">=</span><span class="fl">100</span>,<span class="va">params</span>,include_rebound<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1894.29</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 2352.322</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="effective-annual-costs">Effective Annual Costs<a class="anchor" aria-label="anchor" href="#effective-annual-costs"></a>
 </h3>
 <p>A key financial concept for the modelling is Effective Annual Cost (EAC). The EAC is the annual “bill”. This includes the actual heating bill as well as an annualised capital cost of heating technology and fabric upgrades undertaken. For example, a heat pump is adopted if the EAC gain relative to a competing technology such as gas is sufficient. This is a complex calculation because the optimal BER upgrade for gas and heat pumps are not the same. For real technologies with uncertain lifetimes, EAC declines as the lifetime of the system is approached. <em>hpmicrosimr</em> calculates EAC and expected system lifetimes using a set of technology-specific Weibull hazard functions. The parameters of the failure model is contained in <em>tech_failure_params</em>.</p>
 <p>Effective annual costs (EACs) of heating technologies are assume to changed over time due installation (labour) costs, efficiency gains, fuel cost changes and grants. To illustrate this, early year EACs for heat pump, gas and oil systems installed during 2010-2025 is shown below, using the <em>hpmicrosimr::annualised_heating_system_cost()</em>. The property has BER of 175kWh/m2/year in this example. The impact of the introduction of capital grants in 2018 for heat pumps is obvious. This calculation suggests that heat pumps are the lowest cost for this C1/C2 rated household but this assumes that a substantial use of night-rated electricity. The rebound effect is not included. Rebound lowers the operating cost and therefore makes heat pumps appear less attractive.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.4.3</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──</span></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; ✔ dplyr     1.1.4     ✔ readr     2.1.5</span></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; ✔ forcats   1.0.0     ✔ stringr   1.5.1</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; ✔ ggplot2   4.0.1     ✔ tibble    3.2.1</span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; ✔ lubridate 1.9.3     ✔ tidyr     1.3.1</span></span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; ✔ purrr     1.0.2     </span></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span></span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span></span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.4.3</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co">#&gt; ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; ✔ dplyr     1.1.4     ✔ readr     2.1.5</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; ✔ forcats   1.0.0     ✔ stringr   1.5.1</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; ✔ ggplot2   4.0.1     ✔ tibble    3.2.1</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; ✔ lubridate 1.9.3     ✔ tidyr     1.3.1</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; ✔ purrr     1.0.2     </span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; ✖ tidyr::extract()    masks magrittr::extract()</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt; ✖ dplyr::filter()     masks stats::filter()</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt; ✖ dplyr::group_rows() masks kableExtra::group_rows()</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="co">#&gt; ✖ dplyr::lag()        masks stats::lag()</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="co">#&gt; ✖ purrr::set_names()  masks magrittr::set_names()</span></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="co">#&gt; ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</span></span></code></pre></div>
 <div class="figure">
 <img src="reference/figures/README-historical_eacs-1.png" alt="Equivalent annual cost" width="70%"><p class="caption">
 Equivalent annual cost
@@ -209,7 +313,7 @@ Equivalent annual cost
 <h2 id="example-initial-state-rebound-effect">Example: initial state rebound effect<a class="anchor" aria-label="anchor" href="#example-initial-state-rebound-effect"></a>
 </h2>
 <p>The example below illustrates the use of <em>initialise_agents</em>. The initial annual heating requirements for each household is calculated. The figure shows the resulting distribution of a kWh/year values with and without rebound of 30%.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2015</span><span class="op">)</span></span>
@@ -231,7 +335,7 @@ Equivalent annual cost
 <h2 id="example-updater">Example: Updater<a class="anchor" aria-label="anchor" href="#example-updater"></a>
 </h2>
 <p><em>update_agents</em> is the core function that advances the system by one time step</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phalacrocorax-gaimardi.github.io/hpmicrosimr/">hpmicrosimr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/help.html" class="external-link">help</a></span><span class="op">(</span><span class="st">"update_agents"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; starting httpd help server ... done</span></span></code></pre></div>
@@ -271,7 +375,9 @@ Equivalent annual cost
 <ul class="list-unstyled">
 <li><a href="https://github.com/Phalacrocorax-gaimardi/hpmicrosimr/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/Phalacrocorax-gaimardi/hpmicrosimr/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://opensource.org/licenses/Apache-2.0" class="external-link"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a></li>
-<li><a href="https://creativecommons.org/publicdomain/zero/1.0/" class="external-link"><img src="https://img.shields.io/badge/Data%20License-CC0%201.0-lightgrey.svg" alt="Data License: CC0 1.0"></a></li>
+<li><a href="https://creativecommons.org/licenses/by/4.0/" class="external-link"><img src="https://img.shields.io/badge/data%20license-CC%20BY%204.0-lightgrey.svg" alt="License: CC BY 4.0"></a></li>
+<li><a href="https://www.tidyverse.org/" class="external-link"><img src="https://img.shields.io/badge/tidyverse-%E2%9A%99%EF%B8%8F-brightgreen" alt="tidyverse"></a></li>
+<li><a href="https://cran.r-project.org/web/views/HighPerformanceComputing.html" class="external-link"><img src="https://img.shields.io/badge/parallel-computing-00a8e8" alt="parallel"></a></li>
 </ul>
 </div>
 
