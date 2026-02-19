@@ -386,9 +386,12 @@ retrofit_cost_model_logistic <- function(hli_old,hli_new,house_type,storeys,regi
   c_min <- model_params$c_min
   c_max <- model_params$c_max*1.1
   h_0 <- model_params$h_0
-  #marginal_cost <- function(h) c_min + (c_max-c_min)/(1+exp(k*(h-h_0)))
-  #cost <- ifelse(ber_old > ber_new,integrate(marginal_cost,lower=ber_new,upper=ber_old)$value,0)
+  #marginal_cost <- function(h) c_min/(1+exp(-k(h-h_0))) + c_max/(1+exp(k*(h-h_0)))
   cost <- ifelse(hli_old > hli_new, c_max*(hli_old-hli_new) + (c_max-c_min)/k*(log1p(exp(k*(hli_new-h_0))) - log1p(exp(k*(hli_old-h_0)))),0)
+  #cost <- ifelse(hli_old > hli_new, c_max*(hli_old-hli_new) + (c_max-c_min)/k*(log1p(exp(k*(hli_new-h_0))) - log1p(exp(k*(hli_old-h_0)))),0)
+
+  #cost <- ifelse(hli_old > hli_new, c_min*(hli_new-hli_old) + (c_max-c_min)/k*(log1p(exp(k*(hli_old-h_0))) - log1p(exp(k*(hli_new-h_0)))),0)
+
   #res_2024 <- 10*cost*sqrt(floor_area)*ifelse(region=="Dublin",1.25,1)
   res_2024 <- 4.641589*cost*floor_area^(2/3)*ifelse(region=="Dublin",1.25,1) #economy of scale & Dublin premium (Kren et al)
   #adjust by 2024 labour cost

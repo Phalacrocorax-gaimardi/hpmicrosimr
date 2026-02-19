@@ -22,50 +22,198 @@
 [![R-CMD-check](https://github.com/Phalacrocorax-gaimardi/hpmicrosimr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Phalacrocorax-gaimardi/hpmicrosimr/actions/workflows/R-CMD-check.yaml)
 [![License: Apache
 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Data License: CC0
-1.0](https://img.shields.io/badge/Data%20License-CC0%201.0-lightgrey.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
+[![License: CC BY
+4.0](https://img.shields.io/badge/data%20license-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![tidyverse](https://img.shields.io/badge/tidyverse-%E2%9A%99%EF%B8%8F-brightgreen)](https://www.tidyverse.org/)
+[![parallel](https://img.shields.io/badge/parallel-computing-00a8e8)](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
 <!-- badges: end -->
 
-*hpmicrosimr* is an agent-based model simulation framework describing
-home energy efficiency and heating technology system upgrades by
-$`\approx 800`$ Irish owner-occupier households. Typically the model is
-initialised in 2015 and is run to 2040 or 2050. Agent characteristics
-are based on survey data collected in 2024.
+*hpmicrosimr* is an agent-based modelling framework for residential
+energy efficiency upgrades. It projects space heating technology system
+choices by $`\approx 800`$ Irish owner-occupier households or “agents”.
+Agent characteristics are based on survey data collected in late 2024.
+The model runs at bi-monthly time-steps over the intervals 2015-2040 or
+2015-2040. *hpmicrosimr* therefore describes retrofit activity in the
+pre-2015 Irish housing stock (about 1.16M households).
 
-This is the development, but fully working, version of *hpmicrosimr*.
-The main functionality is (1) a detailed model of financial return on
-household energy investments including choice of heating technology (2)
-an initialiser, (3) an **updater** and (4) runABM. Agents live on a
-artificial social network to allow peer effects in heat pump adoption to
-be described.
+This is a development, but fully working, version of *hpmicrosimr*. The
+main elements are (1) a detailed financial model for household energy
+investments including heating technology, building fabric upgrade and
+state grant supports (2) an **initialiser** that imputes missing data
+and involves randomisation, (3) an **updater** and (4) a run module
+**runABM** where a choice scenario is specified. Agents live on a
+artificial social network to capture possible peer effects in heat pump
+adoption. The heating systems included in the current version of
+*hpmicrosimr* are oil, solid_fuel, gas, electric and air source
+heat_pumps. The current version of *hpmicrosimr* assumes that the
+building heating requirement is satisfied by the primary heating source.
+Backup secondary and tertiary heat sources do not play a role in the
+modelling.
 
-The heating systems included in the current version of *hpmicrosimr* are
-oil, solid_fuel, gas, electric and air source heat_pumps. There are two
-underlying space heating upgrade processes describe by *hpmicrosimr* at
-each time step. The most common event is failure and replacement of the
-current heating system.Failure probability is described by a Weibull
-distribution with technology-specific factors. The current version of
-*hpmicrosimr* assumes that the full heating requirement is supplied by
-the primary heating source. Backup secondary and tertiary heat sources
-do not play a role in the modelling. Agents choose between replacing the
-current fuel source with the same tech or adopting a heat pump. Risk
-aversion and “status quo bias” lowers the rate of adoption of heat pumps
-even in cases where this offers a better financial return. Possibilities
-such as oil $`\rightarrow`$ gas are excluded as this is not an option
-for households not near the gas network.
+Two distinct processes occur at each time step in **updater**. Process 1
+describes random failure and replacement of the current heating
+technology based in the system age (time of installation). Failure
+probability is described by a Weibull distribution with
+technology-specific parameters. When the current system fails, agents
+choose between replacemnet with the old tech or adopting a heat pump.
+Risk aversion and status quo bias lowers the rate of adoption of heat
+pumps even in cases where this appears to offer a better financial
+return as defined by annualised cost savings. This simplification
+excludes possibilities such as solid fuel $`\rightarrow`$ electric or
+oil $`\rightarrow`$ gas. However, when an already installed heat pump
+fails, *hpmicrosimr* assumes that the agents choose between replacement
+with a new heat pump or switching to gas. Grant support is not available
+for a new heat pump in this case. Note that improvement in boiler
+efficiencies means that process 1 leads to a steady improvement in
+residential energy efficiency (BER) even without the effect of heat
+pumps.
 
-A less common, but more significant, event from the point of view of
-energy efficiency is the decision by a household to carry out a home
-energy efficiency retrofit. The rate at which households take this
-option is set by a parameter *p.* fit from calibration to historical
-data. The household investment decision involves a choice of $`BER`$
-upgrade from $`BER_{old} \rightarrow BER_{new}`$, as well as a potential
-technology shift from $`tech_{old} \rightarrow tech_{new}`$. The
-household may also choose to retain their current heating system. This
-choice may be advantageous if the expected residual value of the
-existing asset is high. A function **optimise_upgrade()** determines the
-optimum upgrade choice, including the effect of all currently applicable
-grants.
+Process 2 involves a deliberate decision by some agents make an energy
+efficiency improvement (Building Energy Rating, BER). This reflects a
+desire to save money and/or to improve comfort. The household investment
+decision involves a potential building fabric or Heat Loss Indicator
+($`HLI`$) upgrade from $`HLI_{old} \rightarrow HLI_{new}`$, as well as a
+potential technology switch from $`tech_{old} \rightarrow tech_{new}`$.
+The function **optimise_upgrade()** determines the optimum upgrade path,
+including state grant incentives that apply at the current time. The
+rate at which households choose to update the energy efficiency of their
+home is set by an inertia parameter *p.*. *.p* is the fraction of agents
+who choose to make a home energy efficiency improvement at each time
+step. Along with other poorly known parameters, it is found from
+macro-calibration to historical grant upake data. If the value of $`p.`$
+is small and energy costs are high, most households have not yet taken
+advantage of energy efficiency upgrades that could reduce their costs.
+This is a so-called energy efficiency “gap” or “paradox”. However, there
+are other barriers that contribute to the energy efficiency gap.
+**optimise_upgrade()** includes the agents’ time preferences and other
+behavioural characteristics.
+
+Without “behavioural” parameters that describe agents risk-aversion
+($`\theta`$). The agents time preferences are described by two
+parameters-the discount rate $`r`$ and a present bias $`\beta`$. In
+addition, there is an aversion to disruption $`\eta`$ and and aversion
+to grant applications $`\tau`$. There is also a large “prebound” effect
+$`\rho`$. This means tha
+
+| parameter     | symbol | typical_value | type                  | source            |
+|:--------------|:-------|:--------------|:----------------------|:------------------|
+| risk aversion | θ      | 10-30%        | heterogeneous barrier | survey (2024)     |
+| discount rate | r      | 3.5%          | homogeneous           | macro-calibration |
+| present bias  | β      | 0.5           | homogeneous           | calibration       |
+| inertia       | p      | 0.05          | homogeneous           | calibration       |
+| disruption    | η      | 0.16          | homogeneous           | calibration       |
+| sludge        | τ      | 0.02          | homogeneous           | calibration       |
+| prebound      | ρ      | 0.4           | homogeneous           | observed FEC      |
+
+Table 1: Calibration Parameters
+
+The parameters of Table 1 are integrated into the decision rule as
+follows. Following a heating system breakdown, a heat pump is adopted if
+the annualised cost savings relative to retaining the current technology
+exceed $`\theta_i`$ where $`i`$ is the agent index. Heat pumps involve a
+significant upfront cost, therefore the agents time preferences are
+important.
+
+``` math
+
+EAC = opex + \frac{CRF(r)}{\beta} (capex-grant) \tag{1}
+```
+where $`EAC`$ is the equivalent annual cost with interest rate $`r`$,
+present bias $`\beta`$, including the effect of grants. A heat pump is
+adopted provided that the EAC of a heat pump is sufficiently low
+relative to retaining the current heating system. This is
+heterogeneous - more risk averse or conservative households require
+higher return before switching. However, if an agent has an associate
+who has already adopted a heat pump this is lowered.
+
+Process 2 involves the decision whether to upgrade the energy efficiency
+of the building. Without any corrections, a purely “rational” financial
+decision would minimise the annualised cost $`A`$ annualised investment
+cost with discount rate $`r`$. The change in annualised cost
+$`\Delta A`$ is
+``` math
+
+\Delta EAC = \Delta opex - r(capex - grant) \tag{3}
+```
+If $`\Delta EAC`$ is negative then investment is justified, and agents
+may choose the optimal investment i.e. the . $`\Delta opex`$ is
+calculated from the change in space heating requirement ($`Q_{sh}`$)
+following the upgrade, $`\Delta Q_{sh}=52.7 \times \Delta HLI`$. This
+assumes Heating Degree Days of 2,196 $`^\circ C-days`$. The change is
+annual heating bills is then:
+``` math
+
+\Delta opex = 52.7 \frac{\Delta HLI{\epsilon} p_{fuel} \tag{4}
+```
+where $`\epsilon`$ is the heating system efficiency
+(i.e. $`\epsilon < 1`$ for boilers and $`\approx`$ 3 for a heat pump )
+and $`p_{fuel}`$ is the prevailing fuel price in units $`€/kWh`$. Note
+that no prebound effect is included in Equation (3). The reason is that
+some of the return from investment in building fabric upgrades is in the
+form of improved comfort. A reasonable approach to capturing this is to
+ignore the prebound effect i.e. the engineering financial return capture
+the full welfare gain of the agent include financial cost and comfort.
+On the other hand, a calculation of the impact on energy demand needs to
+take prebound into effect.
+
+It would not be possible to fit the observed uptake of building fabric
+retrofits using Equation (3). In reality, there is a significant impact
+of additional non-financial factors $`\beta`$, $`\eta`$ and $`\tau`$.
+Here $`\beta`$ is used to parameterise the “sticker shock” associated
+with higher upfront costs and $`\eta`$ and $`\tau`$ are associated with
+“hassle” - $`\eta`$ describes the disruption effect that scales with
+capital cost and $`\tau`$ describes the grant application “sludge” that
+is assumed to scale with grant size.
+
+``` math
+
+A = opex - \left(\frac{r}{\beta} + \eta \right) capex + \left(\frac{r}{\beta} - \tau \right) grant \tag{2}
+```
+
+Following a decision to explore an energy efficiency upgrade, the agents
+seek to optimise the upgrade taking the time preferences into.
+\*hpmicrosimr\$ assumes that HLI improvements are a long-live. The
+annualised savings due to a HLI upgrade are then:
+``` math
+
+A_{fabric} = \delta opex - \left(\frac{r}{\beta} + \eta \right) capex + \left(\frac{r}{\beta} - \tau \right) grant \tag{2}
+```
+
+### Fabric Ugrade Cost Model
+
+*hpmicromsimr* uses a simplified model of $`HLI`$ upgrade costs. This is
+based on increasing marginal of improvement at lower values of $`HLI`$.
+The marginal cost model a logistic model, that crosses over from low
+cost measures for inefficient buildings, to high marginal cost for a
+building that is already efficient. If $`C`$ is the upgrade cost for a
+100m$`^2`$ heated floor area building.
+``` math
+
+\frac{d C}{d HLI} = \frac{c_{min}}{1+e^{-\left(HLI-HLI_0\right)/k}} + \frac{c_{max}}{1+e^{\left(HLI-HLI_0\right)/k}} \tag{1}
+```
+The values of the parameters Appropropriate values for Irish upgrade
+costs are currently, For example, for a two-storey semi-detached house
+\$c\_{min}= €42 { <sup>C}{m</sup>2}/W \$,
+$`c_{max}= €465 { ^\circ C}{m^2}/W`$, $`K=0.37W/{ ^\circ C}{m^2}`$. The
+crossover scale $`HLI_0 = 2.3 W/{ ^\circ C}{m^2}`$ which corresponds to
+a BER of C2 for a house with an efficient gas boiler.
+
+Equation (1) can be integrated to find the cost for an arbitrary
+uppgrade from $`HLI_{old}`$ to $`HLI_{new}`$
+``` math
+
+C= c_{max} \left(HLI_{old}-HLI_{new}\right) + K\left(c_{max}-c_{min}\right) \log{\left[ \frac{1+e^{(HLI_{f}-HLI_0)/k})}{1+e^{(HLI_{i}-HLI_0)/k}} \right]} \tag{2}
+```
+Equation (2) is used to find the optimal upgrade path.
+
+<figure>
+<img src="images/upgrade_costs1.png"
+alt="fabric upgrade costs for two-storey semi-detached houses in Munster" />
+<figcaption aria-hidden="true">fabric upgrade costs for two-storey
+semi-detached houses in Munster</figcaption>
+</figure>
+
+\##Scenarios
 
 Applications of *hpmicrosimr* are to project energy efficiency outcomes
 based on future policy scenarios (such as WEM/WAM), impacts on CO2
@@ -73,9 +221,8 @@ emissions, and associated cost-benefit analysis of generous incentive
 schemes.
 
 There are large behavioural preferences that influence energy efficiency
-outcomes. There is strong evidence (Coyne & Denny) of “temperature
-take-back” or rebound effects following space heating efficiency
-upgrades. *hpmicrosimr*
+outcomes. There is strong evidence of “temperature take-back” or rebound
+effects following space heating efficiency upgrades. *hpmicrosimr*
 
 A separate package *hpmicrocalibrater* is used to generate the model
 weights and thresholds and are provided in a dataset *agents_init*
@@ -182,10 +329,10 @@ params <- scenario_params(sD,2026)
 tech_params <- tech_params_fun()
 #C3 rating
 heating_system_operating_cost(hli=4,tech="oil",installation_time=2003,floor_area=100,params,include_rebound=FALSE)
-#> [1] 4296.048
+#> [1] 4331.136
 #B1 rating
 heating_system_operating_cost(hli=2.4,tech="oil",installation_time=2003,floor_area=100,params,include_rebound=FALSE)
-#> [1] 2637.629
+#> [1] 2658.682
 ```
 
 The notional operating costs calculated above assume standard heating
@@ -202,10 +349,10 @@ print(paste("default rebound",params$rho))
 tech_params <- tech_params_fun()
 #C3 rating
 heating_system_operating_cost(hli=4,tech="oil",installation_time=2003,floor_area=100,params,include_rebound=TRUE)
-#> [1] 3055.184
+#> [1] 3523.04
 #B2 rating
 heating_system_operating_cost(hli=2.4,tech="oil",installation_time=2003,floor_area=100,params,include_rebound=TRUE)
-#> [1] 1894.29
+#> [1] 2352.322
 ```
 
 ### Effective Annual Costs
@@ -242,8 +389,11 @@ operating cost and therefore makes heat pumps appear less attractive.
     #> ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
     #> ✔ purrr     1.0.2     
     #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    #> ✖ dplyr::filter() masks stats::filter()
-    #> ✖ dplyr::lag()    masks stats::lag()
+    #> ✖ tidyr::extract()    masks magrittr::extract()
+    #> ✖ dplyr::filter()     masks stats::filter()
+    #> ✖ dplyr::group_rows() masks kableExtra::group_rows()
+    #> ✖ dplyr::lag()        masks stats::lag()
+    #> ✖ purrr::set_names()  masks magrittr::set_names()
     #> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
 <div class="figure">

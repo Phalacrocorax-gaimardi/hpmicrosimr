@@ -49,6 +49,8 @@ min_fun2 <- function(x){
   err_2025 %>% return()
 }
 
+params <- scenario_params(sD,2025)
+
 
 search_space <- makeParamSet(
   makeNumericParam("nu.",0.2,0.8),
@@ -97,9 +99,9 @@ macro_calibration <- macro_calibration %>% select(nu.,p.,beta.,r.,eta.,tau.,y)
 write_csv(macro_calibration,paste("C:/Users/Joe/pkgs/hpmicrosimr/inst/macro_calibration_2.csv",sep=""))
 #write_csv(macro_calibration,paste("~/Policy/CAMG/SolarPVReport/PVBESS_microsimr/macro_calibration_5_parameter_50.csv",sep=""))
 
-macro_calibration <- read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/macro_calibration_parbayes_simple_r_0.03.csv")
+macro_calibration <- read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/macro_calibration_parbayes_refined_2.csv")
 mc <- macro_calibration[1,]
-min_fun2(c(nu=mc$nu,p=mc$p,r=0.03,beta=mc$beta,eta=mc$eta,tau=mc$tau))
+min_fun2(c(nu=mc$nu,p=mc$p,r=mc$r,beta=mc$beta,eta=mc$eta,tau=mc$tau))
 test <- calABM(sD,4,T,nu=mc$nu.,p=mc$p.,r=mc$r.,beta=mc$beta.,eta=mc$eta.,tau=mc$tau.)
 
 
