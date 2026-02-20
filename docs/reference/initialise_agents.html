@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.8</span>
       </span>
     </div>
 
@@ -25,6 +25,16 @@
       <ul class="nav navbar-nav"><li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/model_background.html">model-vignette</a>
+    </li>
+  </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -80,16 +90,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 789 × 19</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    serial w_q52 w_q13 w_theta region  house_type storeys construction_year   ber</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 71     0.771 0.918  1.15   Ulster… detached         2              <span style="text-decoration: underline;">1</span>997 150. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 72     1.02  1.12   0.875  Dublin  semi_deta…       2              <span style="text-decoration: underline;">2</span>004 181. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 74     1.41  1.09   0.698  Dublin  terraced         2              <span style="text-decoration: underline;">1</span>850 219. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 75     1.44  1.17  -<span style="color: #BB0000;">0.131</span>  Dublin  apartment        2              <span style="text-decoration: underline;">2</span>006  78.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 77     1.64  1.26   0.095<span style="text-decoration: underline;">4</span> Munster detached         2              <span style="text-decoration: underline;">1</span>995 196. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 79     1.41  1.28   0.773  Munster detached         2              <span style="text-decoration: underline;">2</span>004 224. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 81     1.01  1.16   1.22   Munster detached         1              <span style="text-decoration: underline;">2</span>002 357. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 82     1.01  0.950  1.04   Ulster… detached         1              <span style="text-decoration: underline;">2</span>006 281. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 84     0.762 1.03   0.508  Rest o… semi_deta…       2              <span style="text-decoration: underline;">1</span>999 157. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 87     0.430 1.15   1.85   Rest o… detached         2              <span style="text-decoration: underline;">1</span>980 174. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 71     0.771 0.918  1.15   Ulster… detached         2              <span style="text-decoration: underline;">1</span>995  133.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 72     1.02  1.12   0.875  Dublin  semi_deta…       2              <span style="text-decoration: underline;">1</span>999  165.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 74     1.41  1.09   0.698  Dublin  terraced         2              <span style="text-decoration: underline;">1</span>968  246.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 75     1.44  1.17  -<span style="color: #BB0000;">0.131</span>  Dublin  apartment        2              <span style="text-decoration: underline;">2</span>005  106.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 77     1.64  1.26   0.095<span style="text-decoration: underline;">4</span> Munster detached         2              <span style="text-decoration: underline;">2</span>003  197.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 79     1.41  1.28   0.773  Munster detached         2              <span style="text-decoration: underline;">1</span>996  542.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 81     1.01  1.16   1.22   Munster detached         1              <span style="text-decoration: underline;">2</span>001  292.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 82     1.01  0.950  1.04   Ulster… detached         1              <span style="text-decoration: underline;">2</span>007  242.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 84     0.762 1.03   0.508  Rest o… semi_deta…       2              <span style="text-decoration: underline;">1</span>999  196.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 87     0.430 1.15   1.85   Rest o… detached         2              <span style="text-decoration: underline;">1</span>986  304.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 779 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 10 more variables: hli &lt;dbl&gt;, floor_area &lt;dbl&gt;, tech &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   heating_install_time &lt;dbl&gt;, income &lt;dbl&gt;, fuel_allowance &lt;lgl&gt;, kW &lt;dbl&gt;,</span></span>
@@ -105,7 +115,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Na Li, Joseph Wheatley.</p>
+  <p></p><p>Developed by Na Li, Lisa Ryan, Joseph Wheatley.</p>
 </div>
 
 <div class="pkgdown">

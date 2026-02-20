@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.8</span>
       </span>
     </div>
 
@@ -25,6 +25,16 @@
       <ul class="nav navbar-nav"><li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/model_background.html">model-vignette</a>
+    </li>
+  </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -103,6 +113,9 @@
 <span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">2.8</span>,<span class="fl">1.8</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="st">"Dublin"</span>,<span class="fl">120</span>,<span class="st">"logistic"</span>,<span class="va">params</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 44544.46</span>
+<span class="r-in"><span><span class="co">#bungalow</span></span></span>
+<span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">2.8</span>,<span class="fl">1.8</span>,<span class="st">"detached"</span>,<span class="fl">1</span>,<span class="st">"Dublin"</span>,<span class="fl">120</span>,<span class="st">"logistic"</span>,<span class="va">params</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 55425.81</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -114,7 +127,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Na Li, Joseph Wheatley.</p>
+  <p></p><p>Developed by Na Li, Lisa Ryan, Joseph Wheatley.</p>
 </div>
 
 <div class="pkgdown">
