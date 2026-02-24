@@ -1,7 +1,7 @@
 Package: hpmicrosimr
 Type: Package
 Title: Agent-based simulation of the uptake of heat pumps and energy efficiency upgrades by households
-Version: 0.3.82
+Version: 0.3.83
 Authors@R: c(
     person("Na", "Li", email = "na.li1@ucd.ie", role = c("aut","ctb"),comment= c(ORCID ="0009-0002-9491-8076") ),
     person("Lisa", "Ryan", email = "lisa.ryan@ucd.ie", role = c("aut","ctb"),comment= c(ORCID ="0000-0002-6097-7900")),
