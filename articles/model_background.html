@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.82</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.83</span>
       </span>
     </div>
 
@@ -146,9 +146,10 @@ that <span class="math inline">$\Delta EAC = EAC_{\rm{reject}} -
 EAC_{\rm{adopt}} &gt; 0$</span>. This is insufficient for adoption in
 <em>hpmicrosimr</em> unless the financial advantage exceeds a
 heterogeneous threshold
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>Δ</mi><mi>E</mi><mi>A</mi><mi>C</mi></mrow><mrow><mi>E</mi><mi>A</mi><msub><mi>C</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">j</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">t</mi></mrow></msub></mrow></mfrac><mo>&gt;</mo><mi>θ</mi></mrow><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>Δ</mi><mi>E</mi><mi>A</mi><mi>C</mi></mrow><mrow><mi>E</mi><mi>A</mi><msub><mi>C</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">j</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">t</mi></mrow></msub></mrow></mfrac><mo>&gt;</mo><mi>θ</mi></mrow><annotation encoding="application/x-tex">\begin{equation}
 \frac{\Delta EAC}{EAC_{\mathrm{reject}}} &gt; \theta \tag{1}
-</annotation></semantics></math> The heterogeneity of the “barrier”
+\end{equation}</annotation></semantics></math> The heterogeneity of the
+“barrier”
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>,
 representing risk aversion and other factors, is determined from a
 micro-calibration to the survey data. When an existing heat pump fails,
@@ -282,9 +283,9 @@ quantifying the underheating of very inefficient buildings.</p>
 </tbody>
 </table>
 <p>The cost of alternative heating technologies is evaluated using:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>A</mi><mi>C</mi><mo>=</mo><mi>o</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>+</mo><mfrac><mrow><mi>C</mi><mi>R</mi><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>r</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mi>β</mi></mfrac><mrow><mo stretchy="true" form="prefix">(</mo><mi>c</mi><mi>a</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>−</mo><mi>g</mi><mi>r</mi><mi>a</mi><mi>n</mi><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>A</mi><mi>C</mi><mo>=</mo><mi>o</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>+</mo><mfrac><mrow><mi>C</mi><mi>R</mi><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>r</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mi>β</mi></mfrac><mrow><mo stretchy="true" form="prefix">(</mo><mi>c</mi><mi>a</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>−</mo><mi>g</mi><mi>r</mi><mi>a</mi><mi>n</mi><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\begin{equation}
 EAC = opex + \frac{CRF(r)}{\beta} (capex-grant) \tag{2}
-</annotation></semantics></math> where
+\end{equation}</annotation></semantics></math> where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mi>R</mi><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>r</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">CRF(r)</annotation></semantics></math>
 is the capital reduction factor. A heat pump is adopted provided that
 the EAC of a heat pump evaluated using Equation (2) is sufficiently low
@@ -297,9 +298,10 @@ but grants mitigate this effect.</p>
 <p>Process 2 involves the decision whether or not to upgrade the
 building fabric. Neglecting behavioural adjustments, the change in EAC
 due to an investment in fabric upgrade would be:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mi>E</mi><mi>A</mi><mi>C</mi><mo>=</mo><mi>Δ</mi><mi>o</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>+</mo><mi>r</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>c</mi><mi>a</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>−</mo><mi>g</mi><mi>r</mi><mi>a</mi><mi>n</mi><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mi>E</mi><mi>A</mi><mi>C</mi><mo>=</mo><mi>Δ</mi><mi>o</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>+</mo><mi>r</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>c</mi><mi>a</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>−</mo><mi>g</mi><mi>r</mi><mi>a</mi><mi>n</mi><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\begin{equation}
 \Delta EAC = \Delta opex + r(capex - grant) \tag{3a}
-</annotation></semantics></math> Comparing to Equation (2),
+\end{equation}</annotation></semantics></math> Comparing to Equation
+(2),
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mi>L</mi><mi>I</mi></mrow><annotation encoding="application/x-tex">HLI</annotation></semantics></math>
 improvements are assumed to be long-lived so that
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mi>R</mi><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>r</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">CRF(r) = r</annotation></semantics></math>.
@@ -307,9 +309,9 @@ improvements are assumed to be long-lived so that
 is the reduction in annual bills calculated from the change in
 engineering space heating requirement following the upgrade.
 <em>hpmicrosimr</em> uses the expression:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mi>o</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>=</mo><mn>52.7</mn><mfrac><mrow><mi>Δ</mi><mi>H</mi><mi>L</mi><mi>I</mi></mrow><mi>ϵ</mi></mfrac><msub><mi>p</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mi>o</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>=</mo><mn>52.7</mn><mfrac><mrow><mi>Δ</mi><mi>H</mi><mi>L</mi><mi>I</mi></mrow><mi>ϵ</mi></mfrac><msub><mi>p</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\begin{equation}
 \Delta opex = 52.7 \frac{\Delta HLI}{\epsilon} p_{fuel} \tag{4}
-</annotation></semantics></math> where
+\end{equation}</annotation></semantics></math> where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>
 is the heating system efficiency
 (i.e. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ϵ</mi><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\epsilon &lt; 1</annotation></semantics></math>
@@ -346,13 +348,13 @@ effect scales with capital cost
 and the grant application “sludge” scales with grant size
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>τ</mi><mo>×</mo><mi>g</mi><mi>r</mi><mi>a</mi><mi>n</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">\tau \times grant</annotation></semantics></math>).
 Equation (3a) becomes:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mi>E</mi><mi>A</mi><mi>C</mi><mo>=</mo><mi>Δ</mi><mi>o</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>r</mi><mi>β</mi></mfrac><mo>+</mo><mi>η</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>c</mi><mi>a</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>r</mi><mi>β</mi></mfrac><mo>−</mo><mi>τ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>g</mi><mi>r</mi><mi>a</mi><mi>n</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mi>E</mi><mi>A</mi><mi>C</mi><mo>=</mo><mi>Δ</mi><mi>o</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>r</mi><mi>β</mi></mfrac><mo>+</mo><mi>η</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>c</mi><mi>a</mi><mi>p</mi><mi>e</mi><mi>x</mi><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>r</mi><mi>β</mi></mfrac><mo>−</mo><mi>τ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>g</mi><mi>r</mi><mi>a</mi><mi>n</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">\begin{equation}
 \Delta EAC = \Delta opex + \left(\frac{r}{\beta} + \eta \right) capex - \left(\frac{r}{\beta} - \tau \right) grant \tag{3b}
-</annotation></semantics></math> Equation (3b) with the parameter values
-of Table 1 gives a good description of the observed cumulative grant
-uptake by scheme and measure (heat pumps and fabric upgrades) over the
-period 2015-2025. Note that the disruption effect is larger that the
-direct financial cost.</p>
+\end{equation}</annotation></semantics></math> Equation (3b) with the
+parameter values of Table 1 gives a good description of the observed
+cumulative grant uptake by scheme and measure (heat pumps and fabric
+upgrades) over the period 2015-2025. Note that the disruption effect is
+larger that the direct financial cost.</p>
 <div class="section level3">
 <h3 id="heating-system-cost-model">Heating System Cost Model<a class="anchor" aria-label="anchor" href="#heating-system-cost-model"></a>
 </h3>
@@ -385,20 +387,20 @@ marginal cost for
 upgrades crosses over from low cost measures for incremental
 improvements in inefficient buildings, to a very high marginal costs for
 a building that is already efficient.
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><mi>C</mi></mrow><mrow><mi>d</mi><mi>H</mi><mi>L</mi><mi>I</mi></mrow></mfrac><mo>=</mo><mfrac><msub><mi>c</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><mi>I</mi><mo>−</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mi>k</mi></mrow></msup></mrow></mfrac><mo>+</mo><mfrac><msub><mi>c</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><mi>I</mi><mo>−</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mi>k</mi></mrow></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><mi>C</mi></mrow><mrow><mi>d</mi><mi>H</mi><mi>L</mi><mi>I</mi></mrow></mfrac><mo>=</mo><mfrac><msub><mi>c</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><mi>I</mi><mo>−</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mi>k</mi></mrow></msup></mrow></mfrac><mo>+</mo><mfrac><msub><mi>c</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><mi>I</mi><mo>−</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mi>k</mi></mrow></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">\begin{equation}
 \frac{d C}{d HLI} = \frac{c_{min}}{1+e^{-\left(HLI-HLI_0\right)/k}} + \frac{c_{max}}{1+e^{\left(HLI-HLI_0\right)/k}} \tag{5a}
-</annotation></semantics></math><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
+\end{equation}</annotation></semantics></math><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
 is the upgrade cost for a
 100m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mn>2</mn></msup><annotation encoding="application/x-tex">^2</annotation></semantics></math>
 floor area. Equation (5a) can be integrated to find the cost for an
 upgrade from
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mi>L</mi><msub><mi>I</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">HLI_{i}</annotation></semantics></math>
 to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mi>L</mi><msub><mi>I</mi><mi>f</mi></msub></mrow><annotation encoding="application/x-tex">HLI_{f}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mi>i</mi></msub><mo>,</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mi>f</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>c</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mrow><mi>o</mi><mi>l</mi><mi>d</mi></mrow></msub><mo>−</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mrow><mi>n</mi><mi>e</mi><mi>w</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>K</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>c</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>−</mo><msub><mi>c</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>log</mo><mrow><mo stretchy="true" form="prefix">[</mo><mfrac><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mi>f</mi></msub><mo>−</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mi>k</mi></mrow></msup><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mi>i</mi></msub><mo>−</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mi>k</mi></mrow></msup></mrow></mfrac><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mi>L</mi><msub><mi>I</mi><mi>f</mi></msub></mrow><annotation encoding="application/x-tex">HLI_{f}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mi>i</mi></msub><mo>,</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mi>f</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>c</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mrow><mi>o</mi><mi>l</mi><mi>d</mi></mrow></msub><mo>−</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mrow><mi>n</mi><mi>e</mi><mi>w</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>K</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>c</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>−</mo><msub><mi>c</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>log</mo><mrow><mo stretchy="true" form="prefix">[</mo><mfrac><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mi>f</mi></msub><mo>−</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mi>k</mi></mrow></msup><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mi>i</mi></msub><mo>−</mo><mi>H</mi><mi>L</mi><msub><mi>I</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mi>k</mi></mrow></msup></mrow></mfrac><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\begin{equation}
 C(HLI_i,HLI_f) = c_{max} \left(HLI_{old}-HLI_{new}\right) + K\left(c_{max}-c_{min}\right) \log{\left[ \frac{1+e^{(HLI_{f}-HLI_0)/k})}{1+e^{(HLI_{i}-HLI_0)/k}} \right]} \tag{5b}
-</annotation></semantics></math> Appropriate parameter values in
-Equation (5b) are determined from reported upgrade costs and case
-studies. They depend on house type and region. For example, for a
+\end{equation}</annotation></semantics></math> Appropriate parameter
+values in Equation (5b) are determined from reported upgrade costs and
+case studies. They depend on house type and region. For example, for a
 two-storey, semi-detached house in Munster, $c_{min}= €42{
 {<sup>}C}m</sup>2/W $,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>=</mo><mi>€</mi><mn>465</mn><msup><mi></mi><mo>∘</mo></msup><mi>C</mi><msup><mi>m</mi><mn>2</mn></msup><mi>/</mi><mi>W</mi></mrow><annotation encoding="application/x-tex">c_{max}= €465 { ^\circ}C{m^2}/W</annotation></semantics></math>.
