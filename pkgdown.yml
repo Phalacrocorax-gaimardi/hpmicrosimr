@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   model_background: model_background.html
-last_built: 2026-02-24T16:37Z
+last_built: 2026-02-24T17:19Z
 urls:
   reference: https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference
   article: https://phalacrocorax-gaimardi.github.io/hpmicrosimr/articles
