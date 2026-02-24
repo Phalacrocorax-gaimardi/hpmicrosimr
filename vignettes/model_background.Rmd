@@ -1,6 +1,9 @@
 ---
 title: "`hpmicrosimr modelling vignette`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_document:
+    theme: lumen
+    mathjax: "default"
 vignette: >
   %\VignetteIndexEntry{model_background}
   %\VignetteEngine{knitr::rmarkdown}
