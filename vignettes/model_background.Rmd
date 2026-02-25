@@ -1,7 +1,7 @@
 ---
 title: "hpmicrosimr modelling vignette"
 output: 
-  rmarkdown::html_vignette:
+  rmarkdown::html_document:
     keep_md: true
 vignette: >
   %\VignetteIndexEntry{hpmicrosimr modelling vignette}
@@ -19,6 +19,21 @@ header-includes:
     };
     </script>
 ---
+
+
+<style>
+.math.display {
+  width: 100%;
+  display: block;
+  margin: 1em 0;
+}
+/* Ensure the MathJax container isn't clipped */
+.main-container {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
