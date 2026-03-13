@@ -12,8 +12,8 @@ annualised_heating_system_cost(
   floor_area,
   house_type,
   construction_year,
-  grant_type,
   params,
+  grant_type,
   include_rebound = FALSE
 )
 }
@@ -32,9 +32,9 @@ annualised_heating_system_cost(
 
 \item{construction_year}{year, integer}
 
-\item{grant_type}{one of "OSS","BetterEnergyHomes", "None"}
-
 \item{params}{parameter values at yeartime}
+
+\item{grant_type}{one of "OSS","BetterEnergyHomes", "None"}
 
 \item{include_rebound}{default FALSE}
 }
@@ -52,5 +52,5 @@ replicate(100,annualised_heating_system_cost(2.3,"heat_pump",params$yeartime,"ne
 annualised_heating_system_cost(2.4,"oil",2010,"new",100,"semi_detached",1997,grant_type="None",params)
 params$beta. <- 0.5
 annualised_heating_system_cost(2.4,"heat_pump",2010,"new",100,"semi_detached",1997,grant_type="None",params)
-annualised_heating_system_cost(2.4,"oil",2010,"new",100,"semi_detached",1997,grant_type="BetterEnergyHomes",params)
+annualised_heating_system_cost(2.4,"oil",2010,"new",100,"semi_detached",1997,params,grant_type="BetterEnergyHomes")
 }

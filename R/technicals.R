@@ -684,7 +684,7 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
 #' space_heating_requirement(1.2,100,0,params)
 #' space_heating_requirement(1.2,100,0.4,params)
 #'
-space_heating_requirement <- function(hli,floor_area,rebound=0.5,params) {
+space_heating_requirement <- function(hli,floor_area,rebound=0.4,params) {
 
   sh <- hli*params$hdd*24/1000 #specific hr
   #rbound
@@ -864,3 +864,8 @@ ef_solid_fuel_fun  <- function(sD,yeartime){
   return(ef)
 
 }
+
+
+
+
+

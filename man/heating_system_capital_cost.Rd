@@ -36,12 +36,11 @@ heating_system_capital_cost(
 a list showing actual cost, grant and cost after grant
 }
 \description{
-cost of a new heating system. Includes VAT using the "two-thirds" rule.\cr
+The cost of a new heating system ine euros. Includes VAT using the "two-thirds" rule.
 \cr
-The installation time is params$yeartime.
-}
-\details{
-This functions assumed that ancilliary costs are halved if the technology is unchanged - "swap" vs "new".
+Costs depends on installation time. This set from params$yeartime.
+\cr
+This functions assumed that ancilliary cost component is halved if the technology is unchanged ie. "swap" vs "new" where swap means that the existing technology is retained.
 \cr
 }
 \examples{
@@ -57,4 +56,5 @@ params$oil_boiler_ban <- 2030
 params$yeartime <- 2035
 heating_system_capital_cost("gas",8,installation_type="new","detached",2003,"OSS",params,include_vat = TRUE)
 heating_system_capital_cost("heat_pump",5,installation_type="new","detached",2003,"None",params,include_vat = TRUE)
+heating_system_capital_cost("oil",5,installation_type="new","detached",2003,"None",params,include_vat = TRUE)
 }

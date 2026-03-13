@@ -13,6 +13,7 @@ optimise_heat(
   construction_year,
   region,
   floor_area,
+  eta,
   params,
   include_rebound = FALSE
 )
@@ -34,6 +35,8 @@ optimise_heat(
 
 \item{floor_area}{total floor area (m2)}
 
+\item{eta}{heterogeneous disruption parameter}
+
 \item{params}{current parameter values}
 
 \item{include_rebound}{default FALSE}
@@ -51,10 +54,10 @@ If current system is a heat pump, choose between a heat pump swap or reversion t
 }
 \examples{
 params <- scenario_params(sD,2026)
-optimise_heat(2.3,"oil",2000,"terraced",2,1980,"Munster",90,params)
-
+optimise_heat(2.3,"oil",2000,"terraced",2,1980,"Munster",90,0.12,params)
+optimise_heat(2.3,"oil",2000,"terraced",2,1980,"Munster",90,0.0,params)
 params <- scenario_params(sD,2026)
-optimise_heat(2.4,"oil",2000,"terraced",2,1980,"Munster",90,params)
-optimise_heat(5.4,"oil",2000,"terraced",2,1980,"Munster",90,params)
+optimise_heat(2.4,"oil",2000,"terraced",2,1980,"Munster",90,0.12,params)
+optimise_heat(5.4,"oil",2000,"terraced",2,1980,"Munster",90,0.12,params)
 
 }

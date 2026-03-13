@@ -168,6 +168,15 @@ Figure 1 illustrates Equation (4b). Note the steeply rising costs for upgrades o
 knitr::include_graphics("images/upgrade_costs1.png")
 ```
 
+### Optimal upgrade
+
+Equations (3b), (4) and (5a) can be used to find the optimal fabric upgrade, given the current $HLI_{initial}$. For the special case where the cost is fully covered by the grant (no financial disincentive), the optimal $EAC$ is given by the solution of
+\begin{equation}
+ \left(\eta + \tau\right ) MC(HLI_{final}) = \frac{52.7 p_f}{\epsilon} \tag{6}
+\end{equation}
+where $HLI_{final} < HLI_{initial}$.
+Therefore if the "hassle" $\eta + \tau > 52.7p_f/\epsilon MC(HLI_{initial})$, no fabric upgrade is undertaken. If the fuel price is $0.12/kWh$, $\epsilon = 0.9$.
+
 ### Scenarios
 
 Applications of *hpmicrosimr* are to project energy efficiency outcomes based on future policy scenarios (such as WEM/WAM), impacts on CO2 emissions, and associated cost-benefit analysis of generous incentive schemes.

@@ -4,7 +4,7 @@
 \alias{space_heating_requirement}
 \title{space_heating_requirement}
 \usage{
-space_heating_requirement(hli, floor_area, rebound = 0.5, params)
+space_heating_requirement(hli, floor_area, rebound = 0.4, params)
 }
 \arguments{
 \item{hli}{heat loss indicator}

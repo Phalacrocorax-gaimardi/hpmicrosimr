@@ -13,7 +13,7 @@ optimise_upgrade(
   construction_year,
   region,
   floor_area,
-  cost_model = "logistic",
+  eta,
   params,
   upgrade_heat = TRUE,
   is_fuel_allowance = FALSE,
@@ -38,7 +38,7 @@ optimise_upgrade(
 
 \item{floor_area}{treated floor area (m2)}
 
-\item{cost_model}{efficiency upgrade cost model - only "logistic" at the moment}
+\item{eta}{heterogeneous disruption parameter}
 
 \item{params}{current parameter values from scenario_params(sD, yeartime)}
 
@@ -68,24 +68,25 @@ Returns a 2 row dataframe with tech_new the existing tech or a heat pump. If the
 
 params <- scenario_params(sD,2026)
 
-optimise_upgrade(1.8,"gas",2005,"semi_detached",2,2003,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE)
+optimise_upgrade(1.8,"gas",2005,"semi_detached",2,2003,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
 
-optimise_upgrade(2.6,"gas",2010,"semi_detached",2,2003,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE)
+optimise_upgrade(2.6,"gas",2010,"semi_detached",2,2003,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
 
-optimise_upgrade(5,"gas",2010,"detached",2,2010,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE)
-optimise_upgrade(1.66,"gas",2010,"detached",2,2010,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE)
+optimise_upgrade(5,"gas",2010,"detached",2,2010,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
+optimise_upgrade(1.66,"gas",2010,"detached",2,2010,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
 
-optimise_upgrade(2.4,"gas",2010,"detached",2,2010,"Dublin",175,"logistic",params,TRUE,FALSE,TRUE)
+optimise_upgrade(2.4,"gas",2010,"detached",2,2010,"Dublin",175,0.12,params,TRUE,FALSE,TRUE)
 
-optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
+optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 100,0.12,params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
 
-optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 200,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
+optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 200,0.12,params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
 
-optimise_upgrade(1.39,"gas",2020,"detached",2,1990,"Munster",100,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE)
+optimise_upgrade(1.39,"gas",2020,"detached",2,1990,"Munster",100,0.12,params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE)
 
 #WarmerHomes
 
-optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
-optimise_upgrade(3.8,"gas", 2003, "detached",2, 2003, "Dublin", 240,"logistic",params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
+optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,0.16,params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
+ optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,0,params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
+optimise_upgrade(3.8,"gas", 2003, "detached",2, 2003, "Dublin", 240,0.12,params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
 
 }

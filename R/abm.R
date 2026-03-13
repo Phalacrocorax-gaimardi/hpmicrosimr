@@ -5,6 +5,8 @@
 #hp_questions <- readr::read_csv("C:/Users/joe/pkgs/hpmicrosimr/inst/extdata/hp_questions.csv")
 #hp_qanda <- readr::read_csv("C:/Users/joe/pkgs/hpmicrosimr/inst/extdata/hp_qanda.csv")
 #sD <- readxl::read_xlsx("C:/Users/joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WEM")
+#sD_cap <- readxl::read_xlsx("C:/Users/joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="CAP")
+
 #use_data(sD,overwrite=TRUE)
 
 
@@ -206,13 +208,19 @@ initialise_agents <- function(sD,yeartime=2015,cal_run=10){
   agents <- agents %>% dplyr::mutate(ber=ber_from_hli(hli,primary_heat,heating_install_time,params))
   #annualised heating cost
   agents <- agents %>% dplyr::rowwise() %>% dplyr::mutate(eac = annualised_heating_system_cost(hli,primary_heat,
-                                      heating_install_time,"new",floor_area,house_type,construction_year,"None",params))
+                                      heating_install_time,"new",floor_area,house_type,construction_year,params,"None"))
   agents <- agents %>% dplyr::rowwise() %>% dplyr::mutate(eac_actual = annualised_heating_system_cost(hli,primary_heat,
-                                    heating_install_time,"new",floor_area,house_type,construction_year,"None",params,include_rebound = TRUE))
+                                    heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = TRUE))
 
   #optionally remove some columns
   agents <- agents %>% dplyr::select(-secondary_heat1,-secondary_heat2)
   agents <- agents %>% dplyr::rename("tech"=primary_heat)
+  #add randomised eta (disruption) values
+  agents <- agents %>% dplyr::inner_join(eta_values)
+  #compute eta values based on macro-calibration parameter
+  agents <- agents %>% dplyr::ungroup() %>% dplyr::mutate(eta=exp(log_eta_bar + rnorm(1,0,0.1481237))) %>% dplyr::select(-log_eta_bar)
+  agents <- agents %>% dplyr::mutate(eta = eta/mean(eta)) %>% dplyr::mutate(eta = params$eta.*eta)
+
   return(agents %>% dplyr::ungroup())
 }
 
@@ -247,7 +255,6 @@ initialise_agents <- function(sD,yeartime=2015,cal_run=10){
 
 update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,cal_run=50, quiet=TRUE){
   #
-  cost_model <- "logistic"
   #beta. <- 0.2532785
   #params at yeartime
   params <- scenario_params(sD,yeartime)
@@ -271,8 +278,8 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   #re-evalute BER to capture PEF drift
   a_s <- a_s %>% dplyr::mutate(ber=ber_from_hli(hli,tech,heating_install_time,params))
   #calculate updated eac and eac_actual
-  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,"None",params,include_rebound = FALSE))
-  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac_actual = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,"None",params,include_rebound = TRUE))
+  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = FALSE))
+  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac_actual = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = TRUE))
   #update definitions of old and new for all agents
   #a_s <- a_s %>% dplyr::mutate(S1_old=S1_new,S2_old = S2_new,B_old=B_new)
   #a_s <- a_s %>% dplyr::mutate(capex_old=capex_new,opex_old=opex_new)
@@ -295,11 +302,11 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
 
   if(nrow(b_s1)==0 & nrow(b_s2)==0) return(a_s)
 
-  hp_savings_env <- function(hli,tech, house_type,storeys, construction_year, region, floor_area) {
-    heat_pump_savings(hli,tech, params$yeartime, house_type, storeys,construction_year, region, floor_area, params)
+  hp_savings_env <- function(hli,tech, house_type,storeys, construction_year, region, floor_area,eta) {
+    heat_pump_savings(hli,tech, params$yeartime, house_type, storeys,construction_year, region, floor_area, eta,params)
   }
-  hp_upgrade_savings_env <- function(hli,tech, heating_install_time,house_type, storeys,construction_year, region, floor_area,fuel_allowance) {
-    heat_pump_upgrade_savings(hli,tech, heating_install_time, house_type,storeys, construction_year, region, floor_area, cost_model,params,fuel_allowance,include_grants = TRUE)
+  hp_upgrade_savings_env <- function(hli,tech, heating_install_time,house_type, storeys,construction_year, region, floor_area,eta,fuel_allowance) {
+    heat_pump_upgrade_savings(hli,tech, heating_install_time, house_type,storeys, construction_year, region, floor_area, eta, params,fuel_allowance,include_grants = TRUE)
   }
 
   ########################
@@ -307,7 +314,7 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   ########################
 
   #logic: if has heat pump replace
-  b_s0 <- b_s1 %>% dplyr::select(hli,tech,house_type, storeys,construction_year, region, floor_area)
+  b_s0 <- b_s1 %>% dplyr::select(hli,tech,house_type, storeys,construction_year, region, floor_area,eta)
   #df <- purrr::pmap(b_s0,optimise_heat_env)
   # should REBOUND be inlcuded at this step?
   df <- purrr::pmap(b_s0,hp_savings_env)
@@ -378,7 +385,7 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   ######################
   #print("b_s2")
   b_s2$upgrade <- TRUE
-  b_s0 <- b_s2 %>% dplyr::select(hli,tech,heating_install_time,house_type,storeys, construction_year, region, floor_area,fuel_allowance)
+  b_s0 <- b_s2 %>% dplyr::select(hli,tech,heating_install_time,house_type,storeys, construction_year, region, floor_area,eta,fuel_allowance)
   #df <- purrr::pmap(b_s0,optimise_heat_env)
   df <- purrr::pmap(b_s0,hp_upgrade_savings_env)
   df <- do.call(rbind,df)

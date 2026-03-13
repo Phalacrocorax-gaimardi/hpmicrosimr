@@ -16,7 +16,6 @@ fabric_grant(
   storeys,
   floor_area = 100,
   is_fuel_allowance = FALSE,
-  cost_model = "logistic",
   params,
   randomise = TRUE
 )
@@ -44,8 +43,6 @@ fabric_grant(
 
 \item{is_fuel_allowance}{TRUE/FALSE}
 
-\item{cost_model}{defaut logistic}
-
 \item{params}{parameters}
 
 \item{randomise}{whether to assign grant elements randomly or not. Default TRUE, for testing set to FALSE}
@@ -62,17 +59,17 @@ fabric upgrdae grant of euro700 applies.
 \examples{
 
 params <- scenario_params(sD,2028)
-fabric_grant(300,200,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,"logistic",params,randomise=TRUE)
+fabric_grant(300,200,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
 
-fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,"logistic",params,randomise=TRUE)
+fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
 
-fabric_grant(300,100,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,"logistic",params,randomise=TRUE)
+fabric_grant(300,100,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
 
-fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,"logistic",params,randomise=TRUE)
+fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE)
 
-fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,"logistic",params,randomise=TRUE)
+fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,params,randomise=TRUE)
 
-fabric_grant(300,280,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,"logistic",params,randomise=TRUE)
+fabric_grant(300,280,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,params,randomise=TRUE)
 
-fabric_grant(175,155,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,"logistic",params,randomise=TRUE)
+fabric_grant(175,155,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE)
 }

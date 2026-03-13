@@ -13,6 +13,7 @@ heat_pump_savings(
   construction_year,
   region,
   floor_area,
+  eta,
   params
 )
 }
@@ -33,26 +34,30 @@ heat_pump_savings(
 
 \item{floor_area}{total floor area (m2)}
 
+\item{eta}{disruption parameter}
+
 \item{params}{current parameter values}
 }
 \value{
 one row dataframe
 }
 \description{
-find the financially optimum household heating system replacement. Choose between current system and installing a heat pump.
-}
-\details{
-The "savings" are relative to an replacing the current system with a new system with the same technology e.g. gas -> gas
-
-If current system is a heat pump, choose between a heat pump swap or reversion to gas.
-
-This function is used in update_agents to determine the system choice when current heating system fails
+Finds the financially optimum household heating system replacement, including a heat pump.
+\cr
+\cr
+"Savings" are relative to an replacing the current system with a new system with the same technology e.g. gas -> gas
+\cr
+\cr
+If current system is a heat pump, the choice between a heat pump swap or reversion to gas. No status quo bias is included at present so the model ca have an unrealistic high number of heat pump defectors.
+\cr
+\cr
+This function is used in *update_agents* to determine the new system choice when current heating system fails. A heat pump "disruption" penality is not included in the current version.
 }
 \examples{
 params <- scenario_params(sD,2025)
-heat_pump_savings(2.31,"electricity",2010,"detached",2,1995,"Munster",120,params)
+heat_pump_savings(2.31,"electricity",2010,"detached",2,1995,"Munster",120,0.12,params)
 params$beta. <- 1
-heat_pump_savings(2,"solid_fuel",2010,"detached",2,1995,"Munster",100,params)
+heat_pump_savings(2,"solid_fuel",2010,"detached",2,1995,"Munster",100,0.12,params)
 
-heat_pump_savings(2,"heat_pump",2010,"detached",2,1995,"Munster",120,params)
+heat_pump_savings(3.5,"oil",2010,"detached",2,1995,"Munster",120,0.12,params)
 }

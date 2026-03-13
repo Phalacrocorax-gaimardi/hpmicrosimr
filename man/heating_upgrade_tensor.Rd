@@ -15,7 +15,7 @@ heating_upgrade_tensor(
   construction_year,
   region,
   floor_area,
-  cost_model = "logistic",
+  eta,
   params,
   upgrade_heat = TRUE,
   is_fuel_allowance = FALSE,
@@ -44,7 +44,7 @@ heating_upgrade_tensor(
 
 \item{floor_area}{floor area of property in m2}
 
-\item{cost_model}{ber upgrade cost model (power, logistic or esri) default logistic}
+\item{eta}{heterogeneous disruption parameter}
 
 \item{params}{params}
 
@@ -68,30 +68,24 @@ Fabric upgrade costs are discounted with infinite lifetime based on the risk-fre
 Behavioural factors are priced at their default in *params*.
 Present bias (params$beta.) is applied to the after grant capex. A hassle disutility (params$eta) describing disruption is applied before grant capex
 A sludge disutility (params$tau.) is applied to the grant amount. These can be turned off by beta params$beta. = 1, params$eta.=0 and params$tau.=0.
-}
-\details{
+\cr
 The new tech is installed at current time (params$yeartime). The old tech installation time is also specified.
-
+\cr
 Eligible grants are applied by default, the effects of grants can optionally be excluded by setting include_grants=FALSE
-
+\cr
 Optionally, the current (old) heating system can be retained by setting upgrade_heat =FALSE
-
+\cr
 Used with optimise_upgrade to determine the optimal upgrade path tech_old -> tech_new and hli_old -> hli_new
 }
 \examples{
 
 params <- scenario_params(sD,2028)
 
-heating_upgrade_tensor(2.31,2.31,"gas",2005,"gas","semi_detached",2,1990,"Dublin",100,cost_model="logistic",params,TRUE,FALSE,TRUE)
+heating_upgrade_tensor(2.31,2.31,"gas",2005,"gas","semi_detached",2,1990,"Dublin",100,eta=0.16,params,TRUE,FALSE,TRUE)
 
-heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
+heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0.16,params,TRUE,FALSE,TRUE,include_rebound=FALSE)
+heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0,params,TRUE,FALSE,TRUE,include_rebound=FALSE)
+heating_upgrade_tensor(2,1.2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,eta=0.12,params,TRUE,FALSE,TRUE,include_rebound=FALSE)
 
-heating_upgrade_tensor(2,1.2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
-
-heating_upgrade_tensor(2,2,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
-heating_upgrade_tensor(3,2,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
-heating_upgrade_tensor(4.8,2.3,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,FALSE,TRUE,include_rebound=FALSE)
-heating_upgrade_tensor(4.8,2.3,"gas",2000,"gas","detached",2, 1980,"Dublin",100,"logistic",params,TRUE,TRUE,TRUE,include_rebound=FALSE)
-heating_upgrade_tensor(4,1.5,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,"logistic",params,TRUE,TRUE,TRUE,include_rebound=FALSE)
 ber_from_hli(1.27,"gas",params$yeartime,params)
 }

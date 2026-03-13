@@ -28,10 +28,9 @@ scheme one of "None", "WarmerHomes", "OSS", "BetterEner
 }
 \description{
 utility function to determine whether or which home energy efficiency grant scheme a homeowner is or was eligible
-}
-\details{
+\cr
 if is_fuel_allowance is TRUE ber_old > 150 to qualifify for WarmerHomes.
-
+\cr
 expressed in terms of ber_old and ber_new
 }
 \examples{

@@ -13,7 +13,7 @@ heat_pump_upgrade_savings(
   construction_year,
   region,
   floor_area,
-  cost_model = "logistic",
+  eta,
   params,
   is_fuel_allowance,
   include_grants
@@ -36,7 +36,7 @@ heat_pump_upgrade_savings(
 
 \item{floor_area}{floor area in m2}
 
-\item{cost_model}{logistic, power or esri}
+\item{eta}{heterogeneous disruption parameter}
 
 \item{params}{scenario params at current yeartime}
 
@@ -54,17 +54,17 @@ The percentage annual equivalent savings achieved by adopting a heat pump as par
 Savings are expressed in two was (1) relative to the current system and (2) the current technology.
 Savings are also expressed relative to current system with no upgrades (used in update_agents to determine whether an upgrade is undertaken)
 If the relative gain is sufficient, a heat pump may be adopted.
-
+\cr
 For WarmerHomes, it is assumed that pre-2025 retrofits "stick" to current heating technology. Post-2025 the cost optimal choice is made.
 }
 \examples{
 
 params <- scenario_params(sD,2026)
-heat_pump_upgrade_savings(2.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE)
+heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
+heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,0,params,is_fuel_allowance=FALSE,include_grants=TRUE)
+heat_pump_upgrade_savings(1.1,"heat_pump",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=TRUE,include_grants=TRUE)
 
-heat_pump_upgrade_savings(1.1,"heat_pump",2000,"semi_detached",2,1990,"Munster",106,"logistic",params,is_fuel_allowance=TRUE,include_grants=TRUE)
-
-heat_pump_upgrade_savings(1.9,"gas",2000,"semi_detached",2,1990,"Munster",106,"logistic",params,is_fuel_allowance=FALSE,include_grants=TRUE)
+heat_pump_upgrade_savings(3.5,"oil",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
 
 
 }
