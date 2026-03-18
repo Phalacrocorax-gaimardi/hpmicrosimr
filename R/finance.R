@@ -1138,17 +1138,16 @@ fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,
 #' @export
 #'
 #' @examples
-#' #WarmerHomes
-#' heat_pump_grant("new","apartment",2003,"WarmerHomes",scenario_params(sD,2025.5))
-#'
-#' heat_pump_grant("new","apartment",2003,"BetterEnergyHomes",scenario_params(sD,2024))
-#'
 #' params <- scenario_params(sD,2025)
+#' heat_pump_grant("new","apartment",2003,"WarmerHomes",params)
+#'
+#' heat_pump_grant("new","apartment",2003,"BetterEnergyHomes",params)
+#'
+#'
 #' heat_pump_grant("new","semi_detached",1997,"OSS",params)
 #' heat_pump_grant("new","semi_detached",1997,"BetterEnergyHomes",params)
 #' heat_pump_grant("new","semi_detached",1997,"none",params)
-#'
-#' heat_pump_grant("new","detached",2003,"BetterEnergyHomes",scenario_params(sD,2024))
+#' heat_pump_grant("new","detached",2003,"BetterEnergyHomes",params)
 
 heat_pump_grant <- function(installation_type,house_type,construction_year,grant_type,params) {
   # Return grant amount based on date and type

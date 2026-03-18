@@ -35,15 +35,14 @@ no grant applies of HLI is great than params$hli_heat_pump_threshold
 for WarmerHomes, it is assumed that the grant covers heat pumps after 1 jan 2025 but not before.
 }
 \examples{
-#WarmerHomes
-heat_pump_grant("new","apartment",2003,"WarmerHomes",scenario_params(sD,2025.5))
-
-heat_pump_grant("new","apartment",2003,"BetterEnergyHomes",scenario_params(sD,2024))
-
 params <- scenario_params(sD,2025)
+heat_pump_grant("new","apartment",2003,"WarmerHomes",params)
+
+heat_pump_grant("new","apartment",2003,"BetterEnergyHomes",params)
+
+
 heat_pump_grant("new","semi_detached",1997,"OSS",params)
 heat_pump_grant("new","semi_detached",1997,"BetterEnergyHomes",params)
 heat_pump_grant("new","semi_detached",1997,"none",params)
-
-heat_pump_grant("new","detached",2003,"BetterEnergyHomes",scenario_params(sD,2024))
+heat_pump_grant("new","detached",2003,"BetterEnergyHomes",params)
 }

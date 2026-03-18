@@ -327,8 +327,10 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   #print(paste("number of heat pump failures", dim(b_s1_hp)[1]))
   # CORRECT
   if(nrow(b_s1_hp) > 0) {
-    b_s1_hp_stick <- b_s1_hp %>% dplyr::filter(savings <= 0 & hli <= params$hli_heat_pump_threshold)
-    b_s1_hp_switch <- b_s1_hp %>% dplyr::filter(savings > 0 | hli > params$hli_heat_pump_threshold )  #
+    #b_s1_hp_stick <- b_s1_hp %>% dplyr::filter(savings <= 0 & hli <= params$hli_heat_pump_threshold)
+    b_s1_hp_stick <- b_s1_hp %>% dplyr::filter(savings <= 0)
+    #b_s1_hp_switch <- b_s1_hp %>% dplyr::filter(savings > 0 | hli > params$hli_heat_pump_threshold )  #
+    b_s1_hp_switch <- b_s1_hp %>% dplyr::filter(savings > 0)
     #print("BUG??")
     b_s1_hp_stick <- b_s1_hp_stick %>% dplyr::mutate(eac=eac_stick,tech_cost=tech_cost_stick)
     b_s1_hp_switch <- b_s1_hp_switch %>% dplyr::mutate(eac=eac_switch,tech_cost=tech_cost_switch)
@@ -351,9 +353,11 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
     #sum and include hypothetical bias correction (default is zero)
     b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_tot = du_fin+du_social+du_theta + params$lambda.)
     #COULD ASSUME A HLI THRESHOLD FOR FAILURE ADOPTERS i.e. clearly heat pump ready
-    b_s1_nhp_switch <- b_s1_nhp %>% dplyr::filter(du_tot > 0 & hli <= params$hli_heat_pump_threshold)
+    #b_s1_nhp_switch <- b_s1_nhp %>% dplyr::filter(du_tot > 0 & hli <= params$hli_heat_pump_threshold)
+    b_s1_nhp_switch <- b_s1_nhp %>% dplyr::filter(du_tot > 0)
     b_s1_nhp_switch$tech <- "heat_pump"
-    b_s1_nhp_stick <- b_s1_nhp %>% dplyr::filter(is.na(du_tot) | du_tot <= 0 | hli > params$hli_heat_pump_threshold)
+    #b_s1_nhp_stick <- b_s1_nhp %>% dplyr::filter(is.na(du_tot) | du_tot <= 0 | hli > params$hli_heat_pump_threshold)
+    b_s1_nhp_stick <- b_s1_nhp %>% dplyr::filter(is.na(du_tot) | du_tot <= 0)
     #print(paste("number of heat pump adopters",dim(b_s1_nhp_switch)[1]))
     #stickers
     b_s1_nhp_stick <- b_s1_nhp_stick %>% dplyr::mutate(eac=eac_stick,tech_cost=tech_cost_stick)

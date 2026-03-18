@@ -17,7 +17,7 @@ sD_wam[sD_wem$parameter=="grant_increase_factor","value"]
 #sD_wem[sD_wem$parameter=="better_energy_introduction","value"] <- 2050
 #sD_wem[sD_wem$parameter=="oss_introduction","value"] <- 2050
 
-test <- runABM(sD_wam,4,2040)
+test <- runABM(sD_cap,4,2040)
 #wam <- test
 #saveRDS(wam,"~/Policy/CAMG/EED/Heat/data/wam.RData")
 
@@ -47,6 +47,7 @@ abm <- wam[[1]]
 n_run <- wem[[3]] %>% filter(parameter=="Nrun") %>% pull(value)
 df0 <- abm %>% group_by(simulation,date) %>% summarise(n0=n())
 housing_stock_oo <- 1147552 #census
+
 
 test2 <- abm %>% group_by(simulation,date,tech) %>% summarise(n=n()) %>% inner_join(df0)
 test2 <- test2 %>% mutate(n=n/n0*housing_stock_oo) %>% select(-n0)
@@ -1331,3 +1332,13 @@ g <- bills %>% ggplot(aes(year,bills,colour=income_tercile))+geom_line(linewidth
 g <- g + scale_colour_canva(palette="Fun and cheerful")+ facet_wrap(.~scenario,nrow=1)
 g
 export::graph2ppt(g,"~/Policy/CAMG/EED/Heat/bills.ppt")
+
+
+############
+#
+abm <- test[[1]]
+
+names(abm)
+abm$tech_cost %>% range(na.rm=T)
+
+abm %>% filter(simulation==1) %>% ggplot(aes(date,tech_cost,colour=tech)) + geom_point()
