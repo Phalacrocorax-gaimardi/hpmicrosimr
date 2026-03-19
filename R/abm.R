@@ -352,6 +352,8 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
     b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_theta = w_theta*theta)
     #sum and include hypothetical bias correction (default is zero)
     b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_tot = du_fin+du_social+du_theta + params$lambda.)
+    b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_tot = dplyr::if_else(tech=="oil" & yeartime >= params$oil_boiler_ban,1,du_tot))
+    b_s1_nhp <- b_s1_nhp %>% dplyr::mutate(du_tot = dplyr::if_else(tech=="gas" & yeartime >= params$gas_boiler_ban,1,du_tot))
     #COULD ASSUME A HLI THRESHOLD FOR FAILURE ADOPTERS i.e. clearly heat pump ready
     #b_s1_nhp_switch <- b_s1_nhp %>% dplyr::filter(du_tot > 0 & hli <= params$hli_heat_pump_threshold)
     b_s1_nhp_switch <- b_s1_nhp %>% dplyr::filter(du_tot > 0)
@@ -437,6 +439,9 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
    b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_theta = w_theta*theta) #barrier
    #sum and include a possible hypothetical bias correction (default is zero but you might need it)
    b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_tot = du_fin+du_social+du_theta + params$lambda.)
+   b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_tot = dplyr::if_else(tech=="oil" & yeartime >= params$oil_boiler_ban,1,du_tot))
+   b_s2_nhp <- b_s2_nhp %>% dplyr::mutate(du_tot = dplyr::if_else(tech=="gas" & yeartime >= params$gas_boiler_ban,1,du_tot))
+
    #adopters
    b_s2_nhp_switch <- b_s2_nhp %>% dplyr::filter(du_tot > 0)
    #non-adopters

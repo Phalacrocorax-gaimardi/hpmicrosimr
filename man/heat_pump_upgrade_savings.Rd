@@ -59,12 +59,12 @@ For WarmerHomes, it is assumed that pre-2025 retrofits "stick" to current heatin
 }
 \examples{
 
-params <- scenario_params(sD,2026)
+params <- scenario_params(sD,2035)
 heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
 heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,0,params,is_fuel_allowance=FALSE,include_grants=TRUE)
 heat_pump_upgrade_savings(1.1,"heat_pump",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=TRUE,include_grants=TRUE)
 
-heat_pump_upgrade_savings(3.5,"oil",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
+heat_pump_upgrade_savings(3.5,"gas",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
 
 
 }
