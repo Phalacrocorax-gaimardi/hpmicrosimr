@@ -165,7 +165,7 @@ test <- calABM(sD,16,beta=params$beta.,lambda=0,p=params$p.,nu=params$nu.,rho=pa
 test %>% inner_join(pv_retrofit) %>% ggplot(aes(date,n))+geom_point()+ geom_point(aes(date,total),colour="red")
 test %>% inner_join(pv_retrofit) %>% ggplot(aes(date,MW))+geom_point()+ geom_point(aes(date,MW_obs),colour="red")
 
-test <- calABM(sD,10,beta=0.27033796,lambda=0,p=0.008068522,nu=0.733091826,rho=0.382862221,delta=0.037169339)
+test <- calABM(sD,10,nu=0.4,p=0.04849829,nu=0.733091826,rho=0.382862221,delta=0.037169339)
 test_1 <- calABM(sD,10,beta=0.213,lambda=0,p=0.01,nu=0.609,rho=0.505,delta=0.047)
 test_1 %>% inner_join(pv_retrofit) %>% ggplot(aes(date,n))+geom_point()+ geom_point(aes(date,total),colour="red")
 test_1 %>% inner_join(pv_retrofit) %>% ggplot(aes(date,MW))+geom_point()+ geom_point(aes(date,MW_obs),colour="red")

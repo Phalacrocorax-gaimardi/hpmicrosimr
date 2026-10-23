@@ -45,7 +45,7 @@ to the intuition that older systems that continue to operate are "free".
 The discount rate set from calibration (params$r.). A present bias (above a capex threshold) params$beta. is included.
 }
 \examples{
- sapply(2010:2040, function(y) annualised_capex("heat_pump",18,2010,"swap","detached",2003,scenario_params(sD,y),"WarmerHomes"))
+sapply(2010:2040, function(y) annualised_capex("heat_pump",18,2010,"swap","detached",2003,scenario_params(sD,y),"WarmerHomes"))
 params <- scenario_params(sD,2026)
 replicate(100,annualised_capex("heat_pump",13,params$yeartime,"new","detached",2003,params,"None")) \%>\% table()
 params$beta. <- 0.5

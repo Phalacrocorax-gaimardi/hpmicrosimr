@@ -3,20 +3,13 @@
 #hp_survey_oo <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/hp_survey_oo.csv")
 #hp_questions <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/hp_questions.csv")
 #heating_bill_values <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/heating_bill_values.csv")
-#electricity_prices <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/electricity_prices.csv")
-#oil_prices <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/oil_prices.csv")
-#wood_prices <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/wood_prices.csv")
-#gas_prices <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/gas_prices.csv")
-#gas_prices$fuel<- "gas"
-#oil_prices$fuel<- "oil"
-#wood_prices$fuel<- "solid fuel"
-#electricity_prices$fuel<- "electricity"
-#energy_prices <- gas_prices %>% bind_rows(oil_prices,wood_prices,electricity_prices)
 #survey_income_ranges <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/income_values.csv")
 #fuel_allowance_eligibility <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/fuel_allowance_eligibility.csv")
 #sample_construction_years <- readr::read_csv("inst/extdata/sample_construction_years.csv")
 #weibull_params <- readr::read_csv("inst/extdata/weibull_params.csv")
 #tech_failure_params <- readr::read_csv("inst/extdata/tech_failure_parameters.csv")
+#tech_cost_params <- readr::read_csv("inst/extdata/technology_cost_parameters.csv")
+#tech_efficiency_params <- readr::read_csv("inst/extdata/tech_efficiency_parameters.csv")
 #seai_grants_average <- readr::read_csv("inst/extdata/seai_grants_averaged.csv")
 #pef_electricity <- readr::read_csv("inst/extdata/primary_energy_factors_electricity_consumption_seai_2024.csv")
 #upgrade_logistic_cost_model <- readr::read_csv("inst/extdata/logistic_upgrade_cost_model_parameters.csv")
@@ -31,7 +24,8 @@
 #' @return character
 #' @export
 #'
-#' @examples get_ber_score(133)
+#' @examples
+#' get_ber_score(133)
 # Assumes ber_ratings_table has columns: min_rating, max_rating, code
 get_ber_score <- function(ber_rating) {
   # Filter only once using which()
@@ -44,7 +38,6 @@ get_ber_score <- function(ber_rating) {
   codes[which.max(nchar(codes))]
 }
 
-
 #' gen_ber_rating
 #'
 #' Stochastically generate a ber rating (kWh/m2/year) from a ber score. G ratings are exponentially distributed from 450kWh/m2/year with
@@ -56,7 +49,8 @@ get_ber_score <- function(ber_rating) {
 #' @returns double
 #' @export
 #'
-#' @examples gen_ber_rating("B3")
+#' @examples
+#' gen_ber_rating("B3")
 gen_ber_rating <- function(ber_score, g_rate = 1/100){
   #
   ifelse(is.na(ber_score),return(NA),{
@@ -84,7 +78,8 @@ gen_ber_rating <- Vectorize(gen_ber_rating)
 #' @return double, ground floor area
 #' @export
 #'
-#' @examples impute_floor_area("detached",3,"Dublin",2,4)
+#' @examples
+#' impute_floor_area("detached",3,"Dublin",2,4)
 
 impute_floor_area <- function(house_type,q2_0,region,q5_0,q3_0){
   #
@@ -122,7 +117,8 @@ impute_floor_area <- Vectorize(impute_floor_area)
 #' @return double, ber rating
 #' @export
 #'
-#' @examples impute_ber("semi-detached",2,"Dublin",4,4)
+#' @examples
+#' impute_ber("semi_detached",2,"Dublin",4,4)
 
 impute_ber <- function(house_type,q2_0,region,q5_0,q3_0){
   #assume all "other" (usually bungalows) and flats are one storey : ignores maisonettes
@@ -186,11 +182,11 @@ recode_fuels <- function(hp_data_in){
 
   recode_fun <- function(q11,z_secondary){
 
-    techs <- c("oil","gas","electricity","solid_fuel","heat_pump","heat_pump","none",NA)
+    techs <- c("oil","gas","electricity","wood","heat_pump","heat_pump","none",NA)
     primary <- dplyr::case_when(q11==1~"oil",
                                 q11==2~"gas",
                                 q11==3~"electricity",
-                                q11==4~"solid_fuel",
+                                q11==4~"wood",
                               #  q11==5~"solar_thermal",
                                 q11 %in% 6:7~"heat_pump",
                                 q11 %in% 8:9~NA)
@@ -252,7 +248,7 @@ recode_fuels <- function(hp_data_in){
 #' recode_survey(hp_survey_oo) #%>% system.time()
 #'
 recode_survey <- function(hp_data_in){
-
+  #
   params <- scenario_params(sD,2024.5)
   hp_data_out <- hp_data_in %>% type.convert(as.is=TRUE)
   codes <- names(hp_data_out)
@@ -264,7 +260,7 @@ recode_survey <- function(hp_data_in){
     hp_data_out <- hp_data_out %>% dplyr::inner_join(hp_response) %>% dplyr::select(-!!rlang::sym(q_code)) %>% dplyr::rename(!!q_code:=response)
 
   }
-  tech_fuel_dictionary <- c("electricity"="electricity","heat_pump"= "electricity","solid_fuel"="solid_fuel","gas"="gas","oil"="oil")
+  tech_fuel_dictionary <- c("electricity"="electricity","heat_pump"= "electricity","wood"="wood","gas"="gas","oil"="oil")
   house_type_dictionary <- c("Flat or apartment"="apartment","Terraced house"="terraced","Semi-detached house"="semi_detached","Detached house"="detached","Other"="detached")
 
   #recode fuels
@@ -315,7 +311,8 @@ recode_survey <- function(hp_data_in){
 #' @returns input dataframe with imputed qh values
 #' @export
 #'
-#' @examples impute_hh_income(hp_survey_oo)
+#' @examples
+#' impute_hh_income(hp_survey_oo)
 impute_hh_income <- function(hp_data_in){
 
   zet_survey <- readxl::read_xlsx(system.file("extdata","ZET_survey_2024_values.xlsx",package="hpmicrosimr"),sheet=1)
@@ -356,13 +353,14 @@ impute_hh_income <- function(hp_data_in){
 #'
 #' @examples
 #' heating_system_age(6,"oil",scenario_params(sD,2015))
+#' heating_system_age(6,"wood",scenario_params(sD,2015))
 #'
 heating_system_age <- function(q7,tech,params){
-
+  #
   l <- list(1,2,c(3,5),c(6,10),c(11,20),c(21,50),c(5,50))[[q7]]
   if(length(l)==1) return(l)
-  beta0 <- params[[paste(tech,"system_beta",sep="_")]]
-  q_fit <- weibull_params %>% dplyr::filter(beta==beta0,lifetime==params[[paste(tech,"system_lifetime",sep="_")]]) %>% dplyr::pull(q)
+  beta0 <- tech_params[[paste(tech,"system_beta",sep="_")]]
+  q_fit <- weibull_params %>% dplyr::filter(beta==beta0,lifetime==tech_params[[paste(tech,"system_lifetime",sep="_")]]) %>% dplyr::pull(q)
   pmf_vals <- DiscreteWeibull::ddweibull(l[1]:l[2], q = q_fit, beta = beta0)
   # conditional probabilities
   cond_probs <- pmf_vals / sum(pmf_vals)
@@ -384,15 +382,16 @@ heating_system_age <- function(q7,tech,params){
 #' @returns year
 #' @export
 #'
-#' @examples  prior_install_year(2020,"gas",initial_year=2015,scenario_params(sD,2015))
+#' @examples
+#' prior_install_year(2020,"wood",initial_year=2015,scenario_params(sD,2015))
 prior_install_year <- function(failure_year,tech, initial_year = 2015, params){
 
     t_vec= 1970:2015
     a_vec <- failure_year - t_vec
     a_vec[a_vec < 1] <- NA  # age must be >= 1
 
-    beta0 <- params[[paste(tech,"system_beta",sep="_")]]
-    q_fit <- weibull_params %>% dplyr::filter(beta==beta0,lifetime==params[[paste(tech,"system_lifetime",sep="_")]]) %>% dplyr::pull(q)
+    beta0 <- tech_params[[paste(tech,"system_beta",sep="_")]]
+    q_fit <- weibull_params %>% dplyr::filter(beta==beta0,lifetime==tech_params[[paste(tech,"system_lifetime",sep="_")]]) %>% dplyr::pull(q)
 
 
     likelihood <- DiscreteWeibull::ddweibull(a_vec, q = q_fit, beta = beta0)
@@ -418,7 +417,8 @@ prior_install_year <- function(failure_year,tech, initial_year = 2015, params){
 #' @returns
 #' @export
 #'
-#' @examples recode_construction_year(1)
+#' @examples
+#' recode_construction_year(1)
 recode_construction_year <- function(q5){
   #assume don't knows were buildt between
   l <- list(c(1750,1975),c(1976,1991),c(1992,2004),c(2005,2010),c(2011,2021),c(2021,2024),c(1750,2010))[[q5]]
@@ -442,23 +442,19 @@ recode_construction_year <- function(q5){
 #' @export
 #'
 #' @examples
-#'
-#' heating_system_efficiency("heat_pump",2040)
-#' heating_system_efficiency(c("oil","gas"),2023)
-#'
+#' heating_system_efficiency("heat_pump",2026)
+#' heating_system_efficiency("gas",2023)
+#' heating_system_efficiency("wood",2023)
 #'
 heating_system_efficiency <- function(tech, install_time) {
 
   eff <- numeric(length(tech))
-
   # electricity
   idx <- tech == "electricity"
   eff[idx] <- tech_params[["electricity_efficiency"]]
-
   # solid fuel
-  idx <- tech == "solid_fuel"
-  eff[idx] <- tech_params[["solid_fuel_efficiency"]]
-
+  idx <- tech == "wood"
+  eff[idx] <- tech_params[["wood_efficiency"]]
   # heat pump
   idx <- tech == "heat_pump"
   if (any(idx)) {
@@ -498,7 +494,8 @@ heating_system_efficiency <- function(tech, install_time) {
 #' @return integer
 #' @export
 #'
-#' @examples replicate(1000,roundr(1.8)) %>% table()
+#' @examples
+#' replicate(1000,roundr(1.8)) %>% table()
 roundr <- function(x){
   x1 <- trunc(x)
   weights = c(1+x1-x,x-x1)
@@ -518,7 +515,8 @@ roundr <- function(x){
 #' @returns did it fail? TRUE/FALSE
 #' @export
 #'
-#' @examples replicate(1000,weibull_failure(2010,2015,2016,"oil")) %>% table()
+#' @examples
+#' replicate(1000,weibull_failure(2010,2015,2016,"oil")) %>% table()
 weibull_failure <- function(t0,t1, t2, tech) {
 
   t1 <- t1 - t0
@@ -551,7 +549,8 @@ weibull_failure <- Vectorize(weibull_failure)
 #' @returns
 #' @export
 #'
-#' @examples expected_residual_lifetime_num("heat_pump",20)
+#' @examples
+#' expected_residual_lifetime_num("heat_pump",20)
 expected_residual_lifetime_num <- function(tech, system_age) {
   beta <- tech_params[[paste(tech, "system_beta", sep = "_")]]
   lifetime <- tech_params[[paste(tech, "system_lifetime", sep = "_")]]
@@ -574,7 +573,9 @@ expected_residual_lifetime_num <- function(tech, system_age) {
 #' @returns residual lifetime in years
 #' @export
 #'
-#' @examples expected_residual_lifetime("heat_pump",15)
+#' @examples
+#' expected_residual_lifetime("heat_pump",15)
+#'
 expected_residual_lifetime <- function(tech,system_age) {
 
   beta <- tech_params[[paste(tech, "system_beta", sep = "_")]]
@@ -602,6 +603,7 @@ expected_residual_lifetime <- function(tech,system_age) {
 #' @export
 #'
 #' @examples
+#' eac_weibull(25,2,10,0.04)
 eac_weibull <- function(lifetime, beta, system_age,r) {
 
   upper<- 1000
@@ -627,11 +629,11 @@ eac_weibull <- function(lifetime, beta, system_age,r) {
 
 #' erv_weibull
 #'
-#' The expected residual value of an asset with Weibull survival function
+#' The expected residual or remaining value of an asset such as a heating system with Weibull survival function
 #' \deqn{S(t) = \exp\Big[-\Big(\frac{t}{\lambda}\Big)^{\beta}\Big]}
 #' conditional on its current age.
 #'
-#' The continuous time discount rate is related to the annual rate \eqn{\delta} by
+#' The result is express as a fraction of the initial value. The continuous time discount rate is related to the annual rate \eqn{\delta} by
 #' \deqn{r=log(1+\delta)}
 #'
 #'
@@ -640,10 +642,14 @@ eac_weibull <- function(lifetime, beta, system_age,r) {
 #' @param system_age vector of system ages
 #' @param r discount rate
 #'
-#' @returns vector of ervs
+#' @returns vector of residual values
 #' @export
 #'
 #' @examples
+#'
+#' #Value of a heat at its expected lifetime
+#' erv_weibull(17, 3, 17,0.04)
+#'
 erv_weibull <- function(lifetime, beta, system_age,r) {
 
   upper<- 1000
@@ -661,8 +667,6 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
 
   return(remaining)
 }
-
-
 
 #' space_heating_requirement
 #'
@@ -740,7 +744,6 @@ heating_system_size <- function(annual_heating_requirement, hdd_annual=2200, col
 #'
 #' peak_heating_demand(2.2,100)
 #'
-#'
 peak_heating_demand <- function(hli,floor_area, coldest_day = -7,size_factor = 1.3) {
 
   #average heating required per degree day
@@ -769,6 +772,7 @@ peak_heating_demand <- function(hli,floor_area, coldest_day = -7,size_factor = 1
 #' params <- scenario_params(sD,2026)
 #' heat_loss_indicator(120,"gas",2020,params)
 #' heat_loss_indicator(200,"heat_pump",2022,params)
+#' heat_loss_indicator(200,"wood",2022,params)
 #'
 heat_loss_indicator <- function(ber,tech,install_time,params) {
   #
@@ -830,7 +834,6 @@ ber_from_hli <- function(hli,tech,install_time,params){
 #' @examples
 #'
 #'
-#'
 pef_fun <- function(sD,yeartime){
   #
   values <- pef_electricity %>% dplyr::filter(year < 2030) %>% dplyr::pull(pef)
@@ -856,9 +859,10 @@ pef_fun <- function(sD,yeartime){
 #' @export
 #'
 #' @examples
-ef_solid_fuel_fun  <- function(sD,yeartime){
+#' ef_wood_fun(sD,2030)
+ef_wood_fun  <- function(sD,yeartime){
 
-  ef0 <- tech_emissions_factors %>% dplyr::filter(tech=="solid_fuel") %>% dplyr::pull(gCO2_per_kWh)
+  ef0 <- tech_emissions_factors %>% dplyr::filter(tech=="wood") %>% dplyr::pull(gCO2_per_kWh)
   phaseout <- dplyr::filter(sD, parameter=="peat_phaseout")$value
   ef <- ef0*ifelse(yeartime < phaseout,1,pmax(0, (phaseout-yeartime)/(phaseout-2026)) )
   return(ef)

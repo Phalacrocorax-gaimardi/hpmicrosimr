@@ -57,4 +57,5 @@ params$yeartime <- 2035
 heating_system_capital_cost("gas",8,installation_type="new","detached",2003,"OSS",params,include_vat = TRUE)
 heating_system_capital_cost("heat_pump",5,installation_type="new","detached",2003,"None",params,include_vat = TRUE)
 heating_system_capital_cost("oil",5,installation_type="new","detached",2003,"None",params,include_vat = TRUE)
+heating_system_capital_cost("wood",5,installation_type="new","detached",2003,"None",params,include_vat = TRUE)
 }

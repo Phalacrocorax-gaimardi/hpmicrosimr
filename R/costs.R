@@ -1,6 +1,9 @@
+
+
+
 #sD <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WEM")
 #historical energy prices
-#energy_prices <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/energy_prices.csv")
+#energy_prices <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/energy_prices_volumetric.csv")
 #oxy <- sinew::makeOxygen(energy_prices)
 #writeLines(oxy, "R/energy_prices.R")
 
@@ -20,7 +23,8 @@
 #' @return long form dataframe containing tech parameter names and values
 #' @export
 #'
-#' @examples tech_params_fun()
+#' @examples
+#' tech_params_fun()
 tech_params_fun <- function(){
   #tech_cost_params <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/technology_cost_model.csv")
   #tech_efficiency_params <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/tech_efficiency_parameters.csv")
@@ -40,7 +44,6 @@ tech_params_fun <- function(){
 
 }
 
-
 tech_params <- tech_params_fun()
 
 
@@ -55,6 +58,7 @@ tech_params <- tech_params_fun()
 #' @export
 #'
 #' @examples
+#' night_discount_fun(sD,2032)
 night_discount_fun <- function(sD,yeartime){
   #night_discount_fun(sD,2027)
   values <- sD %>% dplyr::filter(stringr::str_detect(parameter,"night_rate_discount")) %>% dplyr::pull(value)
@@ -83,12 +87,12 @@ labour_cost_fun <- function(sD,yeartime){
   return(cost)
 }
 
-
 #' energy_price_fun
 #'
 #' historical retail heating fuel prices in cents/kWh.\cr
 #' \cr
-#' prices reflect carbon pricing from carbon_Price_fun()
+#' These are volumetric prices with the effects of standing charges or energy credits removed.
+#' prices reflect future carbon pricing assumptions carbon_Price_fun()
 #'
 #' @param fuel_type one of oil,gas,electricity,solid_fuel
 #' @param sD scenario dataframe
@@ -100,26 +104,48 @@ labour_cost_fun <- function(sD,yeartime){
 #' @examples
 #'
 #' energy_price_fun("oil", sD, 2025)
-#' energy_price_fun("oil", sD, 2030)
-#' energy_price_fun("oil", sD, 2035)
+#' energy_price_fun("electricity", sD, 2040)
+#' energy_price_fun("gas", sD, 2035)
 #' energy_price_fun("oil", sD, 2040)
+#' energy_price_fun("wood",sD,2030)
 #'
-energy_price_fun <- function(fuel_type,sD,yeartime){
-  #
-  emissions_factors <- tech_emissions_factors %>% dplyr::mutate(gCO2_per_kWh=replace(gCO2_per_kWh,tech=="solid_fuel",ef_solid_fuel_fun(sD,yeartime)))
+energy_price_fun <- function(fuel_type, sD, yeartime) {
 
-  stopifnot(fuel_type %in% c("oil","gas","electricity","solid_fuel"))
-  prices <- energy_prices %>% dplyr::filter(fuel==fuel_type) %>% dplyr::select(-fuel)
-  for(year in c(2025,2030,2035,2050)){
-    prices <- prices %>% dplyr::bind_rows(tibble::tibble(year=year,price = sD %>% dplyr::filter(parameter==paste(fuel_type,"price",year,sep="_")) %>% dplyr::pull(value)))
+  stopifnot(fuel_type %in% c("oil", "gas", "electricity", "wood"))
+
+  # Base prices from historical dataset
+  prices <- energy_prices %>%
+    dplyr::filter(fuel == fuel_type) %>%
+    dplyr::select(-fuel)
+
+  future_years <- c(2027, 2030, 2035, 2050)
+
+  for (yt in future_years) {
+    # Match parameter key in sD (e.g. "oil_price_2027.5" or floor/format as needed)
+    param_key <- paste(fuel_type, "price", yt, sep = "_")
+
+    p_val <- sD %>%
+      dplyr::filter(parameter == .env$param_key) %>%
+      dplyr::pull(value)
+
+    prices <- prices %>%
+      dplyr::bind_rows(tibble::tibble(yeartime = yt+0.5, price = p_val))
   }
-  cost <- approx(x=prices$year+0.5, y=prices$price,xout=yeartime,rule=2)$y
-  #add post 2024 carbon price increment
-  ef <- tech_emissions_factors %>% dplyr::filter(tech==fuel_type) %>% dplyr::pull(gCO2_per_kWh)
-  if(yeartime > 2025.5) cost <- cost + ef/1e+4*(carbon_price_fun(sD,yeartime) - 63.5)
+
+  # Linearly interpolate at the requested input 'yeartime'
+  cost <- approx(x = prices$yeartime, y = prices$price, xout = yeartime, rule = 2)$y
+
+  # Add post-2024 carbon price increment
+  ef <- tech_emissions_factors %>%
+    dplyr::filter(tech == fuel_type) %>%
+    dplyr::pull(gCO2_per_kWh)
+
+  if (yeartime >= 2027) {
+    cost <- cost + (ef / 1e4) * (carbon_price_fun(sD, yeartime) - 71) #carbon tax in 2026
+  }
+
   return(cost)
 }
-
 
 #' carbon_price_fun
 #'

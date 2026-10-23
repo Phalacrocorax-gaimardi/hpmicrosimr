@@ -26,5 +26,5 @@ generate a missing Ber rating (double) based on household characteristics\cr
 this current does not currently use heating tech and installation time as an input
 }
 \examples{
-impute_ber("semi-detached",2,"Dublin",4,4)
+impute_ber("semi_detached",2,"Dublin",4,4)
 }

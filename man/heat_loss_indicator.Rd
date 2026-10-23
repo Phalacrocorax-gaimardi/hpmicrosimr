@@ -29,5 +29,6 @@ the value is sensitive to the efficiency of the installed technology.
 params <- scenario_params(sD,2026)
 heat_loss_indicator(120,"gas",2020,params)
 heat_loss_indicator(200,"heat_pump",2022,params)
+heat_loss_indicator(200,"wood",2022,params)
 
 }

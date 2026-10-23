@@ -26,5 +26,5 @@ based on the posterior probability that heating system was installed in year T1 
 a non-uniform prior that the system was installed in 2015 or before. This ensures that initial_agents() has heating systems installed before the initial year.
 }
 \examples{
- prior_install_year(2020,"gas",initial_year=2015,scenario_params(sD,2015))
+prior_install_year(2020,"wood",initial_year=2015,scenario_params(sD,2015))
 }

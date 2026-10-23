@@ -19,4 +19,5 @@ expected residual lifetime of heating system contingent upon current system age
 }
 \examples{
 expected_residual_lifetime("heat_pump",15)
+
 }

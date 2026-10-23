@@ -39,6 +39,6 @@ heating_system_operating_cost(2.3, "heat_pump",2003,100,params)
 
 heating_system_operating_cost(3,"oil",2003,100,params,include_rebound=FALSE)
 
-heating_system_operating_cost(3,"oil",2003,100,params,include_rebound=TRUE)
+heating_system_operating_cost(3,"wood",2003,100,params,include_rebound=TRUE)
 
 }

@@ -10,8 +10,6 @@ sD_wam <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario
 sD_cap <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="CAP")
 sD_dwit <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="DWIT")
 
-
-
 sD_wam[sD_wam$parameter=="grant_increase_date","value"]
 sD_wam[sD_wem$parameter=="grant_increase_factor","value"]
 #sD_wem[sD_wem$parameter=="better_energy_introduction","value"] <- 2050
@@ -20,23 +18,25 @@ sD_wam[sD_wem$parameter=="grant_increase_factor","value"]
 test <- runABM(sD_cap,4,2040)
 #wam <- test
 #saveRDS(wam,"~/Policy/CAMG/EED/Heat/data/wam.RData")
-
 params <- scenario_params(sD_wem,2026)
 params$warmer_homes_introduction
 
 ########
 sD_cal <- readxl::read_xlsx("C:/Users/Joe/pkgs/hpmicrosimr/inst/extdata/scenario_parameters.xlsx",sheet="WEM")
 
-sD_cal[sD_cal$parameter=="nu.","value"] <- calib$nu
+calib <- read_csv("~/Policy/CAMG/EED/Heat/data/macro_calibration_parbayes_5_param_128_nu=0.35.csv")
+calib <- calib[2,]
+
+sD_cal[sD_cal$parameter=="nu.","value"] <- 0.35
 sD_cal[sD_cal$parameter=="p.","value"] <- calib$p
-sD_cal[sD_cal$parameter=="r.","value"] <- 0.03
+sD_cal[sD_cal$parameter=="r.","value"] <- calib$r
 sD_cal[sD_cal$parameter=="beta.","value"] <- calib$beta
 sD_cal[sD_cal$parameter=="eta.","value"] <- calib$eta
 sD_cal[sD_cal$parameter=="tau.","value"] <- calib$tau
 sD_cal[sD_cal$parameter=="lambda.","value"] <- 0
 
 
-#test <- runABM(sD_cal,4,2040)
+test <- runABM(sD_cal,4,2026)
 
 wam <- readRDS("~/Policy/CAMG/EED/Heat/data/wam.RData")
 wem <- readRDS("~/Policy/CAMG/EED/Heat/data/wem.RData")
@@ -902,7 +902,7 @@ print(
 ########################################
 # public vs private investment
 ########################################
-abm <- wam[[1]]
+abm <- cap[[1]]
 invest <- abm %>% group_by(simulation,date) %>% summarise(upgrade_investment=sum(upgrade_cost,na.rm=T), tech_investment=sum(tech_cost,na.rm=T),
                                                           upgrade_grants=sum(upgrade_grant,na.rm=T), heat_pump_grants=sum(heat_pump_grant,na.rm=T))
 
@@ -915,17 +915,20 @@ invest <- invest %>% mutate(private_upgrade_investment=upgrade_investment-upgrad
 invest <- invest %>% select(-upgrade_investment,-tech_investment)
 invest <- invest %>% pivot_longer(cols=-date)
 g1 <- invest %>% filter(str_detect(name,"upgrade")) %>% ggplot(aes(date,value/800*housing_stock_oo/1e+9,fill=name)) + geom_area() + theme_minimal() + scale_fill_canva(palette = "Fun and cheerful") +
-  scale_y_continuous(limits=c(0,4))
+  scale_y_continuous(limits=c(0,20))
 g2 <- invest %>% filter(!str_detect(name,"upgrade")) %>%
-  ggplot(aes(date,value/800*housing_stock_oo/1e+9,fill=name)) + scale_y_continuous(limits=c(0,16)) + geom_area() + theme_minimal() + scale_fill_manual(values = rev(canva_pal("Fun and cheerful")(2)))
+  ggplot(aes(date,value/800*housing_stock_oo/1e+9,fill=name)) + scale_y_continuous(limits=c(0,20)) + geom_area() + theme_minimal() + scale_fill_manual(values = rev(canva_pal("Fun and cheerful")(2)))
 g1 /g2
-export::graph2ppt(g1/g2,"~/Policy/CAMG/EED/Heat/wam_investment.ppt")
+#export::graph2ppt(g1/g2,"~/Policy/CAMG/EED/Heat/wam_investment.ppt")
 #
 
 #############################
-# cost benefit relative to WEM
+# role of eta heterogeneity
 ###########################
 
+abm %>% filter(upgrade, upgrade_cost > 1000, eta < 0.1) %>% pull(upgrade_cost) %>% median()
+
+abm
 
 ##########################
 # TIMES Ireland
@@ -1334,11 +1337,149 @@ g
 export::graph2ppt(g,"~/Policy/CAMG/EED/Heat/bills.ppt")
 
 
-############
-#
+################################
+# check calibration performance
+################################
+
+#abm <- wem[[1]]
 abm <- test[[1]]
+
+test <- summarise_abm_cal(abm,"2025-11-01")# %>% filter(date=="2025-11-01")
+
+cal_summarise <- function(abm){
+
+  cal_date <- "2025-11-01"
+  start_date <- "2015-01-01"
+  cal_dates <- c(start_date,"2021-01-01",cal_date) #two dates for calibration
+  test <- summarise_abm_cal(abm,cal_date)
+  heat_pumps <- test$tech %>% dplyr::filter(date %in% cal_dates,tech == "heat_pump") %>% dplyr::ungroup() %>% dplyr::select(date,n_tech)
+  heat_pumps <- heat_pumps %>% dplyr::rename("n_heat_pump"=n_tech)
+  efficiencies <- test$efficiency %>% dplyr::filter(date %in% cal_dates) %>% dplyr::ungroup()
+  efficiencies <- efficiencies %>% dplyr::inner_join(heat_pumps)
+  grants <- test$grants %>% dplyr::filter(date %in% cal_dates)
+  #print(paste("evaluating summary"))
+  #print(test)
+  n_heat_pump <- test$tech %>% dplyr::filter(date==lubridate::ymd(cal_date),tech=="heat_pump") %>% dplyr::pull(n_tech)
+  n_heat_pump_0 <- test$tech %>% dplyr::filter(date==lubridate::ymd(start_date),tech=="heat_pump") %>% dplyr::pull(n_tech)
+  #
+  n_oss <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="OSS") %>% dplyr::pull(n_grant)
+  n_betterenergy <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="BetterEnergyHomes") %>% dplyr::pull(n_grant)
+  n_warmerhomes <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="WarmerHomes") %>% dplyr::pull(n_grant)
+  n_grant <- n_oss + n_warmerhomes+n_betterenergy
+  #print(n_grant)
+  #
+  cost_oss <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="OSS") %>% dplyr::pull(grants_Meuro)
+  cost_betterenergy <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="BetterEnergyHomes") %>% dplyr::pull(grants_Meuro)
+  cost_warmerhomes <- test$grants %>% dplyr::filter(date==lubridate::ymd(cal_date), grant_type=="WarmerHomes") %>% dplyr::pull(grants_Meuro)
+  #
+  n_b2 <- test$efficiency %>% dplyr::filter(date==lubridate::ymd(cal_date)) %>% dplyr::pull(n_b2)
+  n_b2_0 <- test$efficiency %>% dplyr::filter(date==lubridate::ymd(start_date)) %>% dplyr::pull(n_b2)
+  n_upgrade <- test$efficiency %>% dplyr::filter(date==lubridate::ymd(cal_date)) %>% dplyr::pull(n_b2)
+  #print(n_b2_0)
+  cals <- tibble::tibble(calibration = cal_date,n_heat=n_heat_pump-n_heat_pump_0,n_heat_2015=n_heat_pump_0,number_b2=n_b2-n_b2_0,number_b2_2015=n_b2_0,
+                                                   oss_total=cost_oss,warmerhomes_total=cost_warmerhomes,betterenergy_total=cost_betterenergy,
+                                                   n_oss = n_oss,n_warmerhomes=n_warmerhomes,n_betterenergy=n_betterenergy,
+                                                   n_fabric_total=n_upgrade)
+  cals %>% pivot_longer(-calibration) %>% return()
+
+}
+#
+
+efficiency_cal <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/efficiency_calibration_data.csv")
+efficiency_cal <- efficiency_cal %>% pivot_wider(names_from=measure,values_from=n) %>% mutate(date=dmy(date))
+names(efficiency_cal)[2:3] <- paste(names(efficiency_cal)[2:3],"_obsv",sep="")
+
+grants_cal <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/grant_calibration_data.csv")
+grants_cal <-grants_cal %>% mutate(date=dmy(date))
+
 
 names(abm)
 abm$tech_cost %>% range(na.rm=T)
 
+cal_fun <- function(abm){
+  #
+  cal_dates <- c("2025-11-01","2015-01-01")
+  #x[1] beta. x[2] lambda. x[3] p.
+  #df <- calABM(sD,Nrun=8,beta=x[1],lambda=0,p=x[2],nu=x[3],rho=x[4],delta=x[5])
+  df <- summarise_abm_cal(abm)
+  df_eff <- df$efficiency %>% filter(date %in% cal_dates) %>% dplyr::inner_join(efficiency_cal,by="date")
+  n_heat_pump <- abm %>% group_by(simulation,date) %>% filter(heat_pump_grant > 0  & !is.na(heat_pump_grant)) %>% summarise(n=n()) %>% mutate(n=cumsum(n)) %>% filter(date==cal_dates[1]) %>% pull(n) %>% mean()*housing_stock_oo/800 %>% round()
+
+  n_b2_0 <- df_eff %>% filter(date=="2015-01-01") %>% pull(n_b2)
+  df_eff <- df_eff %>% filter(date %in% cal_dates[1]) %>% mutate(n_heat_pump_err= (n_heat_pump-n_heat_pump_obsv)/n_heat_pump_obsv, n_b2_err = (n_b2-n_b2_0-n_b2_obsv)/n_b2_obsv)
+
+  df_grant <- df$grants %>% dplyr::inner_join(grants_cal)
+  #minimise the % error in grant totals
+  df_grant <- df_grant %>% filter(date %in% cal_dates) %>% mutate(n_error = (n_grant-n_obsv)/n_obsv, euro_error = (grants_Meuro-Meuro_obsv)/Meuro_obsv)
+  err_2025  <- sum((df_grant %>% filter(date=="2025-11-01") %>% pull(n_error))^2)
+  err_2025 <- err_2025 + sum((df_grant %>% filter(date=="2025-11-01") %>% pull(euro_error))^2)
+  df_eff <- df_eff %>% filter(date=="2025-11-01")
+  err_2025 <- err_2025 + 3*sum(df_eff$n_heat_pump_err^2 + df_eff$n_b2_err^2 )
+  #print(paste("evaluated at nu. =",x[1],"p. = ",x[2],"r.=",x[3],"beta.=",x[4],"eta=",x[5],"tau=",x[6],"error=", err_2025))
+  err_2025 %>% return()
+}
+
+cal_fun(abm)
+
+
 abm %>% filter(simulation==1) %>% ggplot(aes(date,tech_cost,colour=tech)) + geom_point()
+
+
+#key diagnostics
+#number of heat pump grants
+abm %>% group_by(simulation,date) %>% filter(heat_pump_grant > 0  & !is.na(heat_pump_grant)) %>% summarise(n=n()) %>% mutate(n=cumsum(n)) %>% filter(date=="2025-11-01") %>% pull(n) %>% mean()*housing_stock_oo/800 %>% round()
+((23899-18233)/18233)^2
+#number of b2 upgrades
+test <- abm %>% group_by(simulation,date) %>% filter(ber <= 125) %>% summarise(n=n()) %>% filter(date %in% cal_dates) %>% pivot_wider(names_from=date,values_from=n)
+test %>% mutate(dnb2=(`2025-11-01`-`2015-01-01`)*housing_stock_oo/800) %>% pull(dnb2) %>% mean() %>% round()
+((72787-83800)/83800)^2
+#grants
+test <- summarise_abm_cal(abm)
+#
+cal_date <- "2025-11-01"
+start_date <- "2015-01-01"
+cal_dates <- c(start_date,"2021-01-01",cal_date) #two dates for calibration
+
+model_grants <- test$grants %>% filter(date %in% cal_date) %>% mutate(upgrade_grants = upgrade_grants/1e+6,heat_pump_grants=heat_pump_grants/1e+6)
+#
+grants_err <- grants_cal %>% filter(date %in% cal_date) %>% inner_join(model_grants) %>% mutate(n_mse=((n_grant-n_obsv)/n_obsv)^2,euro_mse=((grants_Meuro-Meuro_obsv)/Meuro_obsv)^2)
+#
+colSums(grants_err %>% select(n_mse,euro_mse))
+model_efficiency <- test$efficiency %>% filter(date %in% cal_dates)
+#
+test <- grants_err %>% select(grant_type,n_obsv,Meuro_obsv,n_grant, grants_Meuro)
+test <- test %>% mutate(mean_grant_obsv=Meuro_obsv/n_obsv*1e+3,mean_grant_model = grants_Meuro/n_grant*1e+3,n_err=(n_grant-n_obsv)/n_obsv, euro_err=(grants_Meuro-Meuro_obsv)/Meuro_obsv)
+
+xt <- xtable(
+  test %>% select(grant_type,n_obsv,n_grant,mean_grant_obsv,mean_grant_model),
+  caption = "Macro-calibration",
+  label = "tab:heat_pumps",
+  digits=0,
+  align = c("l", "l","r", "r","r","r")
+)
+
+print(
+  xt,
+  include.rownames = FALSE,
+  booktabs = TRUE,
+  sanitize.text.function = identity,
+  caption.placement = "top"
+)
+
+test <- efficiency_cal %>% filter(date=="2025-11-01") %>% bind_cols(n_b2_model=72731,n_heat_pump_model=23899)
+xt <- xtable(
+  test,
+  caption = "Macro-calibration - efficiency",
+  label = "tab:heat_pumps",
+  digits=0,
+  align = c("l", "l","r", "r","r","r")
+)
+
+print(
+  xt,
+  include.rownames = FALSE,
+  booktabs = TRUE,
+  sanitize.text.function = identity,
+  caption.placement = "top"
+)
+

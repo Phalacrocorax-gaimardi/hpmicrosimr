@@ -23,3 +23,6 @@ eac_weibull calculates the unit cost expected equivalent annual cost (or capital
 \deqn{S(t) = \exp\Big[-\Big(\frac{t}{\lambda}\Big)^{\beta}\Big]}
 i.e. a Weibull distribution and the continuous time discount rate is r.
 }
+\examples{
+eac_weibull(25,2,10,0.04)
+}

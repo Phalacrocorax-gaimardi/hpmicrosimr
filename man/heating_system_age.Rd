@@ -19,5 +19,6 @@ This should be replaced by a more realistic discrete weibull distribution.
 }
 \examples{
 heating_system_age(6,"oil",scenario_params(sD,2015))
+heating_system_age(6,"wood",scenario_params(sD,2015))
 
 }

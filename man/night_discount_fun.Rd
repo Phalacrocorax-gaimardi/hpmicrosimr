@@ -17,3 +17,6 @@ price per kWh in euros
 \description{
 Night rate discount relative to standard electricity tariff
 }
+\examples{
+night_discount_fun(sD,2032)
+}

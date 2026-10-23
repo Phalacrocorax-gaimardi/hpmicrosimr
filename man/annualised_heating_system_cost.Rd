@@ -52,5 +52,5 @@ replicate(100,annualised_heating_system_cost(2.3,"heat_pump",params$yeartime,"ne
 annualised_heating_system_cost(2.4,"oil",2010,"new",100,"semi_detached",1997,grant_type="None",params)
 params$beta. <- 0.5
 annualised_heating_system_cost(2.4,"heat_pump",2010,"new",100,"semi_detached",1997,grant_type="None",params)
-annualised_heating_system_cost(2.4,"oil",2010,"new",100,"semi_detached",1997,params,grant_type="BetterEnergyHomes")
+annualised_heating_system_cost(2.4,"wood",2010,"new",100,"semi_detached",1997,params,grant_type="BetterEnergyHomes")
 }

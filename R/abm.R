@@ -20,10 +20,12 @@
 #' @return long form dataframe containing parameter names and values
 #' @export
 #'
-#' @examples scenario_params(sD,2025.5)
+#' @examples
+#' params <- scenario_params(sD,2025.5)
+#'
 scenario_params <- function(sD,yeartime){
   #fast params
-  technologies <- c("oil","gas","electricity","heat_pump","solid_fuel")
+  technologies <- c("oil","gas","electricity","heat_pump","wood")
   scen <- tibble::tibble(parameter="yeartime", value=  yeartime)
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hdd", value=  dplyr::filter(sD, parameter=="hdd")$value))
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="reference temperature", value=  dplyr::filter(sD, parameter=="")$value))
@@ -38,7 +40,7 @@ scenario_params <- function(sD,yeartime){
 
     }
   #system efficiencies
-  for(tech in c("solid_fuel","electricity")){
+  for(tech in c("wood","electricity")){
     scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(tech,"_system_efficiency",sep=""), value=  dplyr::filter(sD, parameter==paste(tech,"_system_efficiency",sep=""))$value))
   }
   #for(tech in c("oil","gas"))
@@ -52,7 +54,7 @@ scenario_params <- function(sD,yeartime){
   }
 
   #fuel prices
-  for(fuel_type in c("oil","gas","electricity","solid_fuel")){
+  for(fuel_type in c("oil","gas","electricity","wood")){
     scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(fuel_type,"price",sep="_"), value=energy_price_fun(fuel_type,sD,yeartime)  ))
   }
   #night rate vs day rate
@@ -110,7 +112,7 @@ scenario_params <- function(sD,yeartime){
   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_heat_pump",  value=dplyr::filter(sD, parameter=="warmer_homes_heat_pump")$value))
 
 
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ef_solid_fuel",  value =  ef_solid_fuel_fun(sD,yeartime)))
+  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ef_wood",  value =  ef_wood_fun(sD,yeartime)))
 
   #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="evening_tariff", value =  evening_tariff_fun(sD,yeartime)))
   #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="night_tariff", value =  night_tariff_fun(sD,yeartime)))

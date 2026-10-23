@@ -19,13 +19,15 @@ cents per kWh
 \description{
 historical retail heating fuel prices in cents/kWh.\cr
 \cr
-prices reflect carbon pricing from carbon_Price_fun()
+These are volumetric prices with the effects of standing charges or energy credits removed.
+prices reflect future carbon pricing assumptions carbon_Price_fun()
 }
 \examples{
 
 energy_price_fun("oil", sD, 2025)
-energy_price_fun("oil", sD, 2030)
-energy_price_fun("oil", sD, 2035)
+energy_price_fun("electricity", sD, 2040)
+energy_price_fun("gas", sD, 2035)
 energy_price_fun("oil", sD, 2040)
+energy_price_fun("wood",sD,2030)
 
 }

@@ -16,14 +16,20 @@ erv_weibull(lifetime, beta, system_age, r)
 \item{r}{discount rate}
 }
 \value{
-vector of ervs
+vector of residual values
 }
 \description{
-The expected residual value of an asset with Weibull survival function
+The expected residual or remaining value of an asset such as a heating system with Weibull survival function
 \deqn{S(t) = \exp\Big[-\Big(\frac{t}{\lambda}\Big)^{\beta}\Big]}
 conditional on its current age.
 }
 \details{
-The continuous time discount rate is related to the annual rate \eqn{\delta} by
+The result is express as a fraction of the initial value. The continuous time discount rate is related to the annual rate \eqn{\delta} by
 \deqn{r=log(1+\delta)}
+}
+\examples{
+
+#Value of a heat at its expected lifetime
+erv_weibull(17, 3, 17,0.04)
+
 }

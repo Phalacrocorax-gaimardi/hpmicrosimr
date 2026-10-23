@@ -19,9 +19,8 @@ there was a sharp improvement in oil and gas tech with the introduction of conde
 A modest post-2020 improvement in heat pump SCOP is allowed for
 }
 \examples{
-
-heating_system_efficiency("heat_pump",2040)
-heating_system_efficiency(c("oil","gas"),2023)
-
+heating_system_efficiency("heat_pump",2026)
+heating_system_efficiency("gas",2023)
+heating_system_efficiency("wood",2023)
 
 }

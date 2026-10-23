@@ -28,5 +28,4 @@ In the past, boiler nameplate capacities were excessively high.
 
 peak_heating_demand(2.2,100)
 
-
 }

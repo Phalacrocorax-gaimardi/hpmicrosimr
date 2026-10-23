@@ -18,5 +18,6 @@ long form dataframe containing parameter names and values
 builds the complete parameter set at yeartime from scenario sD
 }
 \examples{
-scenario_params(sD,2025.5)
+params <- scenario_params(sD,2025.5)
+
 }
