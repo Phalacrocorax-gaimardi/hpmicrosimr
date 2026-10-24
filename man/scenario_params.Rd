@@ -4,10 +4,10 @@
 \alias{scenario_params}
 \title{scenario_params}
 \usage{
-scenario_params(sD, yeartime)
+scenario_params(scen, yeartime)
 }
 \arguments{
-\item{sD}{scenario parameters e.g. scenario_0}
+\item{scen}{scenario parameters e.g. scenario_0}
 
 \item{yeartime}{decimal time}
 }

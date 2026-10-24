@@ -79,14 +79,14 @@ gen_ber_rating <- Vectorize(gen_ber_rating)
 #' @export
 #'
 #' @examples
-#' impute_floor_area("detached",3,"Dublin",2,4)
+#' replicate(100,impute_floor_area("semi_detached",2,"Dublin",2,4)) %>% hist()
 
 impute_floor_area <- function(house_type,q2_0,region,q5_0,q3_0){
   #
   if(house_type == "apartment") q2_0 <- 1
   q5_0 <- ifelse(q5_0==7,sample(1:4,1),q5_0) #assume construction year "don't know" means sometime before 2010
   area_params <- area_model_parameters %>% dplyr::ungroup() %>% dplyr::filter(q1==house_type,q2==q2_0,qc2==region,q5==q5_0,q3==q3_0)
-  if(dim(area_params)[1]==0) area_params <- area_model_parameters %>% dplyr::ungroup() %>% dplyr::filter(house_type=="detached",q2==q2_0,qc2==region,q5==q5_0,q3==q3_0)
+  if(dim(area_params)[1]==0) area_params <- area_model_parameters %>% dplyr::ungroup() %>% dplyr::filter(q1=="detached",q2==q2_0,qc2==region,q5==q5_0,q3==q3_0)
   mu <- area_params  %>% dplyr::pull(mu)
   sigma <- area_params %>% dplyr::pull(sigma)
   #this is needed because of lack of recent single storey semi-detached houses built after 2021
@@ -103,7 +103,7 @@ impute_floor_area <- Vectorize(impute_floor_area)
 
 #' impute_ber
 #'
-#' generate a missing Ber rating (double) based on household characteristics\cr
+#' generate a missing BER rating (double) based on household characteristics\cr
 #' \cr
 #' this current does not currently use heating tech and installation time as an input
 #'
@@ -115,11 +115,9 @@ impute_floor_area <- Vectorize(impute_floor_area)
 #'
 #'
 #' @return double, ber rating
-#' @export
 #'
 #' @examples
-#' impute_ber("semi_detached",2,"Dublin",4,4)
-
+#'
 impute_ber <- function(house_type,q2_0,region,q5_0,q3_0){
   #assume all "other" (usually bungalows) and flats are one storey : ignores maisonettes
   if(house_type == "apartment") q2_0 <- 1
@@ -128,11 +126,34 @@ impute_ber <- function(house_type,q2_0,region,q5_0,q3_0){
   mu <- ber_params %>% dplyr::pull(mu)
   sigma <- ber_params %>% dplyr::pull(sigma)
   #exp(rnorm(1,mean=mu,sd=sigma)) %>% as.numeric() %>% return()
-  x <- rlnorm(1,mu,sigma)+ 75 #bias upwards - households that dont know are likley to be inefficient
+  x <- rlnorm(1,mu,sigma)
+  x <- min(x,450) #bias upwards - households that dont know are likley to be inefficient
   return(x)
 }
 
 impute_ber <- Vectorize(impute_ber)
+
+
+#' impute_missing_hli
+#'
+#' fill missing NAs using bootstrap resampling
+#'
+#' @param x hli values with NAs
+#'
+#' @returns vector of hli values with no NAs
+#'
+#' @examples
+impute_missing_hli <- function(x) {
+  n_missing <- sum(is.na(x))
+  if (n_missing == 0) return(x)
+
+  # Extract observed values
+  obs <- x[!is.na(x)]
+  if (length(obs) == 0) return(x)
+  # Sample with replacement
+  x[is.na(x)] <- sample(obs, size = n_missing, replace = TRUE)
+  return(x)
+}
 
 
 #' recode_ber
@@ -245,11 +266,13 @@ recode_fuels <- function(hp_data_in){
 #'
 #' @examples
 #'
-#' recode_survey(hp_survey_oo) #%>% system.time()
+#' test <- recode_survey(hp_survey_oo) #%>% system.time()
 #'
 recode_survey <- function(hp_data_in){
   #
   params <- scenario_params(sD,2024.5)
+  params$hdd <- 2000
+  params$q_passive <- 30
   hp_data_out <- hp_data_in %>% type.convert(as.is=TRUE)
   codes <- names(hp_data_out)
   #
@@ -271,8 +294,12 @@ recode_survey <- function(hp_data_in){
   #ber
   hp_data_out <- hp_data_out %>% dplyr::mutate(q6=replace(q6,nchar(q6)>2,NA))
   hp_data_out <- hp_data_out %>% dplyr::mutate(q6_b=recode_ber(q6))
-  #hp_new <- hp_new %>% mutate(q6=gen_ber_rating(q6))
-  hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(ber=ifelse(!is.na(q6_b),gen_ber_rating(q6_b),impute_ber(q1,q2,qc2,q5,q3)))
+  #impute_ber(q1,q2,qc2,q5,q3) removed keeping NAs
+  hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(ber=ifelse(!is.na(q6_b),gen_ber_rating(q6_b),NA))
+                                                                               #impute_ber(q1,q2,qc2,q5,q3)))
+  #optionally, bias ber upwards
+  hp_data_out$ber <- hp_data_out$ber + rlnorm(dim(hp_data_out)[1],log(25),sdlog = 0.5)
+
 
   #total floor area replaces ground floor area
   hp_data_out <- hp_data_out %>% dplyr::rowwise() %>%  dplyr::mutate(floor_area=q2*impute_floor_area(q1,q2,qc2,q5,q3)) %>% dplyr::select(-q6_b)
@@ -286,11 +313,16 @@ recode_survey <- function(hp_data_in){
   #hp_data_out <- hp_data_out %>% dplyr::rowwise() %>%  dplyr::mutate(heating_requirment=ber*ground_floor_area*q2)
   #if heating installation is before construction year then set heating installation to construction year
   hp_data_out <- hp_data_out %>% dplyr::mutate(heating_install_time =ifelse(heating_install_time < construction_year,construction_year,heating_install_time))
-  #calculate hli
-  hp_data_out <- hp_data_out %>% dplyr::mutate(hli=heat_loss_indicator(ber,primary_heat,heating_install_time,params))
-
+  #calculate hli adding an upward bias
+  hp_data_out <- hp_data_out %>%
+    dplyr::mutate(hli=ifelse(!is.na(ber),heat_loss_indicator(ber,primary_heat,heating_install_time,params),NA))
+  #impute missing HLI values with resampling based in building age (q5)
+  hp_data_out <-  hp_data_out %>% dplyr::group_by(q5) %>% dplyr::mutate(hli = impute_missing_hli(hli)) %>%
+    dplyr::ungroup()
+  hp_data_out$hli <- hp_data_out$hli + rlnorm(dim(hp_data_out)[1],log(0.4),0.25)
+  #hp_data_out$hli <- impute_missing_hli(hp_data_out$hli) #assume homes that dont know their BER are less efficient
   #check fuel allowance eligibility
-  hp_data_out <- hp_data_out %>% dplyr::mutate(fuel_allowance = is_eligible_fuel_allowance(actualage,income,qi))
+  hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(fuel_allowance = is_eligible_fuel_allowance(actualage,income,qi))
 
   hp_data_out %>% return()
 }
@@ -755,9 +787,9 @@ peak_heating_demand <- function(hli,floor_area, coldest_day = -7,size_factor = 1
 
 #' heat_loss_indicator
 #'
-#' calculates implied heat loss indicator (HLI) in W/(m2 K) from ber. HLI is a property the building fabric *only*.
+#' estimates implied heat loss indicator (HLI) in W/(m2 K) from standarised ber (kWh/m2/year). HLI is a property the building fabric *only*.
 #'
-#' the value is sensitive to the efficiency of the installed technology.
+#' BER  is sensitive to the efficiency of the installed technology.
 #'
 #' @param ber building energy rating kWh/m2/year
 #' @param tech installed technology
@@ -770,13 +802,16 @@ peak_heating_demand <- function(hli,floor_area, coldest_day = -7,size_factor = 1
 #' @examples
 #'
 #' params <- scenario_params(sD,2026)
-#' heat_loss_indicator(120,"gas",2020,params)
+#' params$q_passive <- 30
+#' params$hdd <- 2000
+#' sapply(10:450,function(ber) heat_loss_indicator(ber,"gas",2020,params)) %>% range()
 #' heat_loss_indicator(200,"heat_pump",2022,params)
 #' heat_loss_indicator(200,"wood",2022,params)
 #'
 heat_loss_indicator <- function(ber,tech,install_time,params) {
   #
-  primary_heat <- pmax(params$q_passive,ber-params$q_hotwater-params$q_lighting) #minimum heating requirement is q_passive
+  primary_heat <- ber-params$q_hotwater-params$q_lighting #minimum hating requirement is q_passive
+  primary_heat <- pmax(params$q_passive,primary_heat)
   #rebound effect above rebound_threshold
   #primary_heat <- ifelse(primary_heat <= params$rebound_threshold, primary_heat, params$rebound_threshold + (1-rebound)*(primary_heat-params$rebound_threshold))
   pef <- ifelse(tech %in% c("electricity","heat_pump"), params$pef_electricity, 1.1)
@@ -802,8 +837,8 @@ heat_loss_indicator <- function(ber,tech,install_time,params) {
 #'
 #' #check reversibility
 #' params <- scenario_params(sD,2026)
-#' heat_loss_indicator(25,"heat_pump",2020,params)
-#' ber_from_hli(1.21,"heat_pump",params$yeartime,params)
+#' hli_calc <- heat_loss_indicator(50,"heat_pump",2026,params)
+#' ber_from_hli(hli_calc,"heat_pump",params$yeartime,params)
 #' ber_from_hli(1.2,"heat_pump",params$yeartime,params)
 #'
 ber_from_hli <- function(hli,tech,install_time,params){

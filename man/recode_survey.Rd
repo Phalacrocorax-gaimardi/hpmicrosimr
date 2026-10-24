@@ -20,6 +20,6 @@ Note that this function is based on the actual survey date, taken as 2024.5
 }
 \examples{
 
-recode_survey(hp_survey_oo) #\%>\% system.time()
+test <- recode_survey(hp_survey_oo) #\%>\% system.time()
 
 }

@@ -33,7 +33,7 @@ retrofit_cost_model(
 euros
 }
 \description{
-Building fabric + ventilation retrofit upgrade cost bute excluding tech such as solar PV or Heat Pumps
+Building fabric + ventilation retrofit upgrade cost, excluding tech such as solar PV or Heat Pumps
 }
 \details{
 The default and possibly the most plausible cost model, based on HLI to exclude effects of heating technology efficiency.

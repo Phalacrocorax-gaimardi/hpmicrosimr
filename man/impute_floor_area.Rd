@@ -24,5 +24,5 @@ double, ground floor area
 impute a floor area stochastically based on survey characteristics
 }
 \examples{
-impute_floor_area("detached",3,"Dublin",2,4)
+replicate(100,impute_floor_area("semi_detached",2,"Dublin",2,4)) \%>\% hist()
 }

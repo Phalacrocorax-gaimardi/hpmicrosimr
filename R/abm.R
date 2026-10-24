@@ -14,7 +14,7 @@
 #'
 #' builds the complete parameter set at yeartime from scenario sD
 #'
-#' @param sD scenario parameters e.g. scenario_0
+#' @param scen scenario parameters e.g. scenario_0
 #' @param yeartime decimal time
 #'
 #' @return long form dataframe containing parameter names and values
@@ -23,117 +23,101 @@
 #' @examples
 #' params <- scenario_params(sD,2025.5)
 #'
-scenario_params <- function(sD,yeartime){
+scenario_params <- function(scen,yeartime){
   #fast params
   technologies <- c("oil","gas","electricity","heat_pump","wood")
-  scen <- tibble::tibble(parameter="yeartime", value=  yeartime)
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hdd", value=  dplyr::filter(sD, parameter=="hdd")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="reference temperature", value=  dplyr::filter(sD, parameter=="")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="labour_cost", value=  labour_cost_fun(sD,yeartime)))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="heating_controller_cost", value=  dplyr::filter(sD, parameter=="heating_controller_cost")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="installer_overhead",  value=dplyr::filter(sD, parameter=="overhead")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="installer_profit_margin", value=  dplyr::filter(sD, parameter=="installer_profit_margin")$value))
-  #system lifetimes and weibull shape parameter
+  sc <- tibble::tibble(parameter="yeartime", value=  yeartime)
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="hdd", value=  dplyr::filter(scen, parameter=="hdd")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="reference temperature", value=  dplyr::filter(scen, parameter=="")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="labour_cost", value=  labour_cost_fun(scen,yeartime)))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="heating_controller_cost", value=  dplyr::filter(scen, parameter=="heating_controller_cost")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="installer_overhead",  value=dplyr::filter(sD, parameter=="overhead")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="installer_profit_margin", value=  dplyr::filter(scen, parameter=="installer_profit_margin")$value))
+  #system maintenance costs
   for(tech in technologies){
-    scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(tech,"_system_lifetime",sep=""), value=  dplyr::filter(sD, parameter==paste(tech,"_system_lifetime",sep=""))$value))
-    scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(tech,"_system_beta",sep=""), value=  dplyr::filter(sD, parameter==paste(tech,"_system_beta",sep=""))$value))
-
-    }
-  #system efficiencies
-  for(tech in c("wood","electricity")){
-    scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(tech,"_system_efficiency",sep=""), value=  dplyr::filter(sD, parameter==paste(tech,"_system_efficiency",sep=""))$value))
+    sc <- dplyr::bind_rows(sc,tibble::tibble(parameter=paste(tech,"_system_maintenance",sep=""), value=  dplyr::filter(scen, parameter==paste(tech,"_system_maintenance",sep=""))$value))
   }
-  #for(tech in c("oil","gas"))
-  #  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(tech,"system_efficiency",sep="_"), value=boiler_efficiency_fun(sD,yeartime)  ))
-
-  #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="heat_pump_system_efficiency", value=heat_pump_cop_fun(sD,yeartime)  ))
-
-  #system maintenance
-  for(tech in technologies){
-    scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(tech,"_system_maintenance",sep=""), value=  dplyr::filter(sD, parameter==paste(tech,"_system_maintenance",sep=""))$value))
-  }
-
   #fuel prices
   for(fuel_type in c("oil","gas","electricity","wood")){
-    scen <- dplyr::bind_rows(scen,tibble::tibble(parameter=paste(fuel_type,"price",sep="_"), value=energy_price_fun(fuel_type,sD,yeartime)  ))
+    sc <- dplyr::bind_rows(sc,tibble::tibble(parameter=paste(fuel_type,"price",sep="_"), value=energy_price_fun(fuel_type,scen,yeartime)  ))
   }
   #night rate vs day rate
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="night_rate_discount", value =  night_discount_fun(sD,yeartime)))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hp_night_rate_usage_factor",  value=dplyr::filter(sD, parameter=="hp_night_rate_usage_factor")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="electric_night_rate_usage_factor",  value=dplyr::filter(sD, parameter=="electric_night_rate_usage_factor")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="night_rate_discount", value =  night_discount_fun(scen,yeartime)))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="hp_night_rate_usage_factor",  value=dplyr::filter(scen, parameter=="hp_night_rate_usage_factor")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="electric_night_rate_usage_factor",  value=dplyr::filter(scen, parameter=="electric_night_rate_usage_factor")$value))
   #space heating
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="q_passive",  value=dplyr::filter(sD, parameter=="q_passive")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="q_hotwater",  value=dplyr::filter(sD, parameter=="q_hotwater")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="q_lighting",  value=dplyr::filter(sD, parameter=="q_lighting")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="q_passive",  value=dplyr::filter(sD, parameter=="q_passive")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="q_hotwater",  value=dplyr::filter(sD, parameter=="q_hotwater")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="q_lighting",  value=dplyr::filter(sD, parameter=="q_lighting")$value))
 
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="present_bias_threshold",  value=dplyr::filter(sD, parameter=="present_bias_threshold")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="rebound_threshold",  value=dplyr::filter(sD, parameter=="rebound_threshold")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_target_ber",  value=dplyr::filter(sD, parameter=="warmer_homes_target_ber")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_cost_cap",  value=dplyr::filter(sD, parameter=="warmer_homes_cost_cap")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_enhanced",  value=dplyr::filter(sD, parameter=="warmer_homes_enhanced")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_cost_cap_enhanced",  value=dplyr::filter(sD, parameter=="warmer_homes_cost_cap_enhanced")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_target_ber_enhanced",  value=dplyr::filter(sD, parameter=="warmer_homes_target_ber_enhanced")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="present_bias_threshold",  value=dplyr::filter(scen, parameter=="present_bias_threshold")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="rebound_threshold",  value=dplyr::filter(scen, parameter=="rebound_threshold")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="warmer_homes_target_ber",  value=dplyr::filter(scen, parameter=="warmer_homes_target_ber")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="warmer_homes_cost_cap",  value=dplyr::filter(scen, parameter=="warmer_homes_cost_cap")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="warmer_homes_enhanced",  value=dplyr::filter(scen, parameter=="warmer_homes_enhanced")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="warmer_homes_cost_cap_enhanced",  value=dplyr::filter(scen, parameter=="warmer_homes_cost_cap_enhanced")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="warmer_homes_target_ber_enhanced",  value=dplyr::filter(scen, parameter=="warmer_homes_target_ber_enhanced")$value))
 
 
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="minimum_fabric_grant",  value=dplyr::filter(sD, parameter=="minimum_fabric_grant")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="grant_increase_date",  value=dplyr::filter(sD, parameter=="grant_increase_date")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="grant_increase_factor",  value=dplyr::filter(sD, parameter=="grant_increase_factor")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="minimum_fabric_grant",  value=dplyr::filter(scen, parameter=="minimum_fabric_grant")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="grant_increase_date",  value=dplyr::filter(scen, parameter=="grant_increase_date")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="grant_increase_factor",  value=dplyr::filter(scen, parameter=="grant_increase_factor")$value))
   #draconian
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="oil_boiler_ban",  value=dplyr::filter(sD, parameter=="oil_boiler_ban")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="gas_boiler_ban",  value=dplyr::filter(sD, parameter=="gas_boiler_ban")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="peat_phaseout",  value=dplyr::filter(sD, parameter=="peat_phaseout")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="oil_boiler_ban",  value=dplyr::filter(scen, parameter=="oil_boiler_ban")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="gas_boiler_ban",  value=dplyr::filter(scen, parameter=="gas_boiler_ban")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="peat_phaseout",  value=dplyr::filter(scen, parameter=="peat_phaseout")$value))
 
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="carbon_price", value =  carbon_price_fun(sD,yeartime)))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="carbon_price", value =  carbon_price_fun(scen,yeartime)))
 
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_labour_cost_share",  value=dplyr::filter(sD, parameter=="ber_upgrade_labour_cost_share")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="ber_upgrade_labour_cost_share",  value=dplyr::filter(scen, parameter=="ber_upgrade_labour_cost_share")$value))
 
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="overhead",  value=dplyr::filter(sD, parameter=="overhead")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="overhead",  value=dplyr::filter(scen, parameter=="overhead")$value))
   #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="overhead",  value=dplyr::filter(sD, parameter=="vat_service")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="vat_service",  value=dplyr::filter(sD, parameter=="vat_service")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="vat_goods",  value=dplyr::filter(sD, parameter=="vat_goods")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="labour_cost", value =  labour_cost_fun(sD,yeartime)))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="vat_service",  value=dplyr::filter(scen, parameter=="vat_service")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="vat_goods",  value=dplyr::filter(scen, parameter=="vat_goods")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="labour_cost", value =  labour_cost_fun(scen,yeartime)))
   #
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="pef_electricity", value =  pef_fun(sD,yeartime)))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="pef_electricity", value =  pef_fun(scen,yeartime)))
   #hp grant dates
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hp_grant_introduction",  value=dplyr::filter(sD, parameter=="hp_grant_introduction")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hp_grant_increase",  value=dplyr::filter(sD, parameter=="hp_grant_increase")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hp_grant_removal",  value=dplyr::filter(sD, parameter=="hp_grant_removal")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="hp_grant_introduction",  value=dplyr::filter(scen, parameter=="hp_grant_introduction")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="hp_grant_increase",  value=dplyr::filter(scen, parameter=="hp_grant_increase")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="hp_grant_removal",  value=dplyr::filter(scen, parameter=="hp_grant_removal")$value))
   #ber upgrade dates
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_introduction",  value=dplyr::filter(sD, parameter=="warmer_homes_introduction")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="better_energy_introduction",  value=dplyr::filter(sD, parameter=="better_energy_introduction")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="oss_introduction",  value=dplyr::filter(sD, parameter=="oss_introduction")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="warmer_homes_introduction",  value=dplyr::filter(scen, parameter=="warmer_homes_introduction")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="better_energy_introduction",  value=dplyr::filter(scen, parameter=="better_energy_introduction")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="oss_introduction",  value=dplyr::filter(scen, parameter=="oss_introduction")$value))
 
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hli_heat_pump_threshold",  value=dplyr::filter(sD, parameter=="hli_heat_pump_threshold")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hli_heat_pump_threshold_increase_date",  value=dplyr::filter(sD, parameter=="hli_heat_pump_threshold_increase_date")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="hli_heat_pump_threshold_increase_value",  value=dplyr::filter(sD, parameter=="hli_heat_pump_threshold_increase_value")$value))
-
-
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_cost_scale",  value=dplyr::filter(sD, parameter=="warmer_homes_cost_scale")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="warmer_homes_heat_pump",  value=dplyr::filter(sD, parameter=="warmer_homes_heat_pump")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="hli_heat_pump_threshold",  value=dplyr::filter(scen, parameter=="hli_heat_pump_threshold")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="hli_heat_pump_threshold_increase_date",  value=dplyr::filter(scen, parameter=="hli_heat_pump_threshold_increase_date")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="hli_heat_pump_threshold_increase_value",  value=dplyr::filter(scen, parameter=="hli_heat_pump_threshold_increase_value")$value))
 
 
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ef_wood",  value =  ef_wood_fun(sD,yeartime)))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="warmer_homes_cost_scale",  value=dplyr::filter(scen, parameter=="warmer_homes_cost_scale")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="warmer_homes_heat_pump",  value=dplyr::filter(scen, parameter=="warmer_homes_heat_pump")$value))
+
+
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="ef_wood",  value =  ef_wood_fun(scen,yeartime)))
 
   #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="evening_tariff", value =  evening_tariff_fun(sD,yeartime)))
   #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="night_tariff", value =  night_tariff_fun(sD,yeartime)))
   #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="marginal_tax_rate", value =  dplyr::filter(sD, parameter=="marginal_tax_rate")$value))   scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="discount_rate", value =  dplyr::filter(sD, parameter=="discount_rate")$value))
   #ber upgrade cost model parameters
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_marginal_cost_k",  value=dplyr::filter(sD, parameter=="ber_upgrade_marginal_cost_k")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_marginal_cost_alpha",  value=dplyr::filter(sD, parameter=="ber_upgrade_marginal_cost_alpha")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="ber_upgrade_marginal_cost_c0",  value=dplyr::filter(sD, parameter=="ber_upgrade_marginal_cost_c0")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="ber_upgrade_marginal_cost_k",  value=dplyr::filter(scen, parameter=="ber_upgrade_marginal_cost_k")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="ber_upgrade_marginal_cost_alpha",  value=dplyr::filter(scen, parameter=="ber_upgrade_marginal_cost_alpha")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="ber_upgrade_marginal_cost_c0",  value=dplyr::filter(scen, parameter=="ber_upgrade_marginal_cost_c0")$value))
 
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="nu.", value =  dplyr::filter(sD, parameter=="nu.")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="lambda.", value =  dplyr::filter(sD, parameter=="lambda.")$value)) #probabaly set to zero
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="p.", value =  dplyr::filter(sD, parameter=="p.")$value))
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="r.", value =  dplyr::filter(sD, parameter=="r.")$value)) #delta = 1/(1+r)
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="rho.", value =  dplyr::filter(sD, parameter=="rho.")$value)) #rebound no rebound is rho=0
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="beta.", value =  dplyr::filter(sD, parameter=="beta.")$value)) #presenr bias
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="eta.", value =  dplyr::filter(sD, parameter=="eta.")$value)) #hassle hassle-free is eta=1
-  scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="tau.", value =  dplyr::filter(sD, parameter=="tau.")$value)) #sludge - sludge-free is eta=1
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="nu.", value =  dplyr::filter(scen, parameter=="nu.")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="lambda.", value =  dplyr::filter(scen, parameter=="lambda.")$value)) #probabaly set to zero
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="p.", value =  dplyr::filter(scen, parameter=="p.")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="r.", value =  dplyr::filter(scen, parameter=="r.")$value)) #delta = 1/(1+r)
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="rho.", value =  dplyr::filter(scen, parameter=="rho.")$value)) #rebound no rebound is rho=0
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="beta.", value =  dplyr::filter(scen, parameter=="beta.")$value)) #presenr bias
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="eta.", value =  dplyr::filter(scen, parameter=="eta.")$value)) #hassle hassle-free is eta=1
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="tau.", value =  dplyr::filter(scen, parameter=="tau.")$value)) #sludge - sludge-free is eta=1
 
 
   #return(scen)
-  return(scen %>% fast_params())
+  return(sc %>% fast_params())
 }
 
 #' fast_params
@@ -163,7 +147,7 @@ fast_params <- function(params_long){
 #' creates the agent initial state including model weights, stochastically imputed ground floor areas
 #'
 #'
-#' @param sD scenario (usable_roof_fraction only)
+#' @param scen scenario (usable_roof_fraction only)
 #' @param yeartime start year (default 2010)
 #' @param cal_run calibration run number between 1 and 100
 #'
@@ -172,22 +156,20 @@ fast_params <- function(params_long){
 #'
 #' @examples
 #'
-#' initialise_agents(sD,2015,10) #%>% system.time()
+#' test <- initialise_agents(sD,2015,10) #%>% system.time()
 #'
-initialise_agents <- function(sD,yeartime=2015,cal_run=10){
+initialise_agents <- function(scen,yeartime=2015,cal_run=10){
 
   #initialise to 2015
-  params <- scenario_params(sD,yeartime)
+  params <- scenario_params(scen,yeartime)
   #only has dimensions 861??
   agents <- hp_model_weights_oo %>% dplyr::filter(calibration_run==cal_run) %>% dplyr::select(-calibration_run)
   #retain minimal set of features minimial set for imputing missing data
   hp_surv <- hp_survey_oo %>% dplyr::select(serial,qc2,q1,q2,q3,q5,q6,q11,qh,qb,qe,q4,qf,q7,q13,q121,q122,q123,q124,q125,q126,q127,q128,q129,actualage,qi)
   hp_surv <- recode_survey(hp_surv)
   #bias correct ber values
-  #hp_surv <- hp_surve %>% dplyr::mutate()
   #select minimal featureset
   hp_surv <- hp_surv %>% dplyr::select(serial,qc2,q1,q2,construction_year,ber,hli,floor_area,primary_heat,heating_install_time,secondary_heat1,secondary_heat2,income,fuel_allowance)
-
   #if heating_install_year is later than yeartime look at earlier heating system installation, assuming the same technology was used,
   #unless it is a heat pump, in which case it is 50-50 oil gas at the moment.
   hp_surv <- hp_surv %>% dplyr::rowwise() %>% dplyr::mutate(heating_install_time = ifelse(heating_install_time <= yeartime, heating_install_time,
@@ -203,9 +185,9 @@ initialise_agents <- function(sD,yeartime=2015,cal_run=10){
   agents$q52 <- 1 #assume that nobody knows a heat pump owner
   #agents$q52_up <- 1 #assume that nobody knows an upgrader
   agents$serial <- as.character(agents$serial)
-  #HLI & BER
-  #bias HLI upwards (upgrades & survey bias)
-  agents <- agents %>% dplyr::mutate(hli = pmax(hli,0.7)) #don't allow hli values less than 0.7
+  #generate missing HLI scores
+  print(range(agents$hli))
+  #agents <- agents %>% dplyr::mutate(hli = ifelse(hli < 0.7,0.7,hli)) #don't allow hli values less than 0.7
   #re-compute BER
   agents <- agents %>% dplyr::mutate(ber=ber_from_hli(hli,primary_heat,heating_install_time,params))
   #annualised heating cost
@@ -238,7 +220,7 @@ initialise_agents <- function(sD,yeartime=2015,cal_run=10){
 #' utilities. If these exceed their individual threshold an optimal PV_BESS system is adopted.
 #'
 #'
-#' @param sD  scenario dataframe
+#' @param scen  scenario dataframe
 #' @param yeartime decimal time
 #' @param agents_in input agent dataframe
 #' @param social_network artifical social network
@@ -255,11 +237,11 @@ initialise_agents <- function(sD,yeartime=2015,cal_run=10){
 #' agents_1 <- update_agents(sD,2026+1/6,agents_in,social_network,cal_run=10,quiet=FALSE)
 #' agents_2 <- update_agents(sD,2026+1/3,agents_1,social_network,cal_run=10,quiet=FALSE)
 
-update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,cal_run=50, quiet=TRUE){
+update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=F,cal_run=50, quiet=TRUE){
   #
   #beta. <- 0.2532785
   #params at yeartime
-  params <- scenario_params(sD,yeartime)
+  params <- scenario_params(scen,yeartime)
   #
   tech_params <- tech_params_fun()
   #empirical partial utilites from microcalibration run cal_run
@@ -293,16 +275,16 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   b_s1 <- a_s %>% dplyr::filter(failure)
   #print(paste("number of heating system failures",dim(b_s1)[1]))
   b_s1 <- b_s1 %>% dplyr::select(-heat_pump_grant,-grant_type)
-  #filter on system upgraders
-  b_s2 <- dplyr::slice_sample(a_s,n=roundr(dim(a_s)[1]*params$p.))
+  #filter on system upgraders, but failures are not also upgraders
+  b_s2 <- a_s %>% dplyr::filter(!failure) %>% dplyr::slice_sample(n=roundr(dim(a_s)[1]*params$p.))
   b_s2 <- b_s2 %>% dplyr::select(-heat_pump_grant)
   #print(paste("number of potential upgraders",dim(b_s2)[1]))
   #households that consider full upgrade following failure
-  b_s3 <- b_s1 %>% dplyr::filter(serial %in% b_s2$serial)
+  #b_s3 <- b_s1 %>% dplyr::filter(serial %in% b_s2$serial)
   #exclude failure where upgrade is being implemented => just two categories failure and upgr
-  b_s1 <- b_s1 %>% dplyr::filter(!(serial %in% b_s3$serial))
+  #b_s1 <- b_s1 %>% dplyr::filter(!(serial %in% b_s3$serial))
 
-  if(nrow(b_s1)==0 & nrow(b_s2)==0) return(a_s)
+  if(nrow(b_s1)==0 && nrow(b_s2)==0) return(a_s)
 
   hp_savings_env <- function(hli,tech, house_type,storeys, construction_year, region, floor_area,eta) {
     heat_pump_savings(hli,tech, params$yeartime, house_type, storeys,construction_year, region, floor_area, eta,params)
@@ -412,8 +394,11 @@ update_agents <- function(sD,yeartime,agents_in, social_network,ignore_social=F,
   #print(b_s2_hp)
   if(nrow(b_s2_hp) == 0) b_s2_hp <- b_s2_hp %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
   if(nrow(b_s2_hp) > 0){
-    b_s2_hp_switch <- b_s2_hp %>% dplyr::filter(savings > 0)
-    b_s2_hp_stick <- b_s2_hp %>% dplyr::filter(savings <= 0)
+    b_s2_hp_switch <- b_s2_hp %>% dplyr::filter(savings < 0)
+    b_s2_hp_stick <- b_s2_hp %>% dplyr::filter(savings >= 0)
+
+    b_s2_hp_switch <- b_s2_hp_switch %>% dplyr::mutate(tech = "gas", heating_install_time = params$yeartime)
+    b_s2_hp_stick  <- b_s2_hp_stick %>% dplyr::mutate(heating_install_time = params$yeartime)
   #
     b_s2_hp_stick <- b_s2_hp_stick %>% dplyr::select(-any_of("savings"))
     b_s2_hp_stick <- b_s2_hp_stick %>% dplyr::mutate(hli = hli_stick,eac=eac_stick,upgrade_cost=upgrade_cost_stick,
@@ -1085,34 +1070,3 @@ calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.4,p=0.004,
 
 #calABM(sD,10,beta=params$beta.,lambda=params$lambda.,p=params$p.,nu=params$nu.,rho=params$rho.,r.=params$r.)
 
-
-#' get_financial_utility_scale
-#'
-#' @param agents_in agent chacteristics e.g. output by initialise_agents()
-#' @param cal_run calibration run in 1 to 100
-#'
-#' @returns a scalar (beta.)
-#' @export
-#'
-#' @examples
-get_financial_utility_scale <- function(agents_in,cal_run){
-
-  gen_optimised_hp <- function(agents_in,n_sample=nrow(pv_survey_oo),tariff_plan="night_saver",no_grant = FALSE){
-
-    survey_time <- 2024
-    params <- scenario_params(sD,survey_time)
-    if(no_grant) params$grant_removal_date <- yeartime -1 #remove grant
-    #empirical_u <- empirical_utils_oo %>% dplyr::filter(calibration==cal_run)
-    agents_in <- agents_in %>% dplyr::slice_sample(n=n_sample) %>% dplyr::rowwise() %>% dplyr::mutate(result = list(pvbess_optim_complex(aspect,round(area_1*params$kWp_per_m2),round(area_2*params$kWp_per_m2),shading1,shading2,D_max,D_min,params,tariff_plan=tariff_plan))) %>% tidyr::unnest_wider(result)
-    agents_in %>% dplyr::select(ID,q14,q15,D_max,D_min,aspect,shading1,shading2,S_1,S_2,B,savings) %>% return()
-  }
-
-  agents_in <- gen_optimised_pvbess(agents_in)
-  survey_u <- agents_in %>% dplyr::group_by(q14) %>% dplyr::summarise(savings=-median(savings))
-  empirical_u <- empirical_utils_oo %>% dplyr::filter(calibration==cal_run) %>% dplyr::filter(question_code=="q14")
-  empirical_u <- empirical_u %>% dplyr::select(response_code,du_average) %>% dplyr::rename("q14"=response_code)
-  survey_u <- survey_u %>% dplyr::inner_join(empirical_u)
-  #coef(lm(du_average~savings,survey_u))[2] %>% return()
-  #IQR(survey_u$du_average)/IQR(survey_u$savings) %>% return()
-  mad(survey_u$du_average)/mad(survey_u$savings) %>% return() #mean absolute deviation relative to median
-}

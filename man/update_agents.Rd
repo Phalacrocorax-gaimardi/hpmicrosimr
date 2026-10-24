@@ -5,7 +5,7 @@
 \title{update_agents}
 \usage{
 update_agents(
-  sD,
+  scen,
   yeartime,
   agents_in,
   social_network,
@@ -15,7 +15,7 @@ update_agents(
 )
 }
 \arguments{
-\item{sD}{scenario dataframe}
+\item{scen}{scenario dataframe}
 
 \item{yeartime}{decimal time}
 

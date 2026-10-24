@@ -4,10 +4,10 @@
 \alias{initialise_agents}
 \title{initialise_agents}
 \usage{
-initialise_agents(sD, yeartime = 2015, cal_run = 10)
+initialise_agents(scen, yeartime = 2015, cal_run = 10)
 }
 \arguments{
-\item{sD}{scenario (usable_roof_fraction only)}
+\item{scen}{scenario (usable_roof_fraction only)}
 
 \item{yeartime}{start year (default 2010)}
 
@@ -21,6 +21,6 @@ creates the agent initial state including model weights, stochastically imputed 
 }
 \examples{
 
-initialise_agents(sD,2015,10) #\%>\% system.time()
+test <- initialise_agents(sD,2015,10) #\%>\% system.time()
 
 }

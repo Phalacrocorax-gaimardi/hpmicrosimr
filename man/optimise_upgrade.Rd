@@ -15,7 +15,6 @@ optimise_upgrade(
   floor_area,
   eta,
   params,
-  upgrade_heat = TRUE,
   is_fuel_allowance = FALSE,
   include_grants = TRUE,
   include_rebound = FALSE
@@ -41,8 +40,6 @@ optimise_upgrade(
 \item{eta}{heterogeneous disruption parameter}
 
 \item{params}{current parameter values from scenario_params(sD, yeartime)}
-
-\item{upgrade_heat}{if TRUE then upgrade the current heating system}
 
 \item{is_fuel_allowance}{TRUE/FALSE}
 
@@ -77,16 +74,16 @@ optimise_upgrade(1.66,"gas",2010,"detached",2,2010,"Dublin",100,0.12,params,TRUE
 
 optimise_upgrade(2.4,"gas",2010,"detached",2,2010,"Dublin",175,0.12,params,TRUE,FALSE,TRUE)
 
-optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 100,0.12,params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
+optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 100,0.12,params,is_fuel_allowance=FALSE,include_rebound=FALSE)
 
-optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 200,0.12,params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_rebound=FALSE)
+optimise_upgrade(2.9,"gas", 2015, "detached",2, 2003, "Munster", 200,0.12,params,is_fuel_allowance=FALSE,include_rebound=FALSE)
 
-optimise_upgrade(1.39,"gas",2020,"detached",2,1990,"Munster",100,0.12,params,upgrade_heat=TRUE,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE)
+optimise_upgrade(1.39,"gas",2020,"detached",2,1990,"Munster",100,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE)
 
 #WarmerHomes
 
-optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,0.16,params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
- optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,0,params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
-optimise_upgrade(3.8,"wood", 2003, "detached",2, 2003, "Dublin", 240,0.12,params,upgrade_heat=TRUE,is_fuel_allowance=TRUE,include_rebound=FALSE)
+optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,0.16,params,is_fuel_allowance=TRUE,include_rebound=FALSE)
+ optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,0,params,is_fuel_allowance=TRUE,include_rebound=FALSE)
+optimise_upgrade(3.8,"wood", 2003, "detached",2, 2003, "Dublin", 240,0.12,params,is_fuel_allowance=TRUE,include_rebound=FALSE)
 
 }

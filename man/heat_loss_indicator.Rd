@@ -19,15 +19,17 @@ heat_loss_indicator(ber, tech, install_time, params)
 real valued HLI
 }
 \description{
-calculates implied heat loss indicator (HLI) in W/(m2 K) from ber. HLI is a property the building fabric *only*.
+estimates implied heat loss indicator (HLI) in W/(m2 K) from standarised ber (kWh/m2/year). HLI is a property the building fabric *only*.
 }
 \details{
-the value is sensitive to the efficiency of the installed technology.
+BER  is sensitive to the efficiency of the installed technology.
 }
 \examples{
 
 params <- scenario_params(sD,2026)
-heat_loss_indicator(120,"gas",2020,params)
+params$q_passive <- 30
+params$hdd <- 2000
+sapply(10:450,function(ber) heat_loss_indicator(ber,"gas",2020,params)) \%>\% range()
 heat_loss_indicator(200,"heat_pump",2022,params)
 heat_loss_indicator(200,"wood",2022,params)
 

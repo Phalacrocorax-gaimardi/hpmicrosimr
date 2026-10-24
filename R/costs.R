@@ -95,7 +95,7 @@ labour_cost_fun <- function(sD,yeartime){
 #' prices reflect future carbon pricing assumptions carbon_Price_fun()
 #'
 #' @param fuel_type one of oil,gas,electricity,solid_fuel
-#' @param sD scenario dataframe
+#' @param scen scenario dataframe
 #' @param yeartime decimal time
 #'
 #' @return cents per kWh
@@ -109,7 +109,7 @@ labour_cost_fun <- function(sD,yeartime){
 #' energy_price_fun("oil", sD, 2040)
 #' energy_price_fun("wood",sD,2030)
 #'
-energy_price_fun <- function(fuel_type, sD, yeartime) {
+energy_price_fun <- function(fuel_type, scen, yeartime) {
 
   stopifnot(fuel_type %in% c("oil", "gas", "electricity", "wood"))
 
@@ -124,7 +124,7 @@ energy_price_fun <- function(fuel_type, sD, yeartime) {
     # Match parameter key in sD (e.g. "oil_price_2027.5" or floor/format as needed)
     param_key <- paste(fuel_type, "price", yt, sep = "_")
 
-    p_val <- sD %>%
+    p_val <- scen %>%
       dplyr::filter(parameter == .env$param_key) %>%
       dplyr::pull(value)
 
@@ -141,7 +141,7 @@ energy_price_fun <- function(fuel_type, sD, yeartime) {
     dplyr::pull(gCO2_per_kWh)
 
   if (yeartime >= 2027) {
-    cost <- cost + (ef / 1e4) * (carbon_price_fun(sD, yeartime) - 71) #carbon tax in 2026
+    cost <- cost + (ef / 1e4) * (carbon_price_fun(scen, yeartime) - 71) #carbon tax in 2026
   }
 
   return(cost)

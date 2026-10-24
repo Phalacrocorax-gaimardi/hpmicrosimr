@@ -4,12 +4,12 @@
 \alias{energy_price_fun}
 \title{energy_price_fun}
 \usage{
-energy_price_fun(fuel_type, sD, yeartime)
+energy_price_fun(fuel_type, scen, yeartime)
 }
 \arguments{
 \item{fuel_type}{one of oil,gas,electricity,solid_fuel}
 
-\item{sD}{scenario dataframe}
+\item{scen}{scenario dataframe}
 
 \item{yeartime}{decimal time}
 }

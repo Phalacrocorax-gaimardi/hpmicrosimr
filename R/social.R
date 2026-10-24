@@ -18,7 +18,12 @@ make_artificial_society <- function(society=society,homophily=homophily,nu=4.5){
   #nu gives the social distance decay exponentlarger mu higher assortativity
   #agents with degree zero remain degree zero but there may be additional nodes with degree zero
   society <- society %>% dplyr::mutate(serial=as.character(serial))
-  society <- society %>% dplyr::mutate(degree = ifelse(is.na(degree), sample(c(0,1:5,15,25),size=1,prob = c(0,0.06182796,0.19354839,0.19892473,0.18279570,0.17473118,0.14516129,0.04301075)),degree))
+  deg_values <- c(0, 1:5, 15, 25)
+  deg_probs  <- c(0, 0.06182796, 0.19354839, 0.19892473,0.18279570, 0.17473118, 0.14516129, 0.04301075)
+
+  missing_deg <- is.na(society$degree)
+  society$degree[missing_deg] <- sample(deg_values, size = sum(missing_deg), replace = TRUE, prob = deg_probs)
+  #
   society_factor <- unclass(society %>% dplyr::mutate_if(is.character,as.factor)) %>% as.data.frame()
   society_factor1 <- dplyr::filter(society_factor,degree != 0)
   society1 <- dplyr::filter(society, degree != 0)
@@ -62,19 +67,19 @@ make_artificial_society <- function(society=society,homophily=homophily,nu=4.5){
 #plot(igraph::degree(g), pv_soc$degree)
 
 
-#' get_network_characteristics
-#'
-#' @param society society used to construct homophilous network
-#' @param g homophilous social network
-#'
-#' @return table
-#' @export
-#'
-#' @examples
-get_network_characteristics <- function(society,g){
-  homophily1 <- homophily %>% dplyr::rowwise() %>% dplyr::mutate( assortativity= igraph::assortativity_nominal(g,as.integer(factor(dplyr::pull(society,variable)))))
-  knitr::kable(homophily1 %>% dplyr::filter(variable != "degree")) %>% kableExtra::kable_styling()
-}
+# #' get_network_characteristics
+##'
+##' @param society society used to construct homophilous network
+##' @param g homophilous social network
+##'
+##' @return table
+##' @export
+##'
+##' @examples
+#get_network_characteristics <- function(society,g){
+#  homophily1 <- homophily %>% dplyr::rowwise() %>% dplyr::mutate( assortativity= igraph::assortativity_nominal(g,as.integer(factor(dplyr::pull(society,variable)))))
+#  knitr::kable(homophily1 %>% dplyr::filter(variable != "degree")) %>% kableExtra::kable_styling()
+#}
 
 #get_network_characteristics(pv_society_oo,g)
 

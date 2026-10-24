@@ -73,9 +73,9 @@ The default cost model for energy efficiency improvements used by *hpmicrosimr* 
 library(hpmicrosimr)
 params <- scenario_params(sD,2025)
 #HLI upgrades from 3.3 to 2.3 (the value of params$hli_heat_pump_threshold)
-hpmicrosimr::retrofit_cost_model_logistic(3.3,2.3,"semi_detached",2,"Dublin",120,scenario_params(sD,2026))
+hpmicrosimr::retrofit_cost_model(3.3,2.3,"semi_detached",2,"Dublin",120,scenario_params(sD,2026))
 #HLI upgrade from 2.3 to 1.3 becomex expensive
-hpmicrosimr::retrofit_cost_model_logistic(2.3,1.3,"semi_detached",2,"Dublin",120,scenario_params(sD,2026))
+hpmicrosimr::retrofit_cost_model(2.3,1.3,"semi_detached",2,"Dublin",120,scenario_params(sD,2026))
 
 ```
 
@@ -130,7 +130,7 @@ for(year in 2010:2025){
 params <- scenario_params(sD,year)
 hli <- 2
 incl_rebound <- FALSE
-hp <- annualised_heating_system_cost(hli,"heat_pump", params$yeartime,"new",100,"detached",2000,"None",params,include_rebound=incl_rebound)
+hp <- annualised_heating_system_cost(hli,"heat_pump",params$yeartime,"new",100,"detached",2000,"None",params,include_rebound=incl_rebound)
 hp_grant <- annualised_heating_system_cost(hli,"heat_pump",params$yeartime,"new",100,"detached",2000,"BetterEnergyHomes",params,include_rebound=incl_rebound)
 oil <- annualised_heating_system_cost(hli,"oil", params$yeartime,"new",100,"detached",2000,"None",params,include_rebound=incl_rebound)
 gas <- annualised_heating_system_cost(hli,"gas", params$yeartime,"new",100,"detached",2000,"None",params,include_rebound=incl_rebound)
