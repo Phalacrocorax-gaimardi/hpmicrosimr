@@ -94,3 +94,229 @@ summarise_abm_cal <- function(abm, cal_date = "2025-11-01"){
   return(list("tech"=ntech,"grants"=egrants,"efficiency"=eff))
 
 }
+
+
+#' Summarise ABM calibration outputs
+#'
+#' Summarises technology stocks, cumulative grants, and building efficiency.
+#' Counts are scaled to the owner-occupied housing stock and averaged across
+#' simulations, including simulations with zero qualifying households.
+#'
+#' @param abm Agent-level output from runABM().
+#' @param cal_date Calibration date used for population scaling and the
+#'   cutoff for cumulative grant and fabric-upgrade events.
+#'
+#' @return A list containing tech, grants, and efficiency dataframes.
+#' @export
+summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
+
+  housing_stock_oo <- 1147552 # 2016 census
+  cal_d <- lubridate::ymd(cal_date)
+
+  technologies <- c(
+    "oil", "gas", "electricity", "heat_pump", "wood"
+  )
+
+  schemes <- c(
+    "BetterEnergyHomes", "OSS", "WarmerHomes"
+  )
+
+  # Return NA when a technology is absent from every simulation.
+  # Otherwise retain missing values in means for populated groups.
+  mean_present <- function(x, present) {
+    if (!any(present)) {
+      return(NA_real_)
+    }
+    mean(x[present])
+  }
+
+  # Simulation sizes at the calibration date.
+  df0 <- abm %>%
+    dplyr::filter(date == cal_d) %>%
+    dplyr::group_by(simulation) %>%
+    dplyr::summarise(
+      n0 = dplyr::n(),
+      .groups = "drop"
+    )
+
+  if (!setequal(df0$simulation, unique(abm$simulation))) {
+    stop(
+      "Every simulation must contain observations at cal_date: ",
+      cal_date
+    )
+  }
+
+  simulation_dates <- abm %>%
+    dplyr::distinct(simulation, date)
+
+  # ------------------------------------------------------------
+  # Installed technologies
+  # ------------------------------------------------------------
+
+  ntech <- abm %>%
+    dplyr::group_by(simulation, date, tech) %>%
+    dplyr::summarise(
+      n_tech = dplyr::n(),
+      ber = mean(ber),
+      hli = mean(hli),
+      n_b2 = sum(ber < 125),
+      .groups = "drop"
+    ) %>%
+    tidyr::complete(
+      simulation,
+      date,
+      tech = technologies,
+      fill = list(
+        n_tech = 0L,
+        n_b2 = 0L
+      ),
+      explicit = FALSE
+    ) %>%
+    dplyr::inner_join(df0, by = "simulation") %>%
+    dplyr::mutate(
+      present = n_tech > 0,
+      n_tech = n_tech / n0 * housing_stock_oo,
+      n_b2 = n_b2 / n0 * housing_stock_oo
+    ) %>%
+    dplyr::group_by(tech, date) %>%
+    dplyr::summarise(
+      n_tech = round(mean(n_tech)),
+      ber = mean_present(ber, present),
+      hli = mean_present(hli, present),
+      n_b2 = round(mean(n_b2)),
+      .groups = "drop"
+    )
+
+  # ------------------------------------------------------------
+  # Cumulative grant amounts and counts
+  # ------------------------------------------------------------
+
+  grant_grid <- tidyr::expand_grid(
+    simulation = unique(abm$simulation),
+    date = unique(abm$date),
+    grant_type = schemes
+  )
+
+  egrants <- abm %>%
+    dplyr::filter(
+      !is.na(grant_type),
+      grant_type != "None",
+      date <= cal_d
+    ) %>%
+    dplyr::group_by(simulation, grant_type, date) %>%
+    dplyr::summarise(
+      upgrade_grants = sum(upgrade_grant),
+      heat_pump_grants = sum(heat_pump_grant),
+      n_grant = sum(
+        upgrade_grant > 0 | heat_pump_grant > 0,
+        na.rm = TRUE
+      ),
+      .groups = "drop"
+    ) %>%
+    dplyr::full_join(
+      grant_grid,
+      by = c("simulation", "date", "grant_type")
+    ) %>%
+    dplyr::mutate(
+      upgrade_grants = tidyr::replace_na(upgrade_grants, 0),
+      heat_pump_grants = tidyr::replace_na(heat_pump_grants, 0),
+      n_grant = tidyr::replace_na(n_grant, 0L)
+    ) %>%
+    dplyr::arrange(simulation, grant_type, date) %>%
+    dplyr::group_by(simulation, grant_type) %>%
+    dplyr::mutate(
+      upgrade_grants = cumsum(upgrade_grants),
+      heat_pump_grants = cumsum(heat_pump_grants),
+      n_grant = cumsum(n_grant)
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::inner_join(df0, by = "simulation") %>%
+    dplyr::mutate(
+      upgrade_grants = upgrade_grants / n0 * housing_stock_oo,
+      heat_pump_grants = heat_pump_grants / n0 * housing_stock_oo,
+      n_grant = n_grant / n0 * housing_stock_oo
+    ) %>%
+    dplyr::group_by(grant_type, date) %>%
+    dplyr::summarise(
+      upgrade_grants = mean(upgrade_grants),
+      heat_pump_grants = mean(heat_pump_grants),
+      n_grant = mean(n_grant),
+      .groups = "drop"
+    ) %>%
+    dplyr::mutate(
+      grants_Meuro = (upgrade_grants + heat_pump_grants) / 1e6
+    ) %>%
+    dplyr::select(
+      grant_type, date,
+      upgrade_grants, heat_pump_grants,
+      grants_Meuro, n_grant
+    )
+
+  # ------------------------------------------------------------
+  # Cumulative fabric-upgrade events, with or without grants
+  # ------------------------------------------------------------
+
+  nupgrades <- abm %>%
+    dplyr::filter(
+      date <= cal_d,
+      upgrade
+    ) %>%
+    dplyr::group_by(simulation, date) %>%
+    dplyr::summarise(
+      n_upgrade = dplyr::n(),
+      .groups = "drop"
+    ) %>%
+    dplyr::full_join(
+      simulation_dates,
+      by = c("simulation", "date")
+    ) %>%
+    dplyr::mutate(
+      n_upgrade = tidyr::replace_na(n_upgrade, 0L)
+    ) %>%
+    dplyr::arrange(simulation, date) %>%
+    dplyr::group_by(simulation) %>%
+    dplyr::mutate(
+      n_upgrade = cumsum(n_upgrade)
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::inner_join(df0, by = "simulation") %>%
+    dplyr::mutate(
+      n_upgrade = n_upgrade / n0 * housing_stock_oo
+    ) %>%
+    dplyr::group_by(date) %>%
+    dplyr::summarise(
+      n_upgrade = mean(n_upgrade),
+      .groups = "drop"
+    )
+
+  # ------------------------------------------------------------
+  # Building efficiency and B2-or-better stock
+  # ------------------------------------------------------------
+
+  eff <- abm %>%
+    dplyr::group_by(simulation, date) %>%
+    dplyr::summarise(
+      ber = mean(ber),
+      hli = mean(hli),
+      n_b2 = sum(ber < 125),
+      .groups = "drop"
+    ) %>%
+    dplyr::inner_join(df0, by = "simulation") %>%
+    dplyr::mutate(
+      n_b2 = n_b2 / n0 * housing_stock_oo
+    ) %>%
+    dplyr::group_by(date) %>%
+    dplyr::summarise(
+      ber = round(mean(ber)),
+      hli = mean(hli),
+      n_b2 = round(mean(n_b2)),
+      .groups = "drop"
+    ) %>%
+    dplyr::inner_join(nupgrades, by = "date")
+
+  return(list(
+    tech = ntech,
+    grants = egrants,
+    efficiency = eff
+  ))
+}

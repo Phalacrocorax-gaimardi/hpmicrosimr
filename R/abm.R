@@ -262,8 +262,8 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
   #re-evalute BER to capture PEF drift
   a_s <- a_s %>% dplyr::mutate(ber=ber_from_hli(hli,tech,heating_install_time,params))
   #calculate updated eac and eac_actual
-  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = FALSE))
-  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac_actual = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = TRUE))
+  #a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = FALSE))
+  #a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac_actual = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = TRUE))
   #update definitions of old and new for all agents
   #a_s <- a_s %>% dplyr::mutate(S1_old=S1_new,S2_old = S2_new,B_old=B_new)
   #a_s <- a_s %>% dplyr::mutate(capex_old=capex_new,opex_old=opex_new)
@@ -451,7 +451,7 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
    b_s2_nhp <- b_s2_nhp_stick %>% dplyr::bind_rows(b_s2_nhp_switch) %>% dplyr::mutate(heating_install_time = params$yeartime)
   }
   #combine all upgrades whether existing heat pump or not and update to the new kW installed capacities
-  b_s2 <-  b_s2_hp %>% dplyr::bind_rows(b_s2_nhp) %>% dplyr::mutate(kW=heating_system_size(ber*floor_area))
+  b_s2 <-  b_s2_hp %>% dplyr::bind_rows(b_s2_nhp) #%>% dplyr::mutate(kW=heating_system_size(ber*floor_area))
 
   b_s2 <- b_s2 %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
   if(nrow(b_s2) > 0 ) b_s2 <- b_s2 %>% dplyr::mutate(ber=ber_from_hli(hli,tech,heating_install_time,params))
@@ -468,6 +468,7 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
   #stopifnot(nrow(b_s %>% dplyr::filter(lengths(tech) != 1)) != 0)
   #print(b_s)
   #b_s <- b_s  %>% dplyr::mutate(ber=ber_from_hli(hli,tech,install_time = params$yeartime,params))
+  b_s <- b_s %>% dplyr::mutate(kW=peak_heating_demand(hli,floor_area))
 
   #update agents
   a_s <- dplyr::filter(a_s, !(serial %in% b_s$serial))
@@ -480,8 +481,11 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
   #social network conformity effect
   adopter_nodes <- igraph::V(g)$adopt==TRUE
   a_s$q52 <- as.numeric(ma %*% adopter_nodes) #social reinforcement 0 no adoption 1 adoption
-  if(ignore_social) a_s$q52 <- 1 #no adopters assumed present in local network
+  if(ignore_social) a_s$q52 <- 0 #no adopters assumed present in local network: next line adds 1
   a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(q52 = min(q52+1,4)) #update q52 encoding 1,2,3,4
+  #update eac_actual and kW
+  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = FALSE))
+  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac_actual = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = TRUE))
   #agents_out <- a_s
   #a_s <- a_s %>% dplyr::select(-du_tot)
   if(!quiet) {

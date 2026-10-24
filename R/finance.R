@@ -952,7 +952,7 @@ fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,
   }
 
   excluded <- grant_draw[[scheme0]]
-  print(paste("excluded measures",paste(excluded, collapse = ", ")))
+  #print(paste("excluded measures",paste(excluded, collapse = ", ")))
   relevant_grants <- relevant_grants %>%
     dplyr::filter(!(measure %in% excluded))
   #print(relevant_grants)
