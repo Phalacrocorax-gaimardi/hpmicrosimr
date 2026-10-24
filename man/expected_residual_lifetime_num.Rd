@@ -12,8 +12,7 @@ expected_residual_lifetime_num(tech, system_age)
 \item{system_age}{system age}
 }
 \description{
-the expected remaining lifetime of a heating system given its age
-}
-\examples{
-expected_residual_lifetime_num("heat_pump",20)
+the expected remaining lifetime of a heating system given its age\cr
+\cr
+Not used, diagnostic only
 }

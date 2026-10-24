@@ -8,10 +8,10 @@ runABM(
   sD,
   Nrun = 1,
   simulation_end = 2030,
-  resample_society = F,
+  resample_society = FALSE,
   n_unused_cores = 2,
-  use_parallel = T,
-  ignore_social = F,
+  use_parallel = TRUE,
+  ignore_social = FALSE,
   quiet = TRUE
 )
 }

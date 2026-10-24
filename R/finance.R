@@ -267,84 +267,6 @@ is_eligible_fuel_allowance <- function(age, income,qi) {
 #hp_surv %>% mutate(fuel_allowance = is_eligible_fuel_allowance(actualage,income, ifelse(qi %in% c(1,4),"single","couple")))
 
 
-#' retrofit_cost_model_esri
-#'
-#' ESRI quadratic fit to OSS retrofit data
-#'
-#' Material costs are fixed. ~30% of 2024 cost is assumed to reflect skill labour costs.
-#'
-#'
-#' @param ber_old old ber kWh/m2
-#' @param ber_new new ber kWh/m2
-#' @param house_type seai house type
-#' @param region region
-#' @param floor_area total floor area m2
-#' @param params sD
-#'
-#' @returns cost in euros
-#' @export
-#'
-#'
-#'
-#' @examples
-retrofit_cost_model_esri <- function(ber_old,ber_new, house_type,region="Munster",floor_area=100,params){
-  #Kren et al use is_Dublin,is_apartment, floor_area and houe type as controls
-  #area dependence nstorys*4*sqrt(ground_floor_area)
-  #retrofit_cost_model_esri(175,120,"semi_detached","Munster",120)
-
-  if(ber_old <= ber_new) return(0)
-  a_0 <- 29488
-  a_1 <- -28.42
-  a_2 <- 0.176
-
-  cost <- a_0 + a_1*(ber_new-ber_old) + a_2*(ber_new-ber_old)^2
-  #a_0 and a_1 depend on is_apartment
-  res_2024 <- cost*floor_area/100*ifelse(house_type=="apartment",0.75,1)*ifelse(region=="Dublin",1.25,1)
-  #adjust by 2024 labour cost
-  res_2024*((1-params$ber_upgrade_labour_cost_share) + params$ber_upgrade_labour_cost_share*params$labour_cost/60) %>% return()
-}
-
-#' retrofit_cost_model_power
-#'
-#' A retrofit fit cost model based a power law dependence of marginal upgrade cost on BER
-#' on marginal cost function
-#' \deqn{c_0 + \frac{k}{BER^\alpha}}
-#' so that the cost of upgrade from \eqn{BER_{old}} to \eqn{BER_{new}} is
-#' \deqn{c_o(BER_{old}-BER{_new}) + \frac{k}{1-\alpha}\left(BER_{old}^{1-\alpha}-BER_{new}^{1-\alpha}\right)}
-#' The parameters \eqn{k} and \eqn{\alpha} are set in \emph{params}
-#'
-#' Default fit is based on cost matrix in ber_upgrade_cost_matrix. Assumes a square root dependence of cost on floor area (economy of scale)
-#'
-#' @param ber_old old ber kWh/m2
-#' @param ber_new new ber kWh/m2
-#' @param house_type seai house type
-#' @param region region
-#' @param floor_area total floor area in m2
-#' @param params current parameter values
-#'
-#' @returns cost in euros
-#' @export
-#'
-#' @examples
-#'
-#' params <- scenario_params(sD,2018)
-#' retrofit_cost_model_power(200,100,"semi_detached","Dublin",100,params)
-#'
-#' params <- scenario_params(sD,2024)
-#' retrofit_cost_model_power(200,100,"semi_detached","Dublin",100,params)
-#'
-retrofit_cost_model_power <- function(ber_old,ber_new,house_type,region="Dublin",floor_area=100,params){
-
-  c_0 <- params$ber_upgrade_marginal_cost_c0
-  alpha <- params$ber_upgrade_marginal_cost_alpha
-  k <- params$ber_upgrade_marginal_cost_k
-  cost <- ifelse(ber_old > ber_new,c_0*(ber_old-ber_new) + k/(1-alpha)*(ber_old^(1-alpha)-ber_new^(1-alpha)),0)
-  res_2024 <- 10*cost*sqrt(floor_area)*ifelse(house_type=="apartment",0.75,1)*ifelse(region=="Dublin",1.25,1)
-  #adjust by 2024 labour cost
-  res_2024*((1-params$ber_upgrade_labour_cost_share) + params$ber_upgrade_labour_cost_share*params$labour_cost/60) %>% return()
-  #include premium for detached vs semi-d vs terraced
-}
-
 #' retrofit_cost_model
 #'
 #' Building fabric + ventilation retrofit upgrade cost, excluding tech such as solar PV or Heat Pumps
@@ -400,44 +322,6 @@ retrofit_cost_model <- function(hli_old,hli_new,house_type,storeys,region="Dubli
 }
 
 
-
-#' gen_upgrade_cost_matrix
-#'
-#' generates an implied BER upgrade for given cost model params and house_type, region and floor area
-#'
-#' @param house_type house or apartment
-#' @param storeys 1,2+
-#' @param region region
-#' @param floor_area total floor area in m2
-#' @param params parameters
-#' @param include_grant TRUE/FALSE
-#'
-#' @returns matrix
-#' @export
-#'
-#' @examples
-#'
-#' params <- scenario_params(sD,2024)
-#' #gen_upgrade_cost_matrix("semi_detached","Dublin",100,params,cost_model="power",FALSE)
-#' #gen_upgrade_cost_matrix("semi_detached","Dublin",100,params,cost_model="esri",FALSE)
-#' gen_upgrade_cost_matrix("semi_detached",2,"Dublin",100,params,FALSE)
-#'
-gen_upgrade_cost_matrix <- function(house_type,storeys,region="Dublin",floor_area=100,params,include_grant=FALSE){
-  #gen_upgrade_cost_matrix("semi_detached","Dublin",100,params,"marginal")
-  stopifnot(house_type %in% c("detached","semi_detached","apartment","terraced"))
-  #stopifnot(cost_model %in% c("power","esri","logistic"))
-  storeys <- pmin(storeys,2)
-  df <- tidyr::expand_grid(hli_old=seq(5,0.5,by=-0.5), hli_new=seq(5,0.5,by=-0.5))
-  df <- df %>% dplyr::rowwise() %>% dplyr::mutate(cost = retrofit_cost_model(hli_old,hli_new,house_type,storeys,region,floor_area,params))
-  #df <- df %>% dplyr::mutate(old_ber_score = get_ber_score(ber_old),new_ber_score=get_ber_score(ber_new))
-  #df <- df %>% dplyr::group_by(old_ber_score,new_ber_score) %>% dplyr::summarise(cost=mean(cost))
-  df <- df %>% tidyr::pivot_wider(id_cols="hli_old",names_from="hli_new",values_from=cost)
-  colnames <- df$hli_old
-  df <- df %>% dplyr::ungroup() %>%  dplyr::select(-hli_old)
-  colnames(df) <- colnames
-  df <- tibble::tibble(hli_old = colnames) %>% dplyr::bind_cols(df)
-  return(df)
-}
 
 #' heating_upgrade_tensor
 #'
@@ -627,7 +511,7 @@ optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,store
   #
   #print(grant_type)
   upgrade_heat <- TRUE
-  if(upgrade_heat){
+  #if(upgrade_heat){
   if(grant_type=="WarmerHomes"){
     ##########################################################
     #WarmerHomes. Hit B2 with MINIMUM CAPEX expenditure
@@ -653,7 +537,7 @@ optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,store
      hli_max <- heat_loss_indicator(target_ber,tech_new,params$yeartime,params)
      #if tech_new is a heat pump, hli_new must be below threshold
      hli_max <- ifelse(hli_max < params$hli_heat_pump_threshold,hli_max,params$hli_heat_pump_threshold)
-     result <- optim(par=hli_old,fn=fun,lower=0.5,upper=hli_max,method="Brent")
+     result <- optim(par=hli_old,fn=fun,lower=0.25,upper=hli_max,method="Brent")
      hli_new <- result$par
      #warmet homes cost cap is increased after params$warmer_homes_enhanced
      cost_cap <- ifelse(params$yeartime < params$warmer_homes_enhanced,params$warmer_homes_cost_cap,params$warmer_homes_cost_cap_enhanced)
@@ -698,51 +582,7 @@ optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,store
   df <- df %>% dplyr::filter(tech_new %in% newtechs) #%>% dplyr::slice_min(new_cost)
   }
   return(df %>% dplyr::distinct())
-  }
-  else{ #no heating system upgrade
-    #First check whether qualifies for WarmerHomes
-      if(grant_type=="WarmerHomes"){
-        #WarmerHomes is assume to retain current heating system
-        #tech_new <- ifelse(params$yeartime >= 2025,"heat_pump",tech_old)
-        #df <- tibble::tibble(tech_old=tech_old,tech_new=c(tech_old,"heat_pump"), ber_old=ber_old,ber_new=120)
-        df <- tibble::tibble()
-        newtechs <- ifelse(tech_old=="heat_pump",list(c("heat_pump","gas")), list(c(tech_old,"heat_pump")))[[1]]
-        for(tech_new in newtechs){
-          #
-          target_ber <- ifelse(params$yeartime < params$warmer_homes_enhance,params$warmer_homes_target_ber,params$warmer_homes_target_ber_enhanced)
-          hli_new <- heat_loss_indicator(target_ber,tech_new,params$yeartime,params)
-          df1 <- tibble::tibble(tech_old=tech_old,tech_new = tech_old,hli_old=hli_old,hli_new=hli_new,ber_old=ber_old,ber_new =target_ber) %>% dplyr::bind_cols(heating_upgrade_tensor(hli_old,hli_new,tech_old,installation_time,tech_new,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance=TRUE,include_grants))
-          df <- df %>% dplyr::bind_rows(df1)
-        }
-        #df <- df %>% dplyr::mutate(bill_savings = 100*(annualised_cost-annualised_cost_old)/annualised_cost_old)
-        return(df)
-      }
-      else
-      {
-        df <- tibble::tibble()
-        #for(tech_new in c("heat_pump","oil","gas","electricity","solid_fuel")){
-        #NB assume that the choice is between retaining current tech or heat pump
-
-          fun <- function(hli_new){
-
-            heating_upgrade_tensor(hli_old,hli_new,tech_old,installation_time,tech_old, house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance=FALSE,include_grants,include_rebound)$new_cost
-
-          }
-
-          result <- optim(par=hli_old,fn=fun,lower=0.1,upper=hli_old,method="Brent")
-          hli_new <- result$par
-          ber_new <- ber_from_hli(hli_new,tech_new,params$yeartime,params)
-          df <- df %>% dplyr::bind_rows(tibble::tibble(tech_old=tech_old,tech_new=tech_old, hli_old=hli_old,hli_new=hli_new,ber_old=ber_old,ber_new=ber_optimal))
-        }
-
-        df <- df %>% dplyr::rowwise() %>% dplyr::mutate(result = list(heating_upgrade_tensor(hli_old,hli_new,tech_old,installation_time,
-                                                                                             tech_old,house_type,storeys,construction_year,
-                                                                                             region,floor_area,eta,params,FALSE,include_grants,include_rebound))) %>% tidyr::unnest_wider(result)
-        #df <- df %>% dplyr::mutate(bill_savings = 100*(annualised_cost-annualised_cost_old)/annualised_cost_old)
-        #df <- df %>% dplyr::filter(tech_new %in% c(tech_old,"heat_pump")) #%>% dplyr::slice_min(new_cost)
-      return(df %>% dplyr::distinct())
-
-  }
+  #}
 }
 
 #' optimise_heat
@@ -824,7 +664,7 @@ optimise_heat <- function(hli,tech_old,installation_time,house_type,storeys,cons
 #'
 #' @examples
 #' params <- scenario_params(sD,2025)
-#' heat_pump_savings(2.31,"electricity",2010,"detached",2,1995,"Munster",120,0.12,params)
+#' heat_pump_savings(2.31,"heat_pump",2010,"detached",2,1995,"Munster",120,0.12,params)
 #' params$beta. <- 1
 #' heat_pump_savings(2,"wood",2010,"detached",2,1995,"Munster",100,0.12,params)
 #'

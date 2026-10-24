@@ -21,11 +21,12 @@ vector of residual values
 \description{
 The expected residual or remaining value of an asset such as a heating system with Weibull survival function
 \deqn{S(t) = \exp\Big[-\Big(\frac{t}{\lambda}\Big)^{\beta}\Big]}
-conditional on its current age.
-}
-\details{
+conditional on its current age.\cr
+\cr
 The result is express as a fraction of the initial value. The continuous time discount rate is related to the annual rate \eqn{\delta} by
-\deqn{r=log(1+\delta)}
+\deqn{r=log(1+\delta)}\cr
+\cr
+Not used, diagnostic only
 }
 \examples{
 

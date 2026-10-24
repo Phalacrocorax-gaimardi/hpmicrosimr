@@ -17,5 +17,5 @@ imputes missing household income (qh) using data on car ownership from the house
 Uses random forest
 }
 \examples{
-impute_hh_income(hp_survey_oo)
+test <- impute_hh_income(hp_survey_oo)
 }

@@ -271,8 +271,6 @@ recode_fuels <- function(hp_data_in){
 recode_survey <- function(hp_data_in){
   #
   params <- scenario_params(sD,2024.5)
-  params$hdd <- 2000
-  params$q_passive <- 30
   hp_data_out <- hp_data_in %>% type.convert(as.is=TRUE)
   codes <- names(hp_data_out)
   #
@@ -317,9 +315,12 @@ recode_survey <- function(hp_data_in){
   hp_data_out <- hp_data_out %>%
     dplyr::mutate(hli=ifelse(!is.na(ber),heat_loss_indicator(ber,primary_heat,heating_install_time,params),NA))
   #impute missing HLI values with resampling based in building age (q5)
-  hp_data_out <-  hp_data_out %>% dplyr::group_by(q5) %>% dplyr::mutate(hli = impute_missing_hli(hli)) %>%
-    dplyr::ungroup()
-  hp_data_out$hli <- hp_data_out$hli + rlnorm(dim(hp_data_out)[1],log(0.4),0.25)
+  hp_data_out <- hp_data_out %>% dplyr::mutate(hli_imputed = is.na(hli))
+  hp_data_out <- hp_data_out %>% dplyr::group_by(q5) %>%
+    dplyr::mutate(hli = impute_missing_hli(hli)) %>% dplyr::ungroup()
+  n_imp <- sum(hp_data_out$hli_imputed)
+  hp_data_out$hli[hp_data_out$hli_imputed] <-
+    hp_data_out$hli[hp_data_out$hli_imputed] + rlnorm(n_imp, log(0.5), 0.25)
   #hp_data_out$hli <- impute_missing_hli(hp_data_out$hli) #assume homes that dont know their BER are less efficient
   #check fuel allowance eligibility
   hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(fuel_allowance = is_eligible_fuel_allowance(actualage,income,qi))
@@ -339,35 +340,62 @@ recode_survey <- function(hp_data_in){
 #' Uses random forest
 #'
 #' @param hp_data_in usually hp_survey_oo
-#'
+#' @import ranger
+#' @importFrom stats predict rexp runif
 #' @returns input dataframe with imputed qh values
 #' @export
-#'
 #' @examples
-#' impute_hh_income(hp_survey_oo)
-impute_hh_income <- function(hp_data_in){
+#' test <- impute_hh_income(hp_survey_oo)
+impute_hh_income <- function(hp_data_in) {
+  #
 
-  zet_survey <- readxl::read_xlsx(system.file("extdata","ZET_survey_2024_values.xlsx",package="hpmicrosimr"),sheet=1)
-  #include car ownership as an indicator of income
-  rf <- ranger::ranger(qh~qb+qc2+q1+qe+q3+q4+qf+q13+qg+q58+q59_2,zet_survey %>% dplyr::filter(qh != 12),num.trees=500,mtry=3, min.node.size = 1,sample.fraction = 0.8, splitrule = "variance",
-               respect.unordered.factors = TRUE,replace=TRUE,max.depth = 1e+3,num.threads = 10)
+  #rf <- ranger::ranger(qh~qb+qc2+q1+qe+q3+q4+qf+q13+qg+q58+q59_2,hp_survey_oo %>% dplyr::filter(qh != 12),num.trees=500,mtry=3, min.node.size = 1,sample.fraction = 0.8, splitrule = "variance",
+  #            respect.unordered.factors = TRUE,replace=TRUE,max.depth = 1e+3,num.threads = 10)
+  # Run once during development to save the model artifact:
+  #saveRDS(rf, "inst/extdata/rf_income_model.rds")
   #rf$r.squared
 
+  #pre-trained ranger model from package internal files
+  model_path <- system.file("extdata", "rf_income_model.rds", package = "hpmicrosimr")
+  rf_model <- readRDS(model_path)
+  #zet_survey <- readr::read_csv("inst/extdata/zet_survey.csv")
+  #rows needing income imputation (qh == 12)
+  needs_impute <- hp_data_in$qh == 12
 
-  preds <- ranger::predictions(rf)
+  if (any(needs_impute)) {
+    # Extract all 500 tree predictions for missing rows [n_missing x n_trees]
+    tree_preds <- stats::predict(
+      rf_model,
+      data = hp_data_in[needs_impute, ],
+      predict.all = TRUE
+    )$predictions
 
-  qh_impute <- stats::predict(rf, data = zet_survey %>% dplyr::select(-qh))
+    # Stochastic Draw: Pick one random tree prediction per missing respondent
+    n_missing <- sum(needs_impute)
+    rand_trees <- sample.int(rf_model$num.trees, size = n_missing, replace = TRUE)
+    stochastic_draws <- tree_preds[cbind(1:n_missing, rand_trees)]
 
-  zet_survey$qh_imputed <- qh_impute$predictions
-  hp_data_out <- hp_data_in %>% dplyr::inner_join(zet_survey %>% dplyr::select(serial,qh_imputed))
-  hp_data_out <- hp_data_out %>% dplyr::mutate(qh=ifelse(qh == 12, round(qh_imputed), qh))
-  hp_data_out <- hp_data_out %>% dplyr::inner_join(survey_income_ranges)
-  hp_data_out <- hp_data_out %>% dplyr::mutate(income = mapply(runif, n = 1, min = lower, max = upper))
-  hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(income = replace(income,qh==1, 15000-rexp(1,1/1000)))
-  hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(income = replace(income,qh==11, 261000 + rexp(1,1/40000)))
-  #adjust
+    # Update qh for imputed rows
+    hp_data_in$qh[needs_impute] <- round(stochastic_draws)
+  }
 
-  hp_data_out %>% dplyr::select(-upper,-lower,-qh_imputed) %>% return()
+  #income ranges and sample continuous income (Vectorized)
+  hp_data_out <- hp_data_in %>%
+    dplyr::inner_join(survey_income_ranges, by = "qh") %>%
+    dplyr::mutate(
+      # Draw uniform continuous value within the bracket range
+      income = runif(dplyr::n(), min = lower, max = upper),
+      # Apply exponential tail distribution for bottom (qh == 1) and top (qh == 11) brackets
+      income = dplyr::case_when(
+        qh == 1  ~ 15000 - rexp(dplyr::n(), rate = 1 / 1000),
+        qh == 11 ~ 261000 + rexp(dplyr::n(), rate = 1 / 40000),
+        TRUE     ~ income
+      )
+    ) %>%
+    dplyr::select(-upper, -lower)
+
+  hp_data_out$qh <- hp_data_in$qh
+  return(hp_data_out)
 }
 
 
@@ -572,17 +600,18 @@ weibull_failure <- Vectorize(weibull_failure)
 
 #' expected_residual_lifetime_num
 #'
-#' the expected remaining lifetime of a heating system given its age
+#' the expected remaining lifetime of a heating system given its age\cr
+#' \cr
+#' Not used, diagnostic only
 #'
 #'
 #' @param tech technology
 #' @param system_age system age
 #'
 #' @returns
-#' @export
 #'
 #' @examples
-#' expected_residual_lifetime_num("heat_pump",20)
+#'
 expected_residual_lifetime_num <- function(tech, system_age) {
   beta <- tech_params[[paste(tech, "system_beta", sep = "_")]]
   lifetime <- tech_params[[paste(tech, "system_lifetime", sep = "_")]]
@@ -663,10 +692,12 @@ eac_weibull <- function(lifetime, beta, system_age,r) {
 #'
 #' The expected residual or remaining value of an asset such as a heating system with Weibull survival function
 #' \deqn{S(t) = \exp\Big[-\Big(\frac{t}{\lambda}\Big)^{\beta}\Big]}
-#' conditional on its current age.
-#'
+#' conditional on its current age.\cr
+#' \cr
 #' The result is express as a fraction of the initial value. The continuous time discount rate is related to the annual rate \eqn{\delta} by
-#' \deqn{r=log(1+\delta)}
+#' \deqn{r=log(1+\delta)}\cr
+#' \cr
+#' Not used, diagnostic only
 #'
 #'
 #' @param lifetime mean system lifetime
@@ -882,27 +913,6 @@ pef_fun <- function(sD,yeartime){
 }
 
 
-#' ef_solid_fuel_fun
-#'
-#' solid fuel emissions function. Emissions factor is assumed to fall linearly from 2026 to peat_phaseout to reflect a growing share of
-#' wood in the solid fuel mix.
-#'
-#' @param sD scenario parameters
-#' @param yeartime decimal time
-#'
-#' @returns
-#' @export
-#'
-#' @examples
-#' ef_wood_fun(sD,2030)
-ef_wood_fun  <- function(sD,yeartime){
-
-  ef0 <- tech_emissions_factors %>% dplyr::filter(tech=="wood") %>% dplyr::pull(gCO2_per_kWh)
-  phaseout <- dplyr::filter(sD, parameter=="peat_phaseout")$value
-  ef <- ef0*ifelse(yeartime < phaseout,1,pmax(0, (phaseout-yeartime)/(phaseout-2026)) )
-  return(ef)
-
-}
 
 
 

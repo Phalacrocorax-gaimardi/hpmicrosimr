@@ -16,7 +16,8 @@ calABM(
   eta = 0.02,
   tau = 0.02,
   lambda = 0,
-  rho = 0.3
+  rho = 0.3,
+  quiet = TRUE
 )
 }
 \arguments{
@@ -43,16 +44,18 @@ calABM(
 \item{lambda}{hypothetical bias adjustment}
 
 \item{rho}{rebound}
+
+\item{quiet}{TRUE to suppress messages (default)}
 }
 \value{
-calibration run data
+a list with components parameters (calibration targets), efficiency and grants
 }
 \description{
-macro-calibration of hpmicrosimr. This is the Windows version.\cr
+macro-calibration of hpmicrosimr. Replicates run on a doParallel cluster (works on Windows) or serially.\cr
 \cr
 based on heat pump uptake, grant uptake and number of b2s on 1 nov 2025\cr
 \cr
-The output is summarised using summarise_cal()
+The output is the same for parallel and serial runs. See also calABM2, which uses forking on linux systems.
 }
 \examples{
 

@@ -3,9 +3,9 @@
 \docType{data}
 \name{hp_survey_oo}
 \alias{hp_survey_oo}
-\title{DATASET_TITLE}
+\title{hp_survey_oo}
 \format{
-A data frame with 901 rows and 90 variables:
+A data frame with 901 rows and 92 variables:
 \describe{
   \item{\code{serial}}{double COLUMN_DESCRIPTION}
   \item{\code{qa}}{double COLUMN_DESCRIPTION}
@@ -96,14 +96,16 @@ A data frame with 901 rows and 90 variables:
   \item{\code{qg}}{double COLUMN_DESCRIPTION}
   \item{\code{qh}}{double COLUMN_DESCRIPTION}
   \item{\code{qi}}{double COLUMN_DESCRIPTION}
-  \item{\code{qj}}{double COLUMN_DESCRIPTION} 
+  \item{\code{qj}}{double COLUMN_DESCRIPTION}
+  \item{\code{q58}}{double number of cars owned by household}
+  \item{\code{q59_2}}{double expected price of next car}
 }
 }
 \usage{
 hp_survey_oo
 }
 \description{
-DATASET_DESCRIPTION
+Extract from ZET survey data relevant to heat energy efficiency
 }
 \details{
 DETAILS

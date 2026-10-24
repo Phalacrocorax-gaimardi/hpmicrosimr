@@ -55,7 +55,7 @@ This function is used in *update_agents* to determine the new system choice when
 }
 \examples{
 params <- scenario_params(sD,2025)
-heat_pump_savings(2.31,"electricity",2010,"detached",2,1995,"Munster",120,0.12,params)
+heat_pump_savings(2.31,"heat_pump",2010,"detached",2,1995,"Munster",120,0.12,params)
 params$beta. <- 1
 heat_pump_savings(2,"wood",2010,"detached",2,1995,"Munster",100,0.12,params)
 

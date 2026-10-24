@@ -15,7 +15,8 @@ calABM2(
   r = 0.03,
   eta = 0.03,
   tau = 0.02,
-  rho = 0.3
+  rho = 0.3,
+  quiet = TRUE
 )
 }
 \arguments{
@@ -40,11 +41,16 @@ calABM2(
 \item{tau}{sludge}
 
 \item{rho}{rebound}
+
+\item{quiet}{TRUE to suppress messages (default)}
+}
+\value{
+a list with components parameters (calibration targets), efficiency and grants
 }
 \description{
-macro-calibration of hpmicrosimr using mclapply on linux systems\cr
+macro-calibration of hpmicrosimr using mclapply on linux systems (on Windows it falls back to calABM's backend)\cr
 \cr
-returns the same calibration data as calABM
+returns the same calibration data as calABM. The hypothetical bias parameter lambda. is left at its value in sD.
 }
 \examples{
 #test <- calABM2(sD,2,2,F)

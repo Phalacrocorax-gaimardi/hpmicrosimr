@@ -1,6 +1,6 @@
-#' @title DATASET_TITLE
-#' @description DATASET_DESCRIPTION
-#' @format A data frame with 901 rows and 90 variables:
+#' @title hp_survey_oo
+#' @description Extract from ZET survey data relevant to heat energy efficiency
+#' @format A data frame with 901 rows and 92 variables:
 #' \describe{
 #'   \item{\code{serial}}{double COLUMN_DESCRIPTION}
 #'   \item{\code{qa}}{double COLUMN_DESCRIPTION}
@@ -91,7 +91,9 @@
 #'   \item{\code{qg}}{double COLUMN_DESCRIPTION}
 #'   \item{\code{qh}}{double COLUMN_DESCRIPTION}
 #'   \item{\code{qi}}{double COLUMN_DESCRIPTION}
-#'   \item{\code{qj}}{double COLUMN_DESCRIPTION} 
+#'   \item{\code{qj}}{double COLUMN_DESCRIPTION}
+#'   \item{\code{q58}}{double number of cars owned by household}
+#'   \item{\code{q59_2}}{double expected price of next car}
 #'}
 #' @details DETAILS
 "hp_survey_oo"
