@@ -12,7 +12,6 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/ber_from_hli.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/ber_model_parameters.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/ber_ratings_table.html</loc></url>
-<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/bill_values.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/calABM.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/calABM2.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/carbon_price_fun.html</loc></url>
@@ -31,8 +30,6 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/gen_ber_rating.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/gen_upgrade_cost_matrix.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/get_ber_score.html</loc></url>
-<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/get_financial_utility_scale.html</loc></url>
-<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/get_network_characteristics.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/grant_eligibility.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/heat_loss_indicator.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/heat_pump_grant.html</loc></url>
@@ -54,6 +51,7 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/impute_ber.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/impute_floor_area.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/impute_hh_income.html</loc></url>
+<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/impute_missing_hli.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/index.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/initialise_agents.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/is_eligible_fuel_allowance.html</loc></url>
@@ -79,7 +77,6 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/sD.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/sample_construction_years.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/scenario_params.html</loc></url>
-<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/seai_elec.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/seai_grants.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/seai_grants_average.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/space_heating_requirement.html</loc></url>
