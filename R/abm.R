@@ -46,9 +46,9 @@ scenario_params <- function(scen,yeartime){
   sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="hp_night_rate_usage_factor",  value=dplyr::filter(scen, parameter=="hp_night_rate_usage_factor")$value))
   sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="electric_night_rate_usage_factor",  value=dplyr::filter(scen, parameter=="electric_night_rate_usage_factor")$value))
   #space heating
-  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="q_passive",  value=dplyr::filter(sD, parameter=="q_passive")$value))
-  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="q_hotwater",  value=dplyr::filter(sD, parameter=="q_hotwater")$value))
-  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="q_lighting",  value=dplyr::filter(sD, parameter=="q_lighting")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="q_passive",  value=dplyr::filter(scen, parameter=="q_passive")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="q_hotwater",  value=dplyr::filter(scen, parameter=="q_hotwater")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="q_lighting",  value=dplyr::filter(scen, parameter=="q_lighting")$value))
 
   sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="present_bias_threshold",  value=dplyr::filter(scen, parameter=="present_bias_threshold")$value))
   sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="rebound_threshold",  value=dplyr::filter(scen, parameter=="rebound_threshold")$value))
@@ -75,7 +75,6 @@ scenario_params <- function(scen,yeartime){
   #scen <- dplyr::bind_rows(scen,tibble::tibble(parameter="overhead",  value=dplyr::filter(sD, parameter=="vat_service")$value))
   sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="vat_service",  value=dplyr::filter(scen, parameter=="vat_service")$value))
   sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="vat_goods",  value=dplyr::filter(scen, parameter=="vat_goods")$value))
-  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="labour_cost", value =  labour_cost_fun(scen,yeartime)))
   #
   sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="pef_electricity", value =  pef_fun(scen,yeartime)))
   #hp grant dates
@@ -616,6 +615,46 @@ runABM <- function(sD, Nrun = 1, simulation_end = 2030, resample_society = FALSE
                          value = c(Nrun, simulation_end, unname(vals)))
   list("abm" = abm, "scenario" = sD, "system" = meta)
 }
+
+
+#' run_calibration
+#'
+#' Common engine of calABM and calABM2: sets the calibration parameters in the scenario, runs the 2015-2025
+#' replicates on the chosen backend and summarises the calibration targets.
+#'
+#' @param sD base scenario (historical)
+#' @param Nrun number of runs
+#' @param backend "foreach", "mclapply" or "serial", see run_replicates
+#' @param n_unused_cores unused cores
+#' @param cal_values named numeric vector of calibration parameters, names as in sD e.g. "nu." and "p."
+#' @param quiet TRUE to suppress messages
+#'
+#' @returns list(parameters, efficiency, grants) from calibration_summary
+#' @noRd
+run_calibration <- function(sD, Nrun, backend, n_unused_cores, cal_values, quiet = TRUE){
+
+  year_zero <- 2015
+  simulation_end <- 2025
+  sD_cal <- sD
+  for(nm in names(cal_values)){
+    stopifnot(any(sD_cal$parameter == nm))
+    sD_cal$value[sD_cal$parameter == nm] <- cal_values[[nm]]
+  }
+  print(paste(paste0(names(cal_values), "=", cal_values), collapse = ", "))
+
+  seeds <- sample.int(.Machine$integer.max, Nrun)
+  one_run <- function(j){
+    set.seed(seeds[j])
+    run_single(j, sD_cal, year_zero, simulation_end, resample_society = FALSE, ignore_social = FALSE, quiet = quiet)
+  }
+  abm <- run_replicates(Nrun, one_run, backend = backend, n_unused_cores = n_unused_cores)
+  abm <- abm %>% dplyr::arrange(simulation, date)
+
+  cal_params <- tibble::as_tibble(as.list(cal_values[c("beta.", "eta.", "p.", "nu.", "rho.", "r.")]))
+  calibration_summary(abm, cal_params)
+}
+
+
 
 #' @title calABM
 #'
