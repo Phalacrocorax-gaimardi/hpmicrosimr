@@ -355,6 +355,7 @@ retrofit_cost_model <- function(hli_old,hli_new,house_type,storeys,region="Dubli
 #' @param is_fuel_allowance TRUE/FALSE
 #' @param include_grants TRUE/FALSE
 #' @param include_rebound default FALSE
+#' @param grant_draw If NULL select a random set of fabric grant upgrade measures
 #'
 #' @returns list
 #' @export
@@ -373,7 +374,7 @@ retrofit_cost_model <- function(hli_old,hli_new,house_type,storeys,region="Dubli
 
 #' ber_from_hli(1.27,"gas",params$yeartime,params)
 
-heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,tech_new,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance=FALSE,include_grants=TRUE, include_rebound=FALSE){
+heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,tech_new,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance=FALSE,include_grants=TRUE, include_rebound=FALSE,grant_draw = NULL){
   #heating_upgrade_tensor(175,120,tech_old="gas",tech_new = "heat_pump","detached",2003,"Dublin",100,params,include_grants=T)
   stopifnot(tech_old %in% c("electricity","heat_pump","wood","gas","oil"))
   stopifnot(tech_new %in% c("electricity","heat_pump","wood","gas","oil"))
@@ -393,8 +394,22 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
   #restore present bias
   params$beta. <- present_bias
   #ber upgrade cost including ber grants but excluding heat pump grants
-  fabric_grants <- fabric_grant(ber_old,ber_new,tech_old,tech_new,installation_time,construction_year,region,house_type,storeys,floor_area,is_fuel_allowance,params)
-  #print(upgrade_grants$scheme)
+  if (hli_new >= hli_old) {
+    fabric_grants <- list(
+      scheme = "None",
+      grant_value = 0,
+      cost_estimate = 0,
+      grant_share = 0
+    )
+  } else {
+    fabric_grants <- fabric_grant(
+      ber_old, ber_new, tech_old, tech_new,
+      installation_time, construction_year,
+      region, house_type, storeys, floor_area,
+      is_fuel_allowance, params,
+      grant_draw = grant_draw
+    )
+  }  #print(upgrade_grants$scheme)
   hli_upgrade_capex <- fabric_grants$cost_estimate
   hli_upgrade_grant <- ifelse(grant_type=="None",0,fabric_grants$grant_value)
   #hli_upgrade_capex_with_grant <-  hli_upgrade_capex-ifelse(include_grants,upgrade_grants$grant_value,0) #
@@ -470,6 +485,7 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
 #' @param is_fuel_allowance TRUE/FALSE
 #' @param include_grants defaults to TRUE
 #' @param include_rebound defaults to FALSE
+#' @param grant_draw If NULL choose a random set of envelope upgrade measures
 #'
 #' @returns a two row dataframe. The new EAC "new_cost"
 #' @export
@@ -478,9 +494,9 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
 #'
 #' params <- scenario_params(sD,2026)
 #'
-#' optimise_upgrade(1.8,"gas",2005,"semi_detached",2,2003,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
+#' optimise_upgrade(1.8,"gas",2005,"semi_detached",2,2003,"Dublin",100,0.12,params,TRUE,FALSE,TRUE,NULL)
 #'
-#' optimise_upgrade(2.6,"gas",2010,"semi_detached",2,2003,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
+#' optimise_upgrade(2.6,"gas",2010,"semi_detached",2,2003,"Dublin",100,0.12,params,TRUE,FALSE,TRUE,NULL)
 #'
 #' optimise_upgrade(5,"gas",2010,"detached",2,2010,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
 #' optimise_upgrade(1.66,"gas",2010,"detached",2,2010,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
@@ -497,9 +513,9 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
 #'
 #' optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,0.16,params,is_fuel_allowance=TRUE,include_rebound=FALSE)
 #'  optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,0,params,is_fuel_allowance=TRUE,include_rebound=FALSE)
-#' optimise_upgrade(3.8,"wood", 2003, "detached",2, 2003, "Dublin", 240,0.12,params,is_fuel_allowance=TRUE,include_rebound=FALSE)
+#' optimise_upgrade(3.8,"wood", 2003, "detached",2, 2003, "Dublin", 240,0.12,params,is_fuel_allowance=FALSE,include_rebound=FALSE,TRUE,NULL)
 #'
-optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE){
+optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound=FALSE,grant_draw=NULL){
 
   stopifnot(construction_year %in% 1700:2025)
   storeys <- pmin(storeys,2)
@@ -509,6 +525,9 @@ optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,store
   #First check whether qualifies for WarmerHomes
   grant_type <- ifelse(include_grants,grant_eligibility(ber_old,ber_old,construction_year,is_fuel_allowance,params), "None")
   #
+  if (is.null(grant_draw)) {
+    grant_draw <- draw_grant_measures()
+  }
   #print(grant_type)
   upgrade_heat <- TRUE
   #if(upgrade_heat){
@@ -548,7 +567,7 @@ optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,store
      }
      if(fun(hli_old) > cost_cap) hli_new <- hli_old
      ber_new <- ber_from_hli(hli_new,tech_new,params$yeartime,params)
-     df1 <- tibble::tibble(tech_old=tech_old,tech_new = tech_new,hli_old=hli_old,hli_new=hli_new,ber_old=ber_old,ber_new =ber_new) %>% dplyr::bind_cols(heating_upgrade_tensor(hli_old,hli_new,tech_old,installation_time,tech_new,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance,include_grants=TRUE))
+     df1 <- tibble::tibble(tech_old=tech_old,tech_new = tech_new,hli_old=hli_old,hli_new=hli_new,ber_old=ber_old,ber_new =ber_new) %>% dplyr::bind_cols(heating_upgrade_tensor(hli_old,hli_new,tech_old,installation_time,tech_new,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance,include_grants=TRUE,grant_draw=grant_draw))
      #check whether financial benefit offsets disruption cost? some upgrades may be rejected.
 
      df <- df %>% dplyr::bind_rows(df1)
@@ -565,7 +584,7 @@ optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,store
   #print(tech_new)
   fun <- function(hli_new){
 
-    heating_upgrade_tensor(hli_old,hli_new,tech_old,installation_time,tech_new, house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance=FALSE,include_grants,include_rebound)$new_cost
+    heating_upgrade_tensor(hli_old,hli_new,tech_old,installation_time,tech_new, house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance=FALSE,include_grants,include_rebound,grant_draw=grant_draw)$new_cost
 
   }
 
@@ -577,7 +596,7 @@ optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,store
 
   df <- df %>% dplyr::rowwise() %>% dplyr::mutate(result = list(heating_upgrade_tensor(hli_old,hli_new,tech_old,installation_time,
                                                                                        tech_new,house_type,storeys,construction_year,
-                                                                                       region,floor_area,eta,params,is_fuel_allowance=FALSE,include_grants,include_rebound))) %>% tidyr::unnest_wider(result)
+                                                                                       region,floor_area,eta,params,is_fuel_allowance=FALSE,include_grants,include_rebound,grant_draw=grant_draw))) %>% tidyr::unnest_wider(result)
  #df <- df %>% dplyr::mutate(bill_savings = 100*(annualised_cost-annualised_cost_old)/annualised_cost_old)
   df <- df %>% dplyr::filter(tech_new %in% newtechs) #%>% dplyr::slice_min(new_cost)
   }
@@ -830,6 +849,32 @@ grant_eligibility <- function(ber_old, ber_new, construction_year, is_fuel_allow
   return(ifelse(oss_eligible,"OSS", "BetterEnergyHomes"))
 }
 
+
+#' draw_grant_measures
+#'
+#' Sample SEI grant measures depending on scheme. Internal use in fabric_grant()
+#'
+#' @returns
+#'
+#' @examples
+draw_grant_measures <- function() {
+  walls <- c(
+    "internal_wall_insulation",
+    "external_wall_insulation",
+    "cavity_wall_insulation"
+  )
+
+  list(
+    OSS = c(
+      sample(c("attic_insulation", "rafter_insulation"), 1),
+      sample(walls, 2),
+      sample(c("floor_insulation", ""), 1),
+      sample(c("windows", ""), 1)
+    ),
+    BetterEnergyHomes = sample(walls, 2)
+  )
+}
+
 #' fabric_grant
 #'
 #' \code{fabric_grant()} finds the grant amount available from SEAI for building fabric energy efficiency upgrades. This function \emph{excludes} grants for heat pumps and associated works.
@@ -850,6 +895,7 @@ grant_eligibility <- function(ber_old, ber_new, construction_year, is_fuel_allow
 #' @param is_fuel_allowance TRUE/FALSE
 #' @param params parameters
 #' @param randomise whether to assign grant elements randomly or not. Default TRUE, for testing set to FALSE
+#' @param grant_draw if NULL sample
 #'
 #' @returns list(scheme, grant)
 #' @export
@@ -869,9 +915,9 @@ grant_eligibility <- function(ber_old, ber_new, construction_year, is_fuel_allow
 #'
 #' fabric_grant(300,280,"gas","wood",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,params,randomise=TRUE)
 #'
-#' fabric_grant(175,155,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE)
+#' fabric_grant(175,155,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE,NULL)
 
-fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,construction_year,region,house_type,storeys,floor_area = 100,is_fuel_allowance = FALSE,params,randomise=TRUE) {
+fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,construction_year,region,house_type,storeys,floor_area = 100,is_fuel_allowance = FALSE,params,randomise=TRUE,grant_draw=NULL) {
 
   #Input validation with more informative messages
   stopifnot(house_type %in% c("semi_detached", "detached", "apartment", "terraced","apartment"))
@@ -900,18 +946,15 @@ fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,
   if(randomise) { relevant_grants <- seai_grants %>% dplyr::filter(scheme==scheme0,building_type==house_type)
 
   relevant_grants <-  relevant_grants %>% dplyr::filter(!stringr::str_detect(measure,"heat_pump"))
-  #relevant_grants_mean <- relevant_grants %>% dplyr::mutate(measure=replace(measure, str_detect(measure,"attic|rafter"),"roof"))
-  #relevant_grants_mean <- relevant_grants %>% dplyr::mutate(measure=replace(measure, str_detect(measure,"wall"),"wall"))
 
-  #randomly select grant elements that refer duplicate work
-  oss_rejected_elements <- c(sample(c("attic_insulation","rafter_insulation"),1),
-                         sample(c("internal_wall_insulation","external_wall_insulation","cavity_wall_insulation"),2,replace = F),
-                         sample(c("floor_insulation",""),1),sample(c("windows",""),1))
-  beh_rejected_elements <- sample(c("internal_wall_insulation","external_wall_insulation","cavity_wall_insulation"),2)
+  if (is.null(grant_draw)) {
+    grant_draw <- draw_grant_measures()
+  }
 
-  ifelse(scheme0=="OSS", relevant_grants <- relevant_grants %>% dplyr::filter(!(measure %in% oss_rejected_elements)),
-         relevant_grants <- relevant_grants %>% dplyr::filter(!(measure %in% beh_rejected_elements)))
-
+  excluded <- grant_draw[[scheme0]]
+  print(paste("excluded measures",paste(excluded, collapse = ", ")))
+  relevant_grants <- relevant_grants %>%
+    dplyr::filter(!(measure %in% excluded))
   #print(relevant_grants)
   #print(dim(relevant_grants))
   grant_scale <- ifelse(params$yeartime < params$grant_increase_date,1,params$grant_increase_factor)

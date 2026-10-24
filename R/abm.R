@@ -28,7 +28,7 @@ scenario_params <- function(scen,yeartime){
   technologies <- c("oil","gas","electricity","heat_pump","wood")
   sc <- tibble::tibble(parameter="yeartime", value=  yeartime)
   sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="hdd", value=  dplyr::filter(scen, parameter=="hdd")$value))
-  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="reference temperature", value=  dplyr::filter(scen, parameter=="")$value))
+  sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="reference temperature", value=  dplyr::filter(scen, parameter=="baseline_temperature")$value))
   sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="labour_cost", value=  labour_cost_fun(scen,yeartime)))
   sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="heating_controller_cost", value=  dplyr::filter(scen, parameter=="heating_controller_cost")$value))
   sc <- dplyr::bind_rows(sc,tibble::tibble(parameter="installer_overhead",  value=dplyr::filter(scen, parameter=="overhead")$value))
@@ -651,7 +651,7 @@ run_calibration <- function(sD, Nrun, backend, n_unused_cores, cal_values, quiet
   abm <- abm %>% dplyr::arrange(simulation, date)
 
   cal_params <- tibble::as_tibble(as.list(cal_values[c("beta.", "eta.", "p.", "nu.", "rho.", "r.")]))
-  calibration_summary(abm, cal_params)
+  cal_summary(abm, cal_params)
 }
 
 

@@ -19,7 +19,8 @@ heating_upgrade_tensor(
   params,
   is_fuel_allowance = FALSE,
   include_grants = TRUE,
-  include_rebound = FALSE
+  include_rebound = FALSE,
+  grant_draw = NULL
 )
 }
 \arguments{
@@ -52,6 +53,8 @@ heating_upgrade_tensor(
 \item{include_grants}{TRUE/FALSE}
 
 \item{include_rebound}{default FALSE}
+
+\item{grant_draw}{If NULL select a random set of fabric grant upgrade measures}
 }
 \value{
 list

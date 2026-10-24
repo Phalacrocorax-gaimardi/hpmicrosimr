@@ -17,7 +17,8 @@ optimise_upgrade(
   params,
   is_fuel_allowance = FALSE,
   include_grants = TRUE,
-  include_rebound = FALSE
+  include_rebound = FALSE,
+  grant_draw = NULL
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ optimise_upgrade(
 \item{include_grants}{defaults to TRUE}
 
 \item{include_rebound}{defaults to FALSE}
+
+\item{grant_draw}{If NULL choose a random set of envelope upgrade measures}
 }
 \value{
 a two row dataframe. The new EAC "new_cost"
@@ -65,9 +68,9 @@ Returns a 2 row dataframe with tech_new the existing tech or a heat pump. If the
 
 params <- scenario_params(sD,2026)
 
-optimise_upgrade(1.8,"gas",2005,"semi_detached",2,2003,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
+optimise_upgrade(1.8,"gas",2005,"semi_detached",2,2003,"Dublin",100,0.12,params,TRUE,FALSE,TRUE,NULL)
 
-optimise_upgrade(2.6,"gas",2010,"semi_detached",2,2003,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
+optimise_upgrade(2.6,"gas",2010,"semi_detached",2,2003,"Dublin",100,0.12,params,TRUE,FALSE,TRUE,NULL)
 
 optimise_upgrade(5,"gas",2010,"detached",2,2010,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
 optimise_upgrade(1.66,"gas",2010,"detached",2,2010,"Dublin",100,0.12,params,TRUE,FALSE,TRUE)
@@ -84,6 +87,6 @@ optimise_upgrade(1.39,"gas",2020,"detached",2,1990,"Munster",100,0.12,params,is_
 
 optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,0.16,params,is_fuel_allowance=TRUE,include_rebound=FALSE)
  optimise_upgrade(3.8,"heat_pump", 2003, "detached",2, 2003, "Munster", 300,0,params,is_fuel_allowance=TRUE,include_rebound=FALSE)
-optimise_upgrade(3.8,"wood", 2003, "detached",2, 2003, "Dublin", 240,0.12,params,is_fuel_allowance=TRUE,include_rebound=FALSE)
+optimise_upgrade(3.8,"wood", 2003, "detached",2, 2003, "Dublin", 240,0.12,params,is_fuel_allowance=FALSE,include_rebound=FALSE,TRUE,NULL)
 
 }

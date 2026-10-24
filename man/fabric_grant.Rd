@@ -17,7 +17,8 @@ fabric_grant(
   floor_area = 100,
   is_fuel_allowance = FALSE,
   params,
-  randomise = TRUE
+  randomise = TRUE,
+  grant_draw = NULL
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ fabric_grant(
 \item{params}{parameters}
 
 \item{randomise}{whether to assign grant elements randomly or not. Default TRUE, for testing set to FALSE}
+
+\item{grant_draw}{if NULL sample}
 }
 \value{
 list(scheme, grant)
@@ -71,5 +74,5 @@ fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_al
 
 fabric_grant(300,280,"gas","wood",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,params,randomise=TRUE)
 
-fabric_grant(175,155,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE)
+fabric_grant(175,155,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE,NULL)
 }

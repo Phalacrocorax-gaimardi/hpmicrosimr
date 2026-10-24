@@ -85,7 +85,7 @@ summarise_abm_cal <- function(abm, cal_date = "2025-11-01"){
   ##################################################
 
   eff <-  abm %>% dplyr::group_by(simulation,date) %>% dplyr::summarise(ber=mean(ber), hli=mean(hli))
-  eff1 <- abm %>% dplyr::filter(ber <= 125) %>% dplyr::group_by(simulation,date) %>% dplyr::summarise(n_b2 = dplyr::n())
+  eff1 <- abm %>% dplyr::filter(ber < 125) %>% dplyr::group_by(simulation,date) %>% dplyr::summarise(n_b2 = dplyr::n())
   eff <- eff %>% dplyr::inner_join(eff1) %>% dplyr::mutate(n_b2=tidyr::replace_na(n_b2,0))
   eff <- eff %>% dplyr::inner_join(df0) %>% dplyr::mutate(n_b2=n_b2/n0*housing_stock_oo) %>% dplyr::select(-n0)
   eff <- eff %>% dplyr::group_by(date) %>% dplyr::summarise(ber=round(mean(ber)),hli=mean(hli),n_b2=round(mean(n_b2)))
