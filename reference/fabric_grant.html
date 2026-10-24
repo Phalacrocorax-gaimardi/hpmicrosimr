@@ -20,7 +20,7 @@ fabric upgrade grant of euro700 is applied."><meta property="og:image" content="
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.93</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.94</span>
       </span>
     </div>
 
@@ -148,7 +148,6 @@ fabric upgrade grant of euro700 is applied.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2028</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">300</span>,<span class="fl">200</span>,<span class="st">"gas"</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, <span class="cn">FALSE</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "excluded measures external_wall_insulation, cavity_wall_insulation"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $scheme</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "BetterEnergyHomes"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -163,7 +162,6 @@ fabric upgrade grant of euro700 is applied.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">300</span>,<span class="fl">150</span>,<span class="st">"gas"</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, <span class="cn">FALSE</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "excluded measures internal_wall_insulation, cavity_wall_insulation"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $scheme</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "BetterEnergyHomes"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -178,7 +176,6 @@ fabric upgrade grant of euro700 is applied.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">300</span>,<span class="fl">100</span>,<span class="st">"gas"</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, <span class="cn">FALSE</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "excluded measures attic_insulation, external_wall_insulation, internal_wall_insulation, floor_insulation, windows"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $scheme</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "OSS"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -207,7 +204,6 @@ fabric upgrade grant of euro700 is applied.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">300</span>,<span class="fl">150</span>,<span class="st">"gas"</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "excluded measures cavity_wall_insulation, internal_wall_insulation"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $scheme</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "BetterEnergyHomes"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -222,7 +218,6 @@ fabric upgrade grant of euro700 is applied.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">300</span>,<span class="fl">280</span>,<span class="st">"gas"</span>,<span class="st">"wood"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "excluded measures internal_wall_insulation, cavity_wall_insulation"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $scheme</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "BetterEnergyHomes"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -237,7 +232,6 @@ fabric upgrade grant of euro700 is applied.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">fabric_grant</span><span class="op">(</span><span class="fl">175</span>,<span class="fl">155</span>,<span class="st">"gas"</span>,<span class="st">"gas"</span>,<span class="fl">2010</span>,<span class="fl">2003</span>,<span class="st">"Dublin"</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="fl">100</span>, is_fuel_allowance<span class="op">=</span><span class="cn">TRUE</span>,<span class="va">params</span>,randomise<span class="op">=</span><span class="cn">TRUE</span>,<span class="cn">NULL</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "excluded measures internal_wall_insulation, cavity_wall_insulation"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $scheme</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "BetterEnergyHomes"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
