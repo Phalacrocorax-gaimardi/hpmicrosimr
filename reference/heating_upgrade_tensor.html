@@ -30,7 +30,7 @@ Used with optimise_upgrade to determine the optimal upgrade path tech_old -&amp;
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.92</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.93</span>
       </span>
     </div>
 
@@ -93,7 +93,8 @@ Used with optimise_upgrade to determine the optimal upgrade path tech_old -&gt; 
 <span>  <span class="va">params</span>,</span>
 <span>  is_fuel_allowance <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  include_grants <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  include_rebound <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  include_rebound <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  grant_draw <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -160,6 +161,10 @@ Used with optimise_upgrade to determine the optimal upgrade path tech_old -&gt; 
 <dt id="arg-include-rebound">include_rebound<a class="anchor" aria-label="anchor" href="#arg-include-rebound"></a></dt>
 <dd><p>default FALSE</p></dd>
 
+
+<dt id="arg-grant-draw">grant_draw<a class="anchor" aria-label="anchor" href="#arg-grant-draw"></a></dt>
+<dd><p>If NULL select a random set of fabric grant upgrade measures</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -179,24 +184,28 @@ Used with optimise_upgrade to determine the optimal upgrade path tech_old -&gt; 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: upgrade_grant &lt;dbl&gt;, heat_pump_grant &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">heating_upgrade_tensor</span><span class="op">(</span><span class="fl">4</span>,<span class="fl">2</span>,<span class="st">"oil"</span>,<span class="fl">2000</span>,<span class="st">"heat_pump"</span>,<span class="st">"terraced"</span>,<span class="fl">2</span>,<span class="fl">1980</span>,<span class="st">"Munster"</span>,<span class="fl">90</span>,eta<span class="op">=</span><span class="fl">0.16</span>,<span class="va">params</span>,<span class="cn">FALSE</span>,<span class="cn">TRUE</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "excluded measures attic_insulation, internal_wall_insulation, external_wall_insulation, floor_insulation, "</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   new_cost old_cost savings upgrade_cost heating_sys_cost grant_type</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     <span style="text-decoration: underline;">6</span>078     <span style="text-decoration: underline;">3</span>649   0.666        <span style="text-decoration: underline;">20</span>331            <span style="text-decoration: underline;">12</span>078 OSS       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     <span style="text-decoration: underline;">5</span>900     <span style="text-decoration: underline;">3</span>649   0.617        <span style="text-decoration: underline;">20</span>331            <span style="text-decoration: underline;">12</span>078 OSS       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: upgrade_grant &lt;dbl&gt;, heat_pump_grant &lt;dbl&gt;</span></span>
 <span class="r-in"><span><span class="fu">heating_upgrade_tensor</span><span class="op">(</span><span class="fl">4</span>,<span class="fl">2</span>,<span class="st">"oil"</span>,<span class="fl">2000</span>,<span class="st">"heat_pump"</span>,<span class="st">"terraced"</span>,<span class="fl">2</span>,<span class="fl">1980</span>,<span class="st">"Munster"</span>,<span class="fl">90</span>,eta<span class="op">=</span><span class="fl">0</span>,<span class="va">params</span>,<span class="cn">FALSE</span>,<span class="cn">TRUE</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "excluded measures attic_insulation, external_wall_insulation, internal_wall_insulation, floor_insulation, windows"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   new_cost old_cost savings upgrade_cost heating_sys_cost grant_type</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     <span style="text-decoration: underline;">2</span>757     <span style="text-decoration: underline;">3</span>649  -<span style="color: #BB0000;">0.244</span>        <span style="text-decoration: underline;">20</span>331            <span style="text-decoration: underline;">12</span>078 OSS       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     <span style="text-decoration: underline;">2</span>962     <span style="text-decoration: underline;">3</span>649  -<span style="color: #BB0000;">0.188</span>        <span style="text-decoration: underline;">20</span>331            <span style="text-decoration: underline;">12</span>078 OSS       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: upgrade_grant &lt;dbl&gt;, heat_pump_grant &lt;dbl&gt;</span></span>
 <span class="r-in"><span><span class="fu">heating_upgrade_tensor</span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1.2</span>,<span class="st">"oil"</span>,<span class="fl">2000</span>,<span class="st">"heat_pump"</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>, <span class="fl">1980</span>,<span class="st">"Munster"</span>,<span class="fl">100</span>,eta<span class="op">=</span><span class="fl">0.12</span>,<span class="va">params</span>,<span class="cn">FALSE</span>,<span class="cn">TRUE</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "excluded measures attic_insulation, internal_wall_insulation, cavity_wall_insulation, floor_insulation, windows"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   new_cost old_cost savings upgrade_cost heating_sys_cost grant_type</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     <span style="text-decoration: underline;">6</span>644     <span style="text-decoration: underline;">2</span>098    2.17        <span style="text-decoration: underline;">29</span>942            <span style="text-decoration: underline;">10</span>265 OSS       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     <span style="text-decoration: underline;">6</span>220     <span style="text-decoration: underline;">2</span>098    1.97        <span style="text-decoration: underline;">29</span>942            <span style="text-decoration: underline;">10</span>265 OSS       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: upgrade_grant &lt;dbl&gt;, heat_pump_grant &lt;dbl&gt;</span></span>
 <span class="r-in"><span><span class="fu">heating_upgrade_tensor</span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1.2</span>,<span class="st">"gas"</span>,<span class="fl">2000</span>,<span class="st">"wood"</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>, <span class="fl">1980</span>,<span class="st">"Munster"</span>,<span class="fl">100</span>,eta<span class="op">=</span><span class="fl">0.12</span>,<span class="va">params</span>,<span class="cn">FALSE</span>,<span class="cn">TRUE</span>,include_rebound<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "excluded measures external_wall_insulation, cavity_wall_insulation"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   new_cost old_cost savings upgrade_cost heating_sys_cost grant_type       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
