@@ -18,7 +18,7 @@ Uses random forest"><meta property="og:image" content="https://phalacrocorax-gai
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.91</span>
       </span>
     </div>
 
@@ -74,30 +74,7 @@ Uses random forest</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">impute_hh_income</span><span class="op">(</span><span class="va">hp_survey_oo</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(serial)`</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(qh)`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 901 × 91</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Rowwise: </span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    serial    qa    qb actualage   qc1   qc2    qe    qf    q1    q2    q3    q4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     71     1     2        33     5     4     1     8     4     2     4     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     72     2     6        68     6     1     7     4     3     2     4     1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     74     1     2        31     6     1     1     7     2     2     3     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     75     1     4        47     6     1     2     7     1     2     3     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     76     1     6        65    24     2     6     6     2     2     4     1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     77     2     1        24     4     3     1     8     4     2     4     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     79     2     2        34     3     3     7     5     4     2     3     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     81     2     5        64     4     3     7     4     4     1     4     1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     82     2     4        46     5     4     2     6     4     1     3     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     83     2     6        70     6     1     6     3     1     1     2     1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 891 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 79 more variables: q5 &lt;dbl&gt;, q6 &lt;dbl&gt;, q7 &lt;dbl&gt;, q81 &lt;dbl&gt;, q82 &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   q83 &lt;dbl&gt;, q84 &lt;dbl&gt;, q85 &lt;dbl&gt;, q86 &lt;dbl&gt;, q87 &lt;dbl&gt;, q88 &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   q89 &lt;dbl&gt;, q9 &lt;dbl&gt;, q10 &lt;dbl&gt;, q11 &lt;dbl&gt;, q121 &lt;dbl&gt;, q122 &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   q123 &lt;dbl&gt;, q124 &lt;dbl&gt;, q125 &lt;dbl&gt;, q126 &lt;dbl&gt;, q127 &lt;dbl&gt;, q128 &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   q129 &lt;dbl&gt;, q13 &lt;dbl&gt;, q13n &lt;dbl&gt;, q14 &lt;dbl&gt;, q14n &lt;dbl&gt;, q15 &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   q15n &lt;dbl&gt;, q16 &lt;dbl&gt;, q16n &lt;dbl&gt;, q17 &lt;dbl&gt;, q17n &lt;dbl&gt;, q18 &lt;dbl&gt;, …</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu">impute_hh_income</span><span class="op">(</span><span class="va">hp_survey_oo</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </div>

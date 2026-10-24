@@ -17,7 +17,6 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/carbon_price_fun.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/crf.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/eac_weibull.html</loc></url>
-<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/ef_wood_fun.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/energy_price_fun.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/energy_prices.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/erv_weibull.html</loc></url>
@@ -28,7 +27,6 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/fast_params.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/fuel_allowance_eligibility.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/gen_ber_rating.html</loc></url>
-<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/gen_upgrade_cost_matrix.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/get_ber_score.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/grant_eligibility.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/heat_loss_indicator.html</loc></url>
@@ -70,8 +68,6 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/recode_fuels.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/recode_survey.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/retrofit_cost_model.html</loc></url>
-<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/retrofit_cost_model_esri.html</loc></url>
-<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/retrofit_cost_model_power.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/roundr.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/runABM.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/sD.html</loc></url>
