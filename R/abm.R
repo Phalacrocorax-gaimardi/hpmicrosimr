@@ -172,8 +172,11 @@ initialise_agents <- function(scen,yeartime=2015,cal_run=10){
   hp_surv <- hp_surv %>% dplyr::select(serial,qc2,q1,q2,construction_year,ber,hli,floor_area,primary_heat,heating_install_time,secondary_heat1,secondary_heat2,income,fuel_allowance)
   #if heating_install_year is later than yeartime look at earlier heating system installation, assuming the same technology was used,
   #unless it is a heat pump, in which case it is 50-50 oil gas at the moment.
-  hp_surv <- hp_surv %>% dplyr::rowwise() %>% dplyr::mutate(heating_install_time = ifelse(heating_install_time <= yeartime, heating_install_time,
-                      prior_install_year(heating_install_time,ifelse(primary_heat != "heat_pump",primary_heat,sample(c("oil","gas"),1)),initial_year=yeartime,params)))
+  hp_surv <- hp_surv %>% dplyr::rowwise() %>% dplyr::mutate(
+    prior_tech = if (heating_install_time > yeartime && primary_heat == "heat_pump") sample(c("oil","gas"),1) else primary_heat,
+    heating_install_time = ifelse(heating_install_time <= yeartime, heating_install_time,
+                                  prior_install_year(heating_install_time, prior_tech, initial_year=yeartime, params)),
+    primary_heat = prior_tech) %>% dplyr::select(-prior_tech)
   #ensure that prior install year cannot be older than construction year
   hp_surv <- hp_surv %>% dplyr::mutate(heating_install_time = pmax(construction_year,heating_install_time))
 
@@ -384,7 +387,7 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
   # households that reject efficiency upgrade because of insufficient reward financial relative to disruption
   ##############################################################################################
   print(paste(dim(b_s2 %>% dplyr::filter(eac_stick >= eac_old & eac_switch >= eac_old))[1],"upgrades rejected"))
-  b_s2 <- b_s2 %>% dplyr::filter(eac_stick < eac_old | eac_switch < eac_old) %>% dplyr::select(-eac_old)
+  b_s2 <- b_s2 %>% dplyr::filter(eac_stick < eac_old | eac_switch < eac_old) #%>% dplyr::select(-eac_old)
   #b_s2 %>% dplyr::select(tech,hli,hli_stick,hli_switch,eac_stick,eac_switch,savings)
     ################################################################
     # Efficiency upgrade where there is an existing heat pump
@@ -432,7 +435,7 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
    #adopters
    b_s2_nhp_switch <- b_s2_nhp %>% dplyr::filter(du_tot > 0)
    #non-adopters
-   b_s2_nhp_stick <- b_s2_nhp %>% dplyr::filter(is.na(du_tot) | du_tot <= 0)
+   b_s2_nhp_stick <- b_s2_nhp %>% dplyr::filter(is.na(du_tot) | du_tot <= 0) %>% dplyr::filter(eac_stick < eac_old)
    #clean up non-adopters e.g. remove redundant "switch" data
    b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::select(-du_fin,-du_social,-du_theta,-du_tot,-any_of("savings"))
    b_s2_nhp_stick <- b_s2_nhp_stick %>% dplyr::mutate(hli = hli_stick,eac = eac_stick,upgrade_cost=upgrade_cost_stick,
@@ -453,11 +456,8 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
   #combine all upgrades whether existing heat pump or not and update to the new kW installed capacities
   b_s2 <-  b_s2_hp %>% dplyr::bind_rows(b_s2_nhp) #%>% dplyr::mutate(kW=heating_system_size(ber*floor_area))
 
-  b_s2 <- b_s2 %>% dplyr::select(-any_of("savings")) %>% dplyr::select(!dplyr::matches("switch|stick"))
+  b_s2 <- b_s2 %>% dplyr::select(-any_of(c("savings","eac_old"))) %>% dplyr::select(!dplyr::matches("switch|stick"))
   if(nrow(b_s2) > 0 ) b_s2 <- b_s2 %>% dplyr::mutate(ber=ber_from_hli(hli,tech,heating_install_time,params))
-  #stopifnot(dim(b_s2_nhp)[1] + dim(b_s2_hp)[1] == dim(b_s2)[1])
-  #if(dim(b_s2_nhp)[1] != 0) stopifnot(dim(b_s2_nhp_stick)[1]+dim(b_s2_nhp_switch)[1] == dim(b_s2_nhp)[1])
-  #if(dim(b_s2_hp)[1] != 0) stopifnot(dim(b_s2_hp_stick)[1]+dim(b_s2_hp_switch)[1] == dim(b_s2_hp)[1])
 
   #combine == dim(b_s2)[1])
   ##################################
@@ -479,8 +479,10 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
   ma <- igraph::as_adjacency_matrix(social_network)
   g <- social_network %>% tidygraph::activate(nodes) %>% dplyr::left_join(a_s,by="serial")
   #social network conformity effect
-  adopter_nodes <- igraph::V(g)$adopt==TRUE
-  a_s$q52 <- as.numeric(ma %*% adopter_nodes) #social reinforcement 0 no adoption 1 adoption
+  adopter_nodes <- igraph::V(g)$adopt %in% TRUE
+  q52_graph <- as.numeric(ma %*% adopter_nodes)
+  a_s$q52 <- q52_graph[match(a_s$serial, igraph::V(g)$serial)]
+  #a_s$q52 <- as.numeric(ma %*% adopter_nodes) #social reinforcement 0 no adoption 1 adoption
   if(ignore_social) a_s$q52 <- 0 #no adopters assumed present in local network: next line adds 1
   a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(q52 = min(q52+1,4)) #update q52 encoding 1,2,3,4
   #update eac_actual and kW

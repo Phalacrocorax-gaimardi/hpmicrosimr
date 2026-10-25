@@ -11,7 +11,8 @@
 #' @return a tidygraph object
 #' @export
 #' @importFrom magrittr %>%
-#' @examples make_artificial_society(hp_society_oo,homophily,nu=4.5)
+#' @examples
+#' make_artificial_society(hp_society_oo,homophily,nu=4.5)
 make_artificial_society <- function(society=society,homophily=homophily,nu=4.5){
   #create a random homophilous social network
   #social distance measure=gower distance
@@ -33,7 +34,11 @@ make_artificial_society <- function(society=society,homophily=homophily,nu=4.5){
   zeronodes <- dplyr::filter(society,degree==0)$serial #nodes with no influencers
   stopifnot(N_society1+length(zeronodes) == dim(society)[1])
 
-  dist_mat <- cluster::daisy(society_factor1[,seq(2,dim(society)[2])], metric ="gower", weights=homophily$weights) %>% as.matrix()
+  #dist_mat <- cluster::daisy(society_factor1[,seq(2,dim(society)[2])], metric ="gower", weights=homophily$weights[match(names(x), homophily$variable)]) %>% as.matrix()
+  dist_data <- society_factor1[, seq(2, dim(society)[2])]
+  w <- homophily$weights[match(names(dist_data), homophily$variable)]
+  stopifnot(!anyNA(w))
+  dist_mat <- cluster::daisy(dist_data, metric = "gower", weights = w) %>% as.matrix()
   prob_mat <- (1-dist_mat)^nu
   prob_mat1 <- 1.1*prob_mat %*% diag(society_factor1$degree/apply(prob_mat,2,sum)) #adjust this parameter
 
