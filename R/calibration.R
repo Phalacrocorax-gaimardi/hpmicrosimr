@@ -87,7 +87,7 @@ cal_summary <- function(abm, cal_params, cal_date = "2025-11-01", start_date = "
   start_d <- lubridate::ymd(start_date)
   cal_dates <- c(start_d, lubridate::ymd("2021-01-01"), cal_d) #two dates for calibration plus the start date
 
-  test <- summarise_abm_cal(abm, cal_date)
+  test <- summarise_abm_cal2(abm, cal_date)
 
   heat_pumps <- test$tech %>% dplyr::filter(date %in% cal_dates, tech == "heat_pump") %>% dplyr::ungroup() %>%
     dplyr::select(date, n_heat_pump = n_tech)
