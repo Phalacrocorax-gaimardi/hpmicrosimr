@@ -1,3 +1,181 @@
+
+#' @title calABM
+#'
+#' @description
+#' macro-calibration of hpmicrosimr. Replicates run on a doParallel cluster (works on Windows) or serially.\cr
+#' \cr
+#' based on heat pump uptake, grant uptake and number of b2s on 1 nov 2025\cr
+#' \cr
+#' The output is the same for parallel and serial runs. See also calABM2, which uses forking on linux systems.
+#'
+#' @param sD base scenario (historical)
+#' @param Nrun number of runs
+#' @param n_unused_cores unsued cores default 2
+#' @param use_parallel TRUE or FALSE
+#' @param nu financial utility scale (drawn from financial_utility_scale)
+#' @param p upgrade rate parameter default
+#' @param r risk neutral rate
+#' @param beta present bias
+#' @param eta OSS sludge/hassle
+#' @param tau sludge (transaction cost)
+#' @param lambda hypothetical bias adjustment
+#' @param rho rebound
+#' @param quiet TRUE to suppress messages (default)
+#'
+#' @returns a list with components parameters (calibration targets), efficiency and grants
+#' @export
+#'
+#' @examples
+#'
+#' #test <- calABM(sD,4,2,T)
+
+calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,r=0.03,beta=0.8,eta=0.02,tau=0.02,lambda=0,rho=0.3,quiet=TRUE){
+
+  cal_values <- c("nu."=nu,"p."=p,"r."=r,"beta."=beta,"eta."=eta,"tau."=tau,"lambda."=lambda,"rho."=rho)
+  run_calibration(sD, Nrun, backend = if(use_parallel) "foreach" else "serial", n_unused_cores, cal_values, quiet)
+}
+
+
+#' calABM2
+#'
+#' macro-calibration of hpmicrosimr using mclapply on linux systems (on Windows it falls back to calABM's backend)\cr
+#'\cr
+#' returns the same calibration data as calABM. The hypothetical bias parameter lambda. is left at its value in sD.
+#'
+#' @param sD base scenario (historical)
+#' @param Nrun number of runs
+#' @param n_unused_cores unsued cores default 2
+#' @param use_parallel TRUE or FALSE
+#' @param nu financial utility scale factor
+#' @param p rate parameter
+#' @param beta present bias
+#' @param r finance rate
+#' @param eta disruption
+#' @param tau sludge
+#' @param rho rebound
+#' @param quiet TRUE to suppress messages (default)
+#'
+#' @returns a list with components parameters (calibration targets), efficiency and grants
+#' @export
+#'
+#' @examples
+#' #test <- calABM2(sD,2,2,F)
+
+calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.4,p=0.004,beta=0.8,r=0.03,eta=0.03,tau=0.02,rho=0.3,quiet=TRUE){
+
+  cal_values <- c("nu."=nu,"p."=p,"r."=r,"beta."=beta,"eta."=eta,"tau."=tau,"rho."=rho)
+  run_calibration(sD, Nrun, backend = if(use_parallel) "mclapply" else "serial", n_unused_cores, cal_values, quiet)
+}
+
+#calABM(sD,10,beta=params$beta.,lambda=params$lambda.,p=params$p.,nu=params$nu.,rho=params$rho.,r.=params$r.)
+
+#' cal_summary
+#'
+#' Reduces ABM output to the macro-calibration targets: heat pump uptake, B2 counts, grant numbers and grant
+#' costs between start_date and cal_date. Used by calABM and calABM2.
+#'
+#' @param abm ABM output, a dataframe with columns date and simulation (e.g. from run_replicates)
+#' @param cal_params one row tibble of the calibration parameters, returned as the first columns of \code{parameters}
+#' @param cal_date calibration date
+#' @param start_date start of the calibration period
+#'
+#' @returns a list with components parameters (the calibration targets), efficiency and grants
+#' @noRd
+cal_summary <- function(abm, cal_params, cal_date = "2025-11-01", start_date = "2015-01-01"){
+
+  cal_d <- lubridate::ymd(cal_date)
+  start_d <- lubridate::ymd(start_date)
+  cal_dates <- c(start_d, lubridate::ymd("2021-01-01"), cal_d) #two dates for calibration plus the start date
+
+  test <- summarise_abm_cal(abm, cal_date)
+
+  heat_pumps <- test$tech %>% dplyr::filter(date %in% cal_dates, tech == "heat_pump") %>% dplyr::ungroup() %>%
+    dplyr::select(date, n_heat_pump = n_tech)
+  efficiencies <- test$efficiency %>% dplyr::filter(date %in% cal_dates) %>% dplyr::ungroup() %>%
+    dplyr::inner_join(heat_pumps, by = "date")
+  grants <- test$grants %>% dplyr::filter(date %in% cal_dates)
+
+  #a missing date or scheme would otherwise silently give a zero-row result, so insist on exactly one value
+  one <- function(x, what){
+    if(length(x) != 1) stop("cal_summary: expected one value for ", what, " but found ", length(x))
+    x
+  }
+  hp_at <- function(d){
+    x <- test$tech %>% dplyr::filter(date == d, tech == "heat_pump")
+    one(x[["n_tech"]], paste("heat pumps at", d))
+  }
+  grant_at <- function(scheme, col){
+    x <- test$grants %>% dplyr::filter(date == cal_d, grant_type == scheme)
+    one(x[[col]], paste(col, "for", scheme))
+  }
+  eff_at <- function(d, col){
+    x <- test$efficiency %>% dplyr::filter(date == d)
+    one(x[[col]], paste(col, "at", d))
+  }
+
+  n_heat_pump <- hp_at(cal_d)
+  n_heat_pump_0 <- hp_at(start_d)
+  n_b2 <- eff_at(cal_d, "n_b2")
+  n_b2_0 <- eff_at(start_d, "n_b2")
+  #NB: n_fabric_total has always reported n_b2 at cal_date. The cumulative number of fabric upgrades is
+  #eff_at(cal_d, "n_upgrade"), which may be what was intended.
+  n_fabric_total <- n_b2
+
+  cals <- cal_params %>% dplyr::bind_cols(tibble::tibble(
+    n_heat = n_heat_pump - n_heat_pump_0, n_heat_2015 = n_heat_pump_0,
+    number_b2 = n_b2 - n_b2_0, number_b2_2015 = n_b2_0,
+    oss_total = grant_at("OSS", "grants_Meuro"),
+    warmerhomes_total = grant_at("WarmerHomes", "grants_Meuro"),
+    betterenergy_total = grant_at("BetterEnergyHomes", "grants_Meuro"),
+    n_oss = grant_at("OSS", "n_grant"),
+    n_warmerhomes = grant_at("WarmerHomes", "n_grant"),
+    n_betterenergy = grant_at("BetterEnergyHomes", "n_grant"),
+    n_fabric_total = n_fabric_total))
+
+  list(parameters = cals, efficiency = efficiencies, grants = grants)
+}
+
+
+#' run_calibration
+#'
+#' Common engine of calABM and calABM2: sets the calibration parameters in the scenario, runs the 2015-2025
+#' replicates on the chosen backend and summarises the calibration targets.
+#'
+#' @param sD base scenario (historical)
+#' @param Nrun number of runs
+#' @param backend "foreach", "mclapply" or "serial", see run_replicates
+#' @param n_unused_cores unused cores
+#' @param cal_values named numeric vector of calibration parameters, names as in sD e.g. "nu." and "p."
+#' @param quiet TRUE to suppress messages
+#'
+#' @returns list(parameters, efficiency, grants) from calibration_summary
+#' @noRd
+run_calibration <- function(sD, Nrun, backend, n_unused_cores, cal_values, quiet = TRUE){
+
+  year_zero <- 2015
+  simulation_end <- 2025
+  sD_cal <- sD
+  for(nm in names(cal_values)){
+    stopifnot(any(sD_cal$parameter == nm))
+    sD_cal$value[sD_cal$parameter == nm] <- cal_values[[nm]]
+  }
+  print(paste(paste0(names(cal_values), "=", cal_values), collapse = ", "))
+
+  seeds <- sample.int(.Machine$integer.max, Nrun)
+  one_run <- function(j){
+    set.seed(seeds[j])
+    run_single(j, sD_cal, year_zero, simulation_end, resample_society = FALSE, ignore_social = FALSE, quiet = quiet)
+  }
+  abm <- run_replicates(Nrun, one_run, backend = backend, n_unused_cores = n_unused_cores)
+  abm <- abm %>% dplyr::arrange(simulation, date)
+
+  cal_params <- tibble::as_tibble(as.list(cal_values[c("beta.", "eta.", "p.", "nu.", "rho.", "r.")]))
+  cal_summary(abm, cal_params)
+}
+
+
+
+
 #analysis functions for ABM output
 
 #' summarise_abm_cal
@@ -24,7 +202,7 @@ summarise_abm_cal <- function(abm, cal_date = "2025-11-01"){
   ###############
   # installed tech
   ################
-  ntech <-  abm %>% dplyr::group_by(simulation,date,tech) %>% dplyr::summarise(n_tech=dplyr::n(),ber=mean(ber), hli=mean(hli),n_b2=sum(ber < 125))
+  ntech <-  abm %>% dplyr::group_by(simulation,date,tech) %>% dplyr::summarise(n_tech=dplyr::n(),n_b2=sum(ber < 125),ber=mean(ber), hli=mean(hli))
   ntech <- ntech %>% dplyr::inner_join(df0) %>% dplyr::mutate(n_tech=n_tech/n0*housing_stock_oo,n_b2=n_b2/n0*housing_stock_oo) %>% dplyr::select(-n0)
   ntech <- ntech %>% dplyr::group_by(tech,date) %>% dplyr::summarise(n_tech=round(mean(n_tech)),ber=mean(ber),hli=mean(hli),n_b2=round(mean(n_b2)))
 
@@ -157,9 +335,9 @@ summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
     dplyr::group_by(simulation, date, tech) %>%
     dplyr::summarise(
       n_tech = dplyr::n(),
+      n_b2 = sum(ber < 125),
       ber = mean(ber),
       hli = mean(hli),
-      n_b2 = sum(ber < 125),
       .groups = "drop"
     ) %>%
     tidyr::complete(
@@ -296,9 +474,9 @@ summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
   eff <- abm %>%
     dplyr::group_by(simulation, date) %>%
     dplyr::summarise(
+      n_b2 = sum(ber < 125),
       ber = mean(ber),
       hli = mean(hli),
-      n_b2 = sum(ber < 125),
       .groups = "drop"
     ) %>%
     dplyr::inner_join(df0, by = "simulation") %>%
