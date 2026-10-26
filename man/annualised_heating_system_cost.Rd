@@ -14,6 +14,7 @@ annualised_heating_system_cost(
   construction_year,
   params,
   grant_type,
+  oss_heat_draw = NULL,
   include_rebound = FALSE
 )
 }
@@ -35,6 +36,8 @@ annualised_heating_system_cost(
 \item{params}{parameter values at yeartime}
 
 \item{grant_type}{one of "OSS","BetterEnergyHomes", "None"}
+
+\item{oss_heat_draw}{NULL,0,1}
 
 \item{include_rebound}{default FALSE}
 }

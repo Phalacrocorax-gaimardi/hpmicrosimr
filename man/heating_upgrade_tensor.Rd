@@ -20,7 +20,8 @@ heating_upgrade_tensor(
   is_fuel_allowance = FALSE,
   include_grants = TRUE,
   include_rebound = FALSE,
-  grant_draw = NULL
+  grant_draw = NULL,
+  oss_heat_draw = NULL
 )
 }
 \arguments{
@@ -55,6 +56,8 @@ heating_upgrade_tensor(
 \item{include_rebound}{default FALSE}
 
 \item{grant_draw}{If NULL select a random set of fabric grant upgrade measures}
+
+\item{oss_heat_draw}{if NULL randomly select whether the OSS central heating measure applies}
 }
 \value{
 list
@@ -79,7 +82,7 @@ Used with optimise_upgrade to determine the optimal upgrade path tech_old -> tec
 
 params <- scenario_params(sD,2028)
 
-heating_upgrade_tensor(2.31,2.31,"gas",2005,"gas","semi_detached",2,1990,"Dublin",100,eta=0.16,params,FALSE,TRUE)
+heating_upgrade_tensor(2.31,2.31,"gas",2005,"gas","semi_detached",2,1990,"Dublin",100,eta=0.16,params,FALSE,TRUE,FALSE,grant_draw=NULL,oss_heat_draw = NULL)
 
 heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0.16,params,FALSE,TRUE,include_rebound=FALSE)
 heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0,params,FALSE,TRUE,include_rebound=FALSE)

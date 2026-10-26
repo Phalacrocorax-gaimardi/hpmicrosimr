@@ -9,6 +9,7 @@ heat_pump_grant(
   house_type,
   construction_year,
   grant_type,
+  oss_heat_draw = NULL,
   params
 )
 }
@@ -20,6 +21,8 @@ heat_pump_grant(
 \item{construction_year}{year}
 
 \item{grant_type}{one of "None","BetterEnergyHomes","OSS","WarmerHomes"}
+
+\item{oss_heat_draw}{if NULL makes a random heat pump central heating measure draw for OSS}
 
 \item{params}{current parameters}
 }
@@ -36,13 +39,13 @@ for WarmerHomes, it is assumed that the grant covers heat pumps after 1 jan 2025
 }
 \examples{
 params <- scenario_params(sD,2025)
-heat_pump_grant("new","apartment",2003,"WarmerHomes",params)
+heat_pump_grant("new","apartment",2003,"WarmerHomes",NULL,params)
 
-heat_pump_grant("new","apartment",2003,"BetterEnergyHomes",params)
+heat_pump_grant("new","apartment",2003,"BetterEnergyHomes",NULL,params)
 
 
-heat_pump_grant("new","semi_detached",1997,"OSS",params)
-heat_pump_grant("new","semi_detached",1997,"BetterEnergyHomes",params)
-heat_pump_grant("new","semi_detached",1997,"none",params)
-heat_pump_grant("new","detached",2003,"BetterEnergyHomes",params)
+heat_pump_grant("new","semi_detached",1997,"OSS",0,params)
+heat_pump_grant("new","semi_detached",1997,"BetterEnergyHomes",0,params)
+heat_pump_grant("new","semi_detached",1997,"OSS",1,params)
+heat_pump_grant("new","detached",2003,"BetterEnergyHomes",NULL,params)
 }

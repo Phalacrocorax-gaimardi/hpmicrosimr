@@ -11,6 +11,7 @@ heating_system_capital_cost(
   house_type,
   construction_year,
   grant_type,
+  oss_heat_draw = NULL,
   params,
   include_vat = TRUE
 )
@@ -28,6 +29,8 @@ heating_system_capital_cost(
 
 \item{grant_type}{choose "None" to exclude grant e.g. because HLI > threshold}
 
+\item{oss_heat_draw}{If NULL select central heating grant with 1/2 probability. Otherwise 0 = absent measure.}
+
 \item{params}{scenario params}
 
 \item{include_vat}{TRUE/FALSE}
@@ -38,24 +41,23 @@ a list showing actual cost, grant and cost after grant
 \description{
 The cost of a new heating system ine euros. Includes VAT using the "two-thirds" rule.
 \cr
-Costs depends on installation time. This set from params$yeartime.
+Costs depends on installation time. This set from yeartime.
 \cr
 This functions assumed that ancilliary cost component is halved if the technology is unchanged ie. "swap" vs "new" where swap means that the existing technology is retained.
 \cr
 }
 \examples{
 params <- scenario_params(sD,2026)
-replicate(100,heating_system_capital_cost("heat_pump",13,installation_type="new","detached",2003,"OSS",params)$cost_after_grant) \%>\% table()
 
-heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"BetterEnergyHomes",params)
+heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"BetterEnergyHomes",oss_heat_draw=NULL,params)
 
-heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"WarmerHomes",scenario_params(sD,2026),include_vat = TRUE)
+heating_system_capital_cost("heat_pump",18,installation_type="new","detached",2003,"WarmerHomes",oss_heat_draw=NULL,scenario_params(sD,2026),include_vat = TRUE)
 #
-heating_system_capital_cost("heat_pump",5,installation_type="new","detached",2003,"OSS",scenario_params(sD,2026),include_vat = TRUE)
+heating_system_capital_cost("heat_pump",5,installation_type="new","detached",2003,"OSS",oss_heat_draw=NULL,scenario_params(sD,2026),include_vat = TRUE)
 params$oil_boiler_ban <- 2030
 params$yeartime <- 2035
-heating_system_capital_cost("gas",8,installation_type="new","detached",2003,"OSS",params,include_vat = TRUE)
-heating_system_capital_cost("heat_pump",5,installation_type="new","detached",2003,"None",params,include_vat = TRUE)
-heating_system_capital_cost("oil",5,installation_type="new","detached",2003,"None",params,include_vat = TRUE)
-heating_system_capital_cost("wood",5,installation_type="new","detached",2003,"None",params,include_vat = TRUE)
+heating_system_capital_cost("gas",8,installation_type="new","detached",2003,"OSS",oss_heat_draw=NULL,params,include_vat = TRUE)
+heating_system_capital_cost("heat_pump",5,installation_type="new","detached",2003,"OSS",NULL,params,include_vat = TRUE)
+heating_system_capital_cost("oil",5,installation_type="new","detached",2003,"None",NULL,params,include_vat = TRUE)
+heating_system_capital_cost("wood",5,installation_type="new","detached",2003,"None",NULL,params,include_vat = TRUE)
 }

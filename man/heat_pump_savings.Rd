@@ -14,7 +14,8 @@ heat_pump_savings(
   region,
   floor_area,
   eta,
-  params
+  params,
+  oss_heat_draw = NULL
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ heat_pump_savings(
 \item{eta}{disruption parameter}
 
 \item{params}{current parameter values}
+
+\item{oss_heat_draw}{If NULL random}
 }
 \value{
 one row dataframe
