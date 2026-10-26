@@ -370,7 +370,7 @@ retrofit_cost_model <- function(hli_old,hli_new,house_type,storeys,region="Dubli
 #' heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0,params,FALSE,TRUE,include_rebound=FALSE)
 
 #' heating_upgrade_tensor(2,1.2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)
-#' heating_upgrade_tensor(2,1.2,"gas",2000,"wood","semi_detached",2, 1980,"Munster",100,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)
+#' heating_upgrade_tensor(1.8,1.8,"heat_pump",installation_time=2012,"gas","semi_detached",2, construction_year=2012,"Munster",100,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)
 
 #' ber_from_hli(1.27,"gas",params$yeartime,params)
 
@@ -429,7 +429,10 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
    hli_threshold <- ifelse(params$yeartime < params$hli_heat_pump_threshold_increase_date,params$hli_heat_pump_threshold,
                            params$hli_heat_pump_threshold_increase_value)
 
-   heat_grant_type <- if(tech_old=="heat_pump"| hli_new > hli_threshold | tech_new != "heat_pump" | !include_grants) {"None"} else {grant_type}
+   #heat_grant_type <- if(tech_old=="heat_pump"| hli_new > hli_threshold | tech_new != "heat_pump" | !include_grants) {"None"} else {grant_type}
+   hp_scheme <- if(grant_type == "None" && construction_year <= 2020 && params$yeartime >= params$better_energy_introduction) "BetterEnergyHomes" else grant_type
+   heat_grant_type <- if(tech_old=="heat_pump"| hli_new > hli_threshold | tech_new != "heat_pump" | !include_grants) {"None"} else {hp_scheme}
+
    hc <- heating_system_capital_cost(tech_new,kW_new,installation_type,house_type,construction_year,heat_grant_type,params,include_vat = TRUE)
    heating_sys_cost <- hc$cost
    heat_grant <- hc$grant
@@ -454,6 +457,7 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
    #print(new_annualised_cost)
    #print(paste("heat pump grant=",hp_grant,"heat_eac=",round(new_heat_annualised_cost),"upgrade eac=",round(hli_upgrade_annualised_capex)))
   #c("old"=old_annualised_cost, "new"=new_annualised_cost, "loss_or_gain"=new_annualised_cost-old_annualised_cost)
+   if(heat_grant > 0 && grant_type == "None") grant_type <- heat_grant_type
   if(heat_grant==0 & hli_upgrade_grant==0) grant_type <- "None"
   res <- list("new_cost"=round(as.numeric(new_annualised_cost)),"old_cost"=round(as.numeric(old_annualised_cost)),"savings"= (new_annualised_cost/old_annualised_cost-1), "upgrade_cost"=round(as.numeric(hli_upgrade_capex)),"heating_sys_cost"=round(heating_sys_cost),"grant_type"=grant_type,"upgrade_grant"=round(as.numeric(hli_upgrade_grant)),"heat_pump_grant"=round(as.numeric(heat_grant)))
   return(res %>% tibble::as_tibble())

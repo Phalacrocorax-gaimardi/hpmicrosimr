@@ -143,7 +143,15 @@ fast_params <- function(params_long){
 
 #' initialise_agents
 #'
-#' creates the agent initial state including model weights, stochastically imputed ground floor areas
+#' \code{initialise_agents()} creates the initial agent state required for a simulation run. It describes a population of about 800 owner-occupier agents at the beginning
+#' of 2015.
+#'
+#' \code{initialise_agents()} returns the model weights (random draw), and imputed values of missing data. Housing units built after 2015 are
+#' omitted. Where a house with \code{construction_year} earlier than 2015 but \code{heating_installation_time} greater than 2015, an earlier heating system
+#' of the same type with installation time generated from a Weibull failure model is generated. However, of the heating type is \code{heat_pump}, it is assumed
+#' that the earlier system was a \code{gas} pr \code{oil}. As a result of these assumptions, the starting share of heat pumps in 2015 is about 0.7\%.\cr
+#' \cr
+#'
 #'
 #'
 #' @param scen scenario (usable_roof_fraction only)
@@ -221,6 +229,20 @@ initialise_agents <- function(scen,yeartime=2015,cal_run=10){
 #'
 #' The workhorse ABM function.Within a scenario, does a single month update of the agent characteristics. A random sample of agents evaluates their economic and social
 #' utilities. If these exceed their individual threshold an optimal PV_BESS system is adopted.
+#'
+#' Some specific modelling choices are made. (1) heating system failures trigger and immediate heating system replacement but
+#' do not trigger a building envelope (fabric) upgrade.A heat pump may be adopted at this stage if the financial benefit relation
+#' to retention of an updted version of the current technology overcomes the behavioural barrier. (2) an overall building heat efficiency upgrade
+#' decision chooses between the optimal fabric upgrade with replacement of the current heating system using the same technology, or the optimal
+#' upgrade with a heat pump, including the effects of all grants. The current heating unit is alwasy replaced in an efficiency upgrade, irrespective of its installation date. The logic here is that
+#' the current system is unlikely to be correctly sized following a building fabric upgrade. The remaing value of a younger heating system is not currnetly
+#' included as a cost (e.g. using \code{erv_weibull()} but this could be added) If the equivalent annual cost (EAC) of either decision is higher than the current EAC
+#' then an upgrade is rejected. The EACs include the disruption and sludge transaction costs. A subtlety arises when \eqn{EAC_{heat pump} < EAC_{old}} but the current tech
+#' and \eqn{EAC_{current tech} > EAC_{old}}. In this case, a heat pump may still be rejected if the (technology risk-aversion) barrier leads to negative utility. In this case the outcome
+#' is that an efficiency upgrade is rejected.
+#'
+#'
+#'
 #'
 #'
 #' @param scen  scenario dataframe

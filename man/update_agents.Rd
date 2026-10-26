@@ -38,6 +38,17 @@ micro-simulation time-step updater
 \details{
 The workhorse ABM function.Within a scenario, does a single month update of the agent characteristics. A random sample of agents evaluates their economic and social
 utilities. If these exceed their individual threshold an optimal PV_BESS system is adopted.
+
+Some specific modelling choices are made. (1) heating system failures trigger and immediate heating system replacement but
+do not trigger a building envelope (fabric) upgrade.A heat pump may be adopted at this stage if the financial benefit relation
+to retention of an updted version of the current technology overcomes the behavioural barrier. (2) an overall building heat efficiency upgrade
+decision chooses between the optimal fabric upgrade with replacement of the current heating system using the same technology, or the optimal
+upgrade with a heat pump, including the effects of all grants. The current heating unit is alwasy replaced in an efficiency upgrade, irrespective of its installation date. The logic here is that
+the current system is unlikely to be correctly sized following a building fabric upgrade. The remaing value of a younger heating system is not currnetly
+included as a cost (e.g. using \code{erv_weibull()} but this could be added) If the equivalent annual cost (EAC) of either decision is higher than the current EAC
+then an upgrade is rejected. The EACs include the disruption and sludge transaction costs. A subtlety arises when \eqn{EAC_{heat pump} < EAC_{old}} but the current tech
+and \eqn{EAC_{current tech} > EAC_{old}}. In this case, a heat pump may still be rejected if the (technology risk-aversion) barrier leads to negative utility. In this case the outcome
+is that an efficiency upgrade is rejected.
 }
 \examples{
 

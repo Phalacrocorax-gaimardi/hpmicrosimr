@@ -84,6 +84,6 @@ heating_upgrade_tensor(2.31,2.31,"gas",2005,"gas","semi_detached",2,1990,"Dublin
 heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0.16,params,FALSE,TRUE,include_rebound=FALSE)
 heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0,params,FALSE,TRUE,include_rebound=FALSE)
 heating_upgrade_tensor(2,1.2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)
-heating_upgrade_tensor(2,1.2,"gas",2000,"wood","semi_detached",2, 1980,"Munster",100,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)
+heating_upgrade_tensor(1.8,1.8,"heat_pump",installation_time=2012,"gas","semi_detached",2, construction_year=2012,"Munster",100,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)
 ber_from_hli(1.27,"gas",params$yeartime,params)
 }

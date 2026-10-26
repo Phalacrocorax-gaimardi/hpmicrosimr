@@ -17,7 +17,15 @@ initialise_agents(scen, yeartime = 2015, cal_run = 10)
 a dataframe with columns
 }
 \description{
-creates the agent initial state including model weights, stochastically imputed ground floor areas
+\code{initialise_agents()} creates the initial agent state required for a simulation run. It describes a population of about 800 owner-occupier agents at the beginning
+of 2015.
+}
+\details{
+\code{initialise_agents()} returns the model weights (random draw), and imputed values of missing data. Housing units built after 2015 are
+omitted. Where a house with \code{construction_year} earlier than 2015 but \code{heating_installation_time} greater than 2015, an earlier heating system
+of the same type with installation time generated from a Weibull failure model is generated. However, of the heating type is \code{heat_pump}, it is assumed
+that the earlier system was a \code{gas} pr \code{oil}. As a result of these assumptions, the starting share of heat pumps in 2015 is about 0.7\%.\cr
+\cr
 }
 \examples{
 

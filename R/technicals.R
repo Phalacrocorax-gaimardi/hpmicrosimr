@@ -273,6 +273,8 @@ recode_survey <- function(hp_data_in){
   params <- scenario_params(sD,2024.5)
   hp_data_out <- hp_data_in %>% type.convert(as.is=TRUE)
   codes <- names(hp_data_out)
+  #recode income
+  if("qh" %in% codes) hp_data_out <- impute_hh_income(hp_data_out)
   #
   for(q_code in c("q6","qc2","q1")){
     if(!(q_code %in% codes)) next
@@ -302,8 +304,6 @@ recode_survey <- function(hp_data_in){
   #total floor area replaces ground floor area
   hp_data_out <- hp_data_out %>% dplyr::rowwise() %>%  dplyr::mutate(floor_area=q2*impute_floor_area(q1,q2,qc2,q5,q3)) %>% dplyr::select(-q6_b)
 
-  #recode income
-  if("qh" %in% codes) hp_data_out <- impute_hh_income(hp_data_out)
   #recode construction year to year value
   if("q5" %in% codes) hp_data_out <- hp_data_out %>% dplyr::rowwise() %>% dplyr::mutate(construction_year=recode_construction_year(q5))
   #heating system installation year
@@ -354,12 +354,13 @@ impute_hh_income <- function(hp_data_in) {
   # Run once during development to save the model artifact:
   #saveRDS(rf, "inst/extdata/rf_income_model.rds")
   #rf$r.squared
-
   #pre-trained ranger model from package internal files
   model_path <- system.file("extdata", "rf_income_model.rds", package = "hpmicrosimr")
   rf_model <- readRDS(model_path)
-  #zet_survey <- readr::read_csv("inst/extdata/zet_survey.csv")
-  #rows needing income imputation (qh == 12)
+  #check types
+  vars <- rf_model$forest$independent.variable.names
+  stopifnot(all(vars %in% names(hp_data_in)), all(vapply(hp_data_in[vars], is.numeric, logical(1))))
+
   needs_impute <- hp_data_in$qh == 12
 
   if (any(needs_impute)) {
