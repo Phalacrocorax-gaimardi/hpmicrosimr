@@ -23,7 +23,7 @@ The discount rate set from calibration (params$r.). A present bias (above a cape
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.98</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.99</span>
       </span>
     </div>
 
@@ -74,7 +74,8 @@ The discount rate set from calibration (params$r.). A present bias (above a cape
 <span>  <span class="va">house_type</span>,</span>
 <span>  <span class="va">construction_year</span>,</span>
 <span>  <span class="va">params</span>,</span>
-<span>  <span class="va">grant_type</span></span>
+<span>  <span class="va">grant_type</span>,</span>
+<span>  <span class="va">oss_heat_draw</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -113,6 +114,10 @@ The discount rate set from calibration (params$r.). A present bias (above a cape
 <dt id="arg-grant-type">grant_type<a class="anchor" aria-label="anchor" href="#arg-grant-type"></a></dt>
 <dd><p>grant type</p></dd>
 
+
+<dt id="arg-oss-heat-draw">oss_heat_draw<a class="anchor" aria-label="anchor" href="#arg-oss-heat-draw"></a></dt>
+<dd><p>NULL if random 0,1</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -129,14 +134,14 @@ The discount rate set from calibration (params$r.). A present bias (above a cape
 <span class="r-out co"><span class="r-pr">#&gt;</span> [25]  254.32637  193.90265  144.60168  105.38642   74.99670   52.06794</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [31]   35.23661</span>
 <span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2026</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span><span class="fl">100</span>,<span class="fu">annualised_capex</span><span class="op">(</span><span class="st">"heat_pump"</span>,<span class="fl">13</span>,<span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="st">"detached"</span>,<span class="fl">2003</span>,<span class="va">params</span>,<span class="st">"None"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span><span class="fl">100</span>,<span class="fu">annualised_capex</span><span class="op">(</span><span class="st">"heat_pump"</span>,<span class="fl">13</span>,<span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="st">"detached"</span>,<span class="fl">2003</span>,<span class="va">params</span>,<span class="st">"None"</span>,oss_heat_draw<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> .</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2345.09811106006 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              100 </span>
 <span class="r-in"><span><span class="va">params</span><span class="op">$</span><span class="va">beta.</span> <span class="op">&lt;-</span> <span class="fl">0.5</span></span></span>
-<span class="r-in"><span><span class="fu">annualised_capex</span><span class="op">(</span><span class="st">"gas"</span>,<span class="fl">8</span>,<span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="st">"detached"</span>,<span class="fl">2003</span>,<span class="va">params</span>,<span class="st">"None"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 289.1995</span>
-<span class="r-in"><span><span class="fu">annualised_capex</span><span class="op">(</span><span class="st">"heat_pump"</span>,<span class="fl">8</span>,<span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="st">"detached"</span>,<span class="fl">2003</span>,<span class="va">params</span>,<span class="st">"BetterEnergyHomes"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">annualised_capex</span><span class="op">(</span><span class="st">"heat_pump"</span>,<span class="fl">8</span>,<span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="st">"detached"</span>,<span class="fl">2003</span>,<span class="va">params</span>,<span class="st">"OSS"</span>,<span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 544.0582</span>
+<span class="r-in"><span><span class="fu">annualised_capex</span><span class="op">(</span><span class="st">"heat_pump"</span>,<span class="fl">8</span>,<span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="st">"detached"</span>,<span class="fl">2003</span>,<span class="va">params</span>,<span class="st">"BetterEnergyHomes"</span>,<span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 875.801</span>
 </code></pre></div>
     </div>
