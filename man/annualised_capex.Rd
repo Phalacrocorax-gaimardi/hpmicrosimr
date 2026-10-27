@@ -13,7 +13,7 @@ annualised_capex(
   construction_year,
   params,
   grant_type,
-  oss_heat_draw
+  oss_heat_draw = NULL
 )
 }
 \arguments{

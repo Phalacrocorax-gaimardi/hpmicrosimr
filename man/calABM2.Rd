@@ -10,10 +10,10 @@ calABM2(
   n_unused_cores = 2,
   use_parallel = T,
   nu = 0.4,
-  p = 0.004,
+  p = 0.04,
   beta = 0.8,
   r = 0.03,
-  eta = 0.03,
+  eta = 0.05,
   tau = 0.02,
   rho = 0.3,
   quiet = TRUE

@@ -33,10 +33,10 @@ update_agents(
 updated agent dataframe
 }
 \description{
-micro-simulation time-step updater
+The micro-simulation bi-monthly time-step updater
 }
 \details{
-The workhorse ABM function.Within a scenario, does a single month update of the agent characteristics. A random sample of agents evaluates their economic and social
+\code{update_agents()} is the main workhorse of the ABM. Within a scenario, it looks at agent decision-making during a single bi-monthly time-step and updates the agent characteristics for the next step. A random sample of agents evaluates their economic and social
 utilities. If these exceed their individual threshold an optimal PV_BESS system is adopted.
 
 Some specific modelling choices are made. (1) heating system failures trigger and immediate heating system replacement but

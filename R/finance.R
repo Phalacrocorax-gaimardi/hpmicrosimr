@@ -119,7 +119,7 @@ heating_system_capital_cost <- function(tech,kW,installation_type="new",house_ty
 #' annualised_capex("heat_pump",8,params$yeartime,"new","detached",2003,params,"OSS",0)
 #' annualised_capex("heat_pump",8,params$yeartime,"new","detached",2003,params,"BetterEnergyHomes",0)
 
-annualised_capex <- function(tech,kW,installation_time, installation_type,house_type,construction_year,params,grant_type,oss_heat_draw){
+annualised_capex <- function(tech,kW,installation_time, installation_type,house_type,construction_year,params,grant_type,oss_heat_draw=NULL){
   #annualised_capex("gas",24,"semi_detached","swap",params,include_grant=TRUE)
   #if system exceeds it's expected lifetime set it's annualised capex to zero
   if(params$yeartime < installation_time) stop("yeartime must be later than installation time")
@@ -394,7 +394,7 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
   present_bias <- params$beta.
   #The old annualised cost should not include present bias
   params$beta. <- 1
-  old_annualised_cost <- annualised_heating_system_cost(hli_old,tech_old,installation_time,installation_type="swap",floor_area,house_type,construction_year,grant_type="None",params,include_rebound)
+  old_annualised_cost <- annualised_heating_system_cost(hli_old,tech_old,installation_time,installation_type="swap",floor_area,house_type,construction_year,grant_type="None",params,include_rebound=include_rebound)
   #restore present bias
   params$beta. <- present_bias
   #ber upgrade cost including ber grants but excluding heat pump grants
@@ -527,6 +527,7 @@ optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,store
   stopifnot(construction_year %in% 1700:2025)
   storeys <- pmin(storeys,2)
   stopifnot(storeys %in% 1:2)
+  optimiser <- match.arg(optimiser, c("Brent", "DirectL"))
   #
   oss_heat_draw <- sample(c(1L, 0L), 1)
   grant_draw <- draw_grant_measures()
@@ -657,7 +658,7 @@ optimise_heat <- function(hli,tech_old,installation_time,house_type,storeys,cons
   oss_heat_draw <- sample(c(1L, 0L), 1)
   df0 <- tibble::tibble("tech_old"=tech_old,"tech_new"=newtechs)
   upgrade_fun <- function(tech_old, tech_new){
-        heating_upgrade_tensor(hli,hli,tech_old,installation_time,tech_new,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound,grant_draw=grant_draw,oss_heat_draw = oss_heat_draw)
+        heating_upgrade_tensor(hli,hli,tech_old,installation_time,tech_new,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance=FALSE,include_grants=TRUE,include_rebound,oss_heat_draw = oss_heat_draw)
       }
 
   df1 <- purrr::pmap(df0,upgrade_fun)
@@ -744,6 +745,7 @@ heat_pump_savings <- function(hli,tech_old,installation_time,house_type,storeys,
 #' @param params scenario params at current yeartime
 #' @param is_fuel_allowance default FALSE
 #' @param include_grants TRUE or FALSE
+#' @param optimiser "Brent" (default) or "DirectL"
 #'
 #' @returns a single row dataframe
 #' @export
@@ -751,7 +753,11 @@ heat_pump_savings <- function(hli,tech_old,installation_time,house_type,storeys,
 #' @examples
 #'
 #' params <- scenario_params(sD,2035)
+#' set.seed(100)
 #' heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
+#' set.seed(100)
+#' heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE,optimiser="DirectL")
+
 #' heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,0,params,is_fuel_allowance=FALSE,include_grants=TRUE)
 
 #' heat_pump_upgrade_savings(1.1,"heat_pump",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=TRUE,include_grants=TRUE)
@@ -759,10 +765,11 @@ heat_pump_savings <- function(hli,tech_old,installation_time,house_type,storeys,
 #' heat_pump_upgrade_savings(3.5,"gas",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
 #'
 #'
-heat_pump_upgrade_savings <-  function(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance,include_grants){
+heat_pump_upgrade_savings <-  function(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance,include_grants,optimiser="Brent"){
   #
   backflow <- TRUE #allow households with heat pumps to revert to gas, with no "status quo bias"
-  df <- optimise_upgrade(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance,include_grants,include_rebound=FALSE)
+  optimiser <- match.arg(optimiser, c("Brent", "DirectL"))
+  df <- optimise_upgrade(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance,include_grants,include_rebound=FALSE,optimiser)
   stopifnot(dim(df)[1]==2)
   stopifnot(dim(df)[2]==14)
   #

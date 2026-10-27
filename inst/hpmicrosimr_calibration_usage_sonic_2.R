@@ -10,10 +10,8 @@ n_run <- 4
 library(hpmicrosimr)
 library(mlrMBO)
 library(tidyverse)
-
 # Load data
 data(sD)
-
 # ===== YOUR ORIGINAL min_fun2 (unchanged) =====
 min_fun2 <- function(x) {
   cal_dates <- c("2025-11-01","2021-01-01")
@@ -47,10 +45,8 @@ min_fun2 <- function(x) {
 # Load calibration data
 ifelse(sonic, efficiency_cal <-  readr::read_csv("/home/people/jwheatley/hpretrofit/calibration/efficiency_calibration_data.csv"),
        efficiency_cal <-  readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/efficiency_calibration_data.csv"))
-efficiency_cal <- efficiency_cal %>%
-  pivot_wider(names_from=measure, values_from=n) %>%
-  mutate(date=lubridate::dmy(date))
-names(efficiency_cal)[2:3] <- paste(names(efficiency_cal)[2:3], "_obsv", sep="")
+  efficiency_cal <- efficiency_cal %>% pivot_wider(names_from=measure, values_from=n) %>% mutate(date=lubridate::dmy(date))
+   names(efficiency_cal)[2:3] <- paste(names(efficiency_cal)[2:3], "_obsv", sep="")
 
 ifelse(sonic,grants_cal <- readr::read_csv("/home/people/jwheatley/hpretrofit/calibration/grant_calibration_data.csv"),
        grants_cal <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/grant_calibration_data.csv"))

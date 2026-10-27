@@ -280,7 +280,7 @@ recode_survey <- function(hp_data_in){
     if(!(q_code %in% codes)) next
     hp_response <- hp_qanda %>% dplyr::filter(question_code==q_code) %>% dplyr::select(response_code,response) %>% dplyr::rename(!!q_code:=response_code)
     hp_response <- hp_response %>% type.convert(as.is=TRUE)
-    hp_data_out <- hp_data_out %>% dplyr::inner_join(hp_response) %>% dplyr::select(-!!rlang::sym(q_code)) %>% dplyr::rename(!!q_code:=response)
+    hp_data_out <- hp_data_out %>% dplyr::inner_join(hp_response,by=q_code) %>% dplyr::select(-!!rlang::sym(q_code)) %>% dplyr::rename(!!q_code:=response)
 
   }
   tech_fuel_dictionary <- c("electricity"="electricity","heat_pump"= "electricity","wood"="wood","gas"="gas","oil"="oil")

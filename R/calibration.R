@@ -1,3 +1,8 @@
+#grants_cal <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/grant_calibration_data.csv")
+#efficiency_cal <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/efficiency_calibration_data.csv")
+
+
+
 
 #' @title calABM
 #'
@@ -61,7 +66,7 @@ calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,r=0.
 #' @examples
 #' #test <- calABM2(sD,2,2,F)
 
-calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.4,p=0.004,beta=0.8,r=0.03,eta=0.03,tau=0.02,rho=0.3,quiet=TRUE){
+calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.4,p=0.04,beta=0.8,r=0.03,eta=0.05,tau=0.02,rho=0.3,quiet=TRUE){
 
   cal_values <- c("nu."=nu,"p."=p,"r."=r,"beta."=beta,"eta."=eta,"tau."=tau,"rho."=rho)
   run_calibration(sD, Nrun, backend = if(use_parallel) "mclapply" else "serial", n_unused_cores, cal_values, quiet)
@@ -145,7 +150,7 @@ cal_summary <- function(abm, cal_params, cal_date = "2025-11-01", start_date = "
 #' @param Nrun number of runs
 #' @param backend "foreach", "mclapply" or "serial", see run_replicates
 #' @param n_unused_cores unused cores
-#' @param cal_values named numeric vector of calibration parameters, names as in sD e.g. "nu." and "p."
+#' @param cal_values named numeric vector of calibration parameters e.g. c("nu."=0.35,"r."=0.04,"beta."=,"eta."=,"tau."="rho.=")
 #' @param quiet TRUE to suppress messages
 #'
 #' @returns list(parameters, efficiency, grants) from calibration_summary
@@ -169,7 +174,7 @@ run_calibration <- function(sD, Nrun, backend, n_unused_cores, cal_values, quiet
   abm <- run_replicates(Nrun, one_run, backend = backend, n_unused_cores = n_unused_cores)
   abm <- abm %>% dplyr::arrange(simulation, date)
 
-  cal_params <- tibble::as_tibble(as.list(cal_values[c("beta.", "eta.", "p.", "nu.", "rho.", "r.")]))
+  cal_params <- tibble::as_tibble(as.list(cal_values[c("nu.","p.","r.","beta.", "eta.", "tau.", "rho.")]))
   cal_summary(abm, cal_params)
 }
 
@@ -498,3 +503,37 @@ summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
     efficiency = eff
   ))
 }
+#
+
+
+
+cal_error <- function(abm_cal) {
+  #
+  cal_dates <- c("2025-11-01","2021-01-01")
+  #df <- calABM(sD, Nrun=32, 2, TRUE, nu=x[1], p=x[2], beta=x[3],r=x[4], eta=x[5], tau=x[6], rho=0.3)
+  df_eff <- abm_cal$efficiency %>% dplyr::inner_join(efficiency_cal, by="date")
+  n_heat_pump0 <- df_eff %>% dplyr::filter(date=="2015-01-01") %>% dplyr::pull(n_heat_pump)
+  n_b2_0 <- df_eff %>% dplyr::filter(date=="2015-01-01") %>% dplyr::pull(n_b2)
+  df_eff <- df_eff %>% dplyr::filter(date %in% cal_dates) %>%
+    dplyr::mutate(n_heat_pump_err = (n_heat_pump - n_heat_pump0 - n_heat_pump_obsv)/n_heat_pump_obsv,
+           n_b2_err = (n_b2 - n_b2_0 - n_b2_obsv)/n_b2_obsv)
+
+  df_grant <- abm_cal$grants %>% dplyr::inner_join(grants_cal)
+  df_grant <- df_grant %>% dplyr::filter(date %in% cal_dates) %>%
+    mutate(n_error = (n_grant - n_obsv)/n_obsv,
+           euro_error = (grants_Meuro - Meuro_obsv)/Meuro_obsv)
+
+  err_2025 <- sum((df_grant %>% filter(date=="2025-11-01") %>% pull(n_error))^2)
+  err_2025 <- err_2025 + sum((df_grant %>% filter(date=="2025-11-01") %>% pull(euro_error))^2)
+
+  df_eff <- df_eff %>% filter(date=="2025-11-01")
+  err_2025 <- err_2025 + 3*sum(df_eff$n_heat_pump_err^2 + df_eff$n_b2_err^2)
+
+  print(paste("evaluated at nu. =", x[1], "p. = ", x[2], "beta.=", x[3],
+              "r.=", x[4], "eta=", x[5], "tau=", x[6], "error=", err_2025))
+
+  return(err_2025)
+}
+
+
+
