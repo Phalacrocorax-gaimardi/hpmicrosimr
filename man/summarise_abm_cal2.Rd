@@ -7,10 +7,9 @@
 summarise_abm_cal2(abm, cal_date = "2025-11-01")
 }
 \arguments{
-\item{abm}{Agent-level output from runABM().}
+\item{abm}{Agent-level output from runABM() or calABM2()}
 
-\item{cal_date}{Calibration date used for population scaling and the
-cutoff for cumulative grant and fabric-upgrade events.}
+\item{cal_date}{Calibration date}
 }
 \value{
 A list containing tech, grants, and efficiency dataframes.

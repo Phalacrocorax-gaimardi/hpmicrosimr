@@ -45,12 +45,12 @@ min_fun2 <- function(x) {
 # Load calibration data
 ifelse(sonic, efficiency_cal <-  readr::read_csv("/home/people/jwheatley/hpretrofit/calibration/efficiency_calibration_data.csv"),
        efficiency_cal <-  readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/efficiency_calibration_data.csv"))
-  efficiency_cal <- efficiency_cal %>% pivot_wider(names_from=measure, values_from=n) %>% mutate(date=lubridate::dmy(date))
+  efficiency_cal <- efficiency_cal %>% tidyr::pivot_wider(names_from=measure, values_from=n) %>% dplyr::mutate(date=lubridate::dmy(date))
    names(efficiency_cal)[2:3] <- paste(names(efficiency_cal)[2:3], "_obsv", sep="")
 
 ifelse(sonic,grants_cal <- readr::read_csv("/home/people/jwheatley/hpretrofit/calibration/grant_calibration_data.csv"),
        grants_cal <- readr::read_csv("C:/Users/Joe/pkgs/hpmicrosimr/inst/grant_calibration_data.csv"))
-grants_cal <- grants_cal %>% mutate(date=lubridate::dmy(date))
+grants_cal <- grants_cal %>% dplyr::mutate(date=lubridate::dmy(date))
 
 # ===== CRITICAL: CONFIGURE mlrMBO FOR SEQUENTIAL EXECUTION =====
 search_space <- makeParamSet(

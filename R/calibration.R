@@ -285,9 +285,8 @@ summarise_abm_cal <- function(abm, cal_date = "2025-11-01"){
 #' Counts are scaled to the owner-occupied housing stock and averaged across
 #' simulations, including simulations with zero qualifying households.
 #'
-#' @param abm Agent-level output from runABM().
-#' @param cal_date Calibration date used for population scaling and the
-#'   cutoff for cumulative grant and fabric-upgrade events.
+#' @param abm Agent-level output from runABM() or calABM2()
+#' @param cal_date Calibration date
 #'
 #' @return A list containing tech, grants, and efficiency dataframes.
 #' @export
@@ -503,10 +502,19 @@ summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
     efficiency = eff
   ))
 }
-#
 
 
-
+#' cal_error
+#'
+#' \code{cal_error()} calculates the calibration error from the output of calABM() or calABM2(). The is used with Bayesian optimsation
+#' to find the optimal behavioural parameter set
+#'
+#' @param abm_cal outpit of calABM() or calABM2()
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 cal_error <- function(abm_cal) {
   #
   cal_dates <- c("2025-11-01","2021-01-01")
@@ -516,7 +524,7 @@ cal_error <- function(abm_cal) {
   n_b2_0 <- df_eff %>% dplyr::filter(date=="2015-01-01") %>% dplyr::pull(n_b2)
   df_eff <- df_eff %>% dplyr::filter(date %in% cal_dates) %>%
     dplyr::mutate(n_heat_pump_err = (n_heat_pump - n_heat_pump0 - n_heat_pump_obsv)/n_heat_pump_obsv,
-           n_b2_err = (n_b2 - n_b2_0 - n_b2_obsv)/n_b2_obsv)
+                  n_b2_err = (n_b2 - n_b2_0 - n_b2_obsv)/n_b2_obsv)
 
   df_grant <- abm_cal$grants %>% dplyr::inner_join(grants_cal)
   df_grant <- df_grant %>% dplyr::filter(date %in% cal_dates) %>%
@@ -529,11 +537,9 @@ cal_error <- function(abm_cal) {
   df_eff <- df_eff %>% filter(date=="2025-11-01")
   err_2025 <- err_2025 + 3*sum(df_eff$n_heat_pump_err^2 + df_eff$n_b2_err^2)
 
-  print(paste("evaluated at nu. =", x[1], "p. = ", x[2], "beta.=", x[3],
-              "r.=", x[4], "eta=", x[5], "tau=", x[6], "error=", err_2025))
+  #print(paste("evaluated at nu. =", x[1], "p. = ", x[2], "beta.=", x[3],
+  #            "r.=", x[4], "eta=", x[5], "tau=", x[6], "error=", err_2025))
 
   return(err_2025)
 }
-
-
 
