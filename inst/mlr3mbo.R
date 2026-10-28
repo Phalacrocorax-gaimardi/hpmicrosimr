@@ -1,10 +1,5 @@
 # Bayesian optimisation of the hpmicrosimr calibration error with mlr3mbo
 #
-# UNTESTED: written without access to R. Run the pre-flight block first.
-#
-# Needs: hpmicrosimr (>= 0.4.01), bbotk, paradox, mlr3, mlr3learners, mlr3mbo,
-#        DiceKriging (surrogate), lhs (initial design), data.table
-#
 # Design choices
 #  * 5 free parameters: p., r., beta., eta., tau.  nu. and rho. are fixed at their sD values.
 #  * The objective is log(cal_error): errors are positive, span orders of magnitude, and a
@@ -21,6 +16,7 @@ library(bbotk)
 library(mlr3)
 library(mlr3learners)
 library(mlr3mbo)
+library(tidyverse)
 
 ## ---- settings -------------------------------------------------------------------------
 n_rep           <- 32      # replicates per evaluation
@@ -93,8 +89,8 @@ objective <- ObjectiveRFun$new(
   codomain = ps(log_error = p_dbl(tags = "minimize")),
   id       = "hpmicrosimr_cal"
 )
-
-instance <- oi(objective, terminator = trm("evals", n_evals = n_evals))
+#synthatic sugar
+instance <- bbotk::oi(objective, terminator = trm("evals", n_evals = n_evals))
 
 ## ---- initial design -------------------------------------------------------------------
 set.seed(1)

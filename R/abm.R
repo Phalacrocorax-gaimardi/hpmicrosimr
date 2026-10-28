@@ -408,7 +408,7 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
   #############################################################################################
   # households that reject efficiency upgrade because of insufficient reward financial relative to disruption
   ##############################################################################################
-  print(paste(dim(b_s2 %>% dplyr::filter(eac_stick >= eac_old & eac_switch >= eac_old))[1],"upgrades rejected"))
+  if(!quiet) print(paste(dim(b_s2 %>% dplyr::filter(eac_stick >= eac_old & eac_switch >= eac_old))[1],"upgrades rejected"))
   b_s2 <- b_s2 %>% dplyr::filter(eac_stick < eac_old | eac_switch < eac_old) #%>% dplyr::select(-eac_old)
   #b_s2 %>% dplyr::select(tech,hli,hli_stick,hli_switch,eac_stick,eac_switch,savings)
     ################################################################
