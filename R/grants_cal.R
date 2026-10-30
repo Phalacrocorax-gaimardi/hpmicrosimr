@@ -7,5 +7,5 @@
 #'   \item{\code{n_obsv}}{double number of grants awarded}
 #'   \item{\code{Meuro_obsv}}{double million euros awarded}
 #'}
-#' @details \url{}
+#' @details \url{https://www.seai.ie/grants/home-energy-grants/home-upgrades}
 "grants_cal"

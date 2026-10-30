@@ -9,7 +9,15 @@ cal_error(abm_cal)
 \arguments{
 \item{abm_cal}{outpit of calABM() or calABM2()}
 }
+\value{
+a positive real number
+}
 \description{
-\code{cal_error()} calculates the calibration error from the output of calABM() or calABM2(). The is used with Bayesian optimsation
-to find the optimal behavioural parameter set
+\code{cal_error()} calculates the calibration error from the output of calABM() or calABM2(). The is used in the Bayesian optimsation
+to find the optimal behavioural parameter set.
+}
+\details{
+\code{cal_error()} sums the mean square model fractional errors relative to observations on 2025-11-01. The variable considered are the number grant-assisted of B2
+upgrades since 2015, the number of of heat pumps installed since 2015, the number of WarmerHomes, OSS and BetterEnergyHomes grants, and the total expenditure in those
+three schemes. To balance error in energy efficiecncy measure vs grants, the former error is multiplied by a factor of 3.
 }

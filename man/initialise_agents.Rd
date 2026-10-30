@@ -29,6 +29,6 @@ that the earlier system was a \code{gas} pr \code{oil}. As a result of these ass
 }
 \examples{
 
-test <- initialise_agents(sD,2015,10) #\%>\% system.time()
+agents_init <- initialise_agents(sD,2015,10) #\%>\% system.time()
 
 }

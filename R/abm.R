@@ -163,7 +163,7 @@ fast_params <- function(params_long){
 #'
 #' @examples
 #'
-#' test <- initialise_agents(sD,2015,10) #%>% system.time()
+#' agents_init <- initialise_agents(sD,2015,10) #%>% system.time()
 #'
 initialise_agents <- function(scen,yeartime=2015,cal_run=10){
 
@@ -408,8 +408,8 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
   #############################################################################################
   # households that reject efficiency upgrade because of insufficient reward financial relative to disruption
   ##############################################################################################
-  if(!quiet) print(paste(dim(b_s2 %>% dplyr::filter(eac_stick >= eac_old & eac_switch >= eac_old))[1],"upgrades rejected"))
-  b_s2 <- b_s2 %>% dplyr::filter(eac_stick < eac_old | eac_switch < eac_old) #%>% dplyr::select(-eac_old)
+  if(!quiet && nrow(b_s2) > 0) print(paste(dim(b_s2 %>% dplyr::filter(eac_stick >= eac_old & eac_switch >= eac_old))[1],"upgrades rejected"))
+  if(nrow(b_s2) > 0) b_s2 <- b_s2 %>% dplyr::filter(eac_stick < eac_old | eac_switch < eac_old) #%>% dplyr::select(-eac_old)
   #b_s2 %>% dplyr::select(tech,hli,hli_stick,hli_switch,eac_stick,eac_switch,savings)
     ################################################################
     # Efficiency upgrade where there is an existing heat pump
