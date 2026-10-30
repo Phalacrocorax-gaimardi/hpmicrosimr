@@ -14,10 +14,12 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/ber_ratings_table.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/calABM.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/calABM2.html</loc></url>
+<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/cal_error.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/carbon_price_fun.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/crf.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/draw_grant_measures.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/eac_weibull.html</loc></url>
+<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/efficiency_cal.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/energy_price_fun.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/energy_prices.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/erv_weibull.html</loc></url>
@@ -30,6 +32,7 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/gen_ber_rating.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/get_ber_score.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/grant_eligibility.html</loc></url>
+<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/grants_cal.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/heat_loss_indicator.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/heat_pump_grant.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/heat_pump_savings.html</loc></url>
@@ -77,7 +80,6 @@
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/seai_grants.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/seai_grants_average.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/space_heating_requirement.html</loc></url>
-<url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/summarise_abm_cal.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/summarise_abm_cal2.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/survey_income_ranges.html</loc></url>
 <url><loc>https://phalacrocorax-gaimardi.github.io/hpmicrosimr/reference/tech_cost_params.html</loc></url>
