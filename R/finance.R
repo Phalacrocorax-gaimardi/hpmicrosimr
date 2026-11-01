@@ -407,7 +407,7 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
     )
   } else {
     fabric_grants <- fabric_grant(
-      ber_old, ber_new, tech_old, tech_new,
+      hli_old, hli_new, tech_old, tech_new,
       installation_time, construction_year,
       region, house_type, storeys, floor_area,
       is_fuel_allowance, params,
@@ -905,8 +905,8 @@ draw_grant_measures <- function() {
 #' the fabric grant depends on eligility for OSS and therefore on ber scores and uplift. This means that it depends also on tech_old and tech_new. A minimum
 #' fabric upgrade grant of euro700 is applied.
 #'
-#' @param ber_old old hli, double
-#' @param ber_new new hli, double
+#' @param hli_old old hli, double
+#' @param hli_new new hli, double
 #' @param tech_old old tech
 #' @param heating_install_time decimal time
 #' @param tech_new new tech
@@ -926,27 +926,24 @@ draw_grant_measures <- function() {
 #' @examples
 #'
 #' params <- scenario_params(sD,2028)
-#' fabric_grant(300,200,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
+#' fabric_grant(3,2,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
 #'
-#' fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
+#' fabric_grant(4,2.4,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
 #'
-#' fabric_grant(300,100,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
+#' fabric_grant(3,2.1,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE)
 #'
-#' fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE)
-#'
-#' fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,params,randomise=TRUE)
-#'
-#' fabric_grant(300,280,"gas","wood",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,params,randomise=TRUE)
-#'
-#' fabric_grant(175,155,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE,NULL)
+#' fabric_grant(2,1,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,params,randomise=TRUE)
 
-fabric_grant <- function(ber_old,ber_new,tech_old,tech_new,heating_install_time,construction_year,region,house_type,storeys,floor_area = 100,is_fuel_allowance = FALSE,params,randomise=TRUE,grant_draw=NULL) {
+fabric_grant <- function(hli_old,hli_new,tech_old,tech_new,heating_install_time,construction_year,region,house_type,storeys,floor_area = 100,is_fuel_allowance = FALSE,params,randomise=TRUE,grant_draw=NULL) {
 
   #Input validation with more informative messages
   stopifnot(house_type %in% c("semi_detached", "detached", "apartment", "terraced","apartment"))
+  stopifnot((hli_old < 20) & (hli_new < 20))
   #set.seed(as.integer(Sys.time()))
-  hli_old <- heat_loss_indicator(ber_old,tech_old,heating_install_time,params)
-  hli_new <- heat_loss_indicator(ber_new,tech_new,params$yeartime,params)
+  #hli_old <- heat_loss_indicator(ber_old,tech_old,heating_install_time,params)
+  #hli_new <- heat_loss_indicator(ber_new,tech_new,params$yeartime,params)
+  ber_old <- ber_from_hli(hli_old,tech_old,heating_install_time,params)
+  ber_new <- ber_from_hli(hli_new,tech_new,params$yeartime,params)
   cost_estimate <- retrofit_cost_model(hli_old,hli_new,house_type,storeys,region,floor_area,params)
   scheme0 <- grant_eligibility(ber_old,ber_new,construction_year,is_fuel_allowance,params)
 

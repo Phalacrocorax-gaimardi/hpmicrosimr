@@ -96,8 +96,16 @@ cal_summary <- function(abm, cal_params, cal_date = "2025-11-01", start_date = "
 
   heat_pumps <- test$tech %>% dplyr::filter(date %in% cal_dates, tech == "heat_pump") %>% dplyr::ungroup() %>%
     dplyr::select(date, n_heat_pump = n_tech)
+  #efficiencies <- test$efficiency %>% dplyr::filter(date %in% cal_dates) %>% dplyr::ungroup() %>%
+  #  dplyr::inner_join(heat_pumps, by = "date")
+  hp_grants <- test$grants %>% dplyr::filter(date %in% cal_dates) %>%
+    dplyr::group_by(date) %>%
+    dplyr::summarise(n_heat_pump_grants = sum(n_hp_grant), .groups = "drop")
+
   efficiencies <- test$efficiency %>% dplyr::filter(date %in% cal_dates) %>% dplyr::ungroup() %>%
-    dplyr::inner_join(heat_pumps, by = "date")
+    dplyr::inner_join(heat_pumps, by = "date") %>%
+    dplyr::left_join(hp_grants, by = "date") %>%
+    dplyr::mutate(n_heat_pump_grants = tidyr::replace_na(n_heat_pump_grants, 0))
   grants <- test$grants %>% dplyr::filter(date %in% cal_dates)
 
   #a missing date or scheme would otherwise silently give a zero-row result, so insist on exactly one value
@@ -125,9 +133,10 @@ cal_summary <- function(abm, cal_params, cal_date = "2025-11-01", start_date = "
   #NB: n_fabric_total has always reported n_b2 at cal_date. The cumulative number of fabric upgrades is
   #eff_at(cal_d, "n_upgrade"), which may be what was intended.
   n_fabric_total <- n_b2
-
+  n_heat_pump_grants <- sum(test$grants$n_hp_grant[test$grants$date == cal_d])
   cals <- cal_params %>% dplyr::bind_cols(tibble::tibble(
     n_heat = n_heat_pump - n_heat_pump_0, n_heat_2015 = n_heat_pump_0,
+    n_heat_pump_grants = n_heat_pump_grants,
     number_b2 = n_b2 - n_b2_0, number_b2_2015 = n_b2_0,
     oss_total = grant_at("OSS", "grants_Meuro"),
     warmerhomes_total = grant_at("WarmerHomes", "grants_Meuro"),
@@ -416,11 +425,12 @@ summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
 #' \code{cal_error()} calculates the calibration error from the output of calABM() or calABM2(). The is used in the Bayesian optimsation
 #' to find the optimal behavioural parameter set.
 #'
-#' \code{cal_error()} sums the mean square model fractional errors relative to observations on 2025-11-01. The variable considered are the number grant-assisted of B2
-#' upgrades since 2015, the number of of heat pumps installed since 2015, the number of WarmerHomes, OSS and BetterEnergyHomes grants, and the total expenditure in those
-#' three schemes. To balance error in energy efficiecncy measure vs grants, the former error is multiplied by a factor of 3.
+#' \code{cal_error()} sums the mean square model fractional errors relative to observations (SEAI grant uptake over the period 2015=01-01 to 2025-11-01). The variable considered are the number grant-assisted of B2
+#' upgrades since 2015, the number of of grant-assisted heat pumps installed since 2015, the number of WarmerHomes, OSS and BetterEnergyHomes grants, and the total expenditure in those
+#' three schemes. To balance error in energy efficiency measure vs grants, the former error is multiplied by a factor of 2.5, so that the error is weighted
+#' towards accuracy .
 #'
-#' @param abm_cal outpit of calABM() or calABM2()
+#' @param abm_cal outpit of calABM2()
 #'
 #' @returns  a positive real number
 #' @export
@@ -434,7 +444,7 @@ cal_error <- function(abm_cal) {
   n_heat_pump0 <- df_eff %>% dplyr::filter(date=="2015-01-01") %>% dplyr::pull(n_heat_pump)
   n_b2_0 <- df_eff %>% dplyr::filter(date=="2015-01-01") %>% dplyr::pull(n_b2)
   df_eff <- df_eff %>% dplyr::filter(date %in% cal_dates) %>%
-    dplyr::mutate(n_heat_pump_err = (n_heat_pump - n_heat_pump0 - n_heat_pump_obsv)/n_heat_pump_obsv,
+  dplyr::mutate(n_heat_pump_err = (n_heat_pump_grants - n_heat_pump_obsv)/n_heat_pump_obsv,
                   n_b2_err = (n_b2_grant - n_b2_obsv)/n_b2_obsv)
 
   df_grant <- abm_cal$grants %>% dplyr::inner_join(grants_cal)
@@ -446,7 +456,7 @@ cal_error <- function(abm_cal) {
   err_2025 <- err_2025 + sum((df_grant %>% dplyr::filter(date=="2025-11-01") %>% dplyr::pull(euro_error))^2) #mse relative grant amount
 
   df_eff <- df_eff %>% dplyr::filter(date=="2025-11-01")
-  err_2025 <- err_2025 + 3*sum(df_eff$n_heat_pump_err^2 + df_eff$n_b2_err^2) #give a heavier weighting to efficiency because there are three grant cateogries
+  err_2025 <- err_2025 + 2.5*sum(df_eff$n_heat_pump_err^2 + df_eff$n_b2_err^2) #give a heavier weighting to efficiency because there are three grant cateogries
 
   #print(paste("evaluated at nu. =", x[1], "p. = ", x[2], "beta.=", x[3],
   #            "r.=", x[4], "eta=", x[5], "tau=", x[6], "error=", err_2025))

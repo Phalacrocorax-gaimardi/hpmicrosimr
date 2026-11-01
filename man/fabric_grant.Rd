@@ -5,8 +5,8 @@
 \title{fabric_grant}
 \usage{
 fabric_grant(
-  ber_old,
-  ber_new,
+  hli_old,
+  hli_new,
   tech_old,
   tech_new,
   heating_install_time,
@@ -22,9 +22,9 @@ fabric_grant(
 )
 }
 \arguments{
-\item{ber_old}{old hli, double}
+\item{hli_old}{old hli, double}
 
-\item{ber_new}{new hli, double}
+\item{hli_new}{new hli, double}
 
 \item{tech_old}{old tech}
 
@@ -62,17 +62,11 @@ fabric upgrade grant of euro700 is applied.
 \examples{
 
 params <- scenario_params(sD,2028)
-fabric_grant(300,200,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
+fabric_grant(3,2,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
 
-fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
+fabric_grant(4,2.4,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
 
-fabric_grant(300,100,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
+fabric_grant(3,2.1,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE)
 
-fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE)
-
-fabric_grant(300,150,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,params,randomise=TRUE)
-
-fabric_grant(300,280,"gas","wood",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,params,randomise=TRUE)
-
-fabric_grant(175,155,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE,NULL)
+fabric_grant(2,1,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,params,randomise=TRUE)
 }
