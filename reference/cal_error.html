@@ -18,7 +18,7 @@ to find the optimal behavioural parameter set."><meta property="og:image" conten
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.04</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.05</span>
       </span>
     </div>
 
@@ -64,7 +64,7 @@ to find the optimal behavioural parameter set.</p>
 
 
 <dl><dt id="arg-abm-cal">abm_cal<a class="anchor" aria-label="anchor" href="#arg-abm-cal"></a></dt>
-<dd><p>outpit of calABM() or calABM2()</p></dd>
+<dd><p>outpit of calABM2()</p></dd>
 
 </dl></div>
     <div id="value">
@@ -73,9 +73,10 @@ to find the optimal behavioural parameter set.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p><code>cal_error()</code> sums the mean square model fractional errors relative to observations on 2025-11-01. The variable considered are the number grant-assisted of B2
-upgrades since 2015, the number of of heat pumps installed since 2015, the number of WarmerHomes, OSS and BetterEnergyHomes grants, and the total expenditure in those
-three schemes. To balance error in energy efficiecncy measure vs grants, the former error is multiplied by a factor of 3.</p>
+    <p><code>cal_error()</code> sums the mean square model fractional errors relative to observations (SEAI grant uptake over the period 2015=01-01 to 2025-11-01). The variable considered are the number grant-assisted of B2
+upgrades since 2015, the number of of grant-assisted heat pumps installed since 2015, the number of WarmerHomes, OSS and BetterEnergyHomes grants, and the total expenditure in those
+three schemes. To balance error in energy efficiency measure vs grants, the former error is multiplied by a factor of 2.5, so that the error is weighted
+towards accuracy .</p>
     </div>
 
   </div>
