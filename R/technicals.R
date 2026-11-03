@@ -695,21 +695,23 @@ crf_weibull <- function(lifetime,beta,r){
 #' #Value of a heat at its expected lifetime
 #' erv_weibull(17, 3, 17,0.04)
 #'
-erv_weibull <- function(lifetime, beta, system_age,r) {
+erv_weibull <- function(lifetime, beta, system_age, r) {
 
-  upper<- 1000
   lambda <- lifetime / gamma(1 + 1 / beta)
+  crf <- crf_weibull(lifetime, beta, r)
 
-  # CRF for a new system
-   crf <- crf_weibull(lifetime,beta,r)
-
-  # Remaining PV at each age t
   sapply(system_age, function(tt) {
-    crf*integrate(function(u) exp(-r*u) * exp(-((tt+u)/lambda)^beta), 0, upper, rel.tol = 1e-8)$value
+    crf * integrate(
+      function(u) {
+        exp(-r * u) *
+          exp(-(((tt + u) / lambda)^beta - (tt / lambda)^beta))
+      },
+      lower = 0,
+      upper = 1000,
+      rel.tol = 1e-8
+    )$value
   })
-
 }
-
 
 
 
