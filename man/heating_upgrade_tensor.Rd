@@ -78,13 +78,19 @@ Eligible grants are applied by default, the effects of grants can optionally be 
 \cr
 Used with optimise_upgrade to determine the optimal upgrade path tech_old -> tech_new and hli_old -> hli_new
 }
+\details{
+\code{heating_upgrade_tensor()} returns costs for the specified fabric upgrade and technology choice. The quantity \code{new_cost} is the sum of the new
+opex and annualised capital cost i.e
+\deqn{\mathrm{new cost}=opex_{new} + CRF_{Weibull} \times capex}
+The \code{old_cost} include the previous opex (potentially higher because of lower efficiency) and a measure of
+}
 \examples{
 
 params <- scenario_params(sD,2028)
 
-heating_upgrade_tensor(2.31,2.31,"gas",2005,"gas","semi_detached",2,1990,"Dublin",100,eta=0.16,params,FALSE,TRUE,FALSE,grant_draw=NULL,oss_heat_draw = NULL)
+heating_upgrade_tensor(2.31,2.31,"gas",2027.5,"gas","semi_detached",2,1990,"Dublin",100,eta=0.16,params,FALSE,TRUE,FALSE,grant_draw=NULL,oss_heat_draw = NULL)
 
-heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0.16,params,FALSE,TRUE,include_rebound=FALSE)
+heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0.05,params,FALSE,TRUE,include_rebound=FALSE)
 heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0,params,FALSE,TRUE,include_rebound=FALSE)
 heating_upgrade_tensor(2,1.2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)
 heating_upgrade_tensor(1.8,1.8,"heat_pump",installation_time=2012,"gas","semi_detached",2, construction_year=2012,"Munster",100,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)

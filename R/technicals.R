@@ -649,49 +649,30 @@ expected_residual_lifetime <- function(tech,system_age) {
 }
 #
 
-#' eac_weibull
+
+
+#' crf_weibull
 #'
-#' eac_weibull calculates the unit cost expected equivalent annual cost (or capital reduction factor CRF) when the asset survival function is
-#' \deqn{S(t) = \exp\Big[-\Big(\frac{t}{\lambda}\Big)^{\beta}\Big]}
-#' i.e. a Weibull distribution and the continuous time discount rate is r.
+#' Generalisation of \code{crf} for Weilbull survival function
 #'
+#' @param lifetime expected system lifetime
+#' @param beta Weibull parameter
+#' @param r discount rate
 #'
-#' @param lifetime mean system lifetime
-#' @param beta weibull shape parameter (usually > 1)
-#' @param system_age vector of system ages
-#' @param r continuous time discount rate
-#'
-#' @returns vector of annualised costs assumi
+#' @returns
 #' @export
 #'
 #' @examples
-#' eac_weibull(25,2,10,0.04)
-eac_weibull <- function(lifetime, beta, system_age,r) {
+crf_weibull <- function(lifetime,beta,r){
 
-  upper<- 1000
-  lambda <- lifetime / gamma(1 + 1 / beta)
-
-  # CRF for a new system
-  denom0 <- integrate(function(u) exp(-r*u) * exp(-(u/lambda)^beta), 0, upper, rel.tol = 1e-8)$value
-  crf <- 1 / denom0
-
-  # Remaining PV at each age t
-  #remaining <- sapply(system_age, function(tt) {
-  #  denom_t <- integrate(function(u) exp(-r*u) * exp(-((tt+u)/lambda)^beta), 0, upper, rel.tol = 1e-8)$value
-  #  crf * denom_t
-  #})
-
-  # Exact annualised cost per year: integrate over each year
-  annualised <- sapply(system_age, function(tt) {
-    integrate(function(u) exp(-r*u) * exp(-((tt+u)/lambda)^beta), 0, 1, rel.tol = 1e-8)$value* crf
-  })
-
-  return(annualised)
+  lambda <- lifetime/gamma(1+1/beta)
+  1/integrate(function(u) exp(-r*u)*exp(-(u/lambda)^beta),0,1000,rel.tol=1e-7)$value
 }
+
 
 #' erv_weibull
 #'
-#' The expected residual or remaining value of an asset such as a heating system with Weibull survival function
+#' The expected conidtional residual or remaining value of an asset such as a heating system with Weibull survival function
 #' \deqn{S(t) = \exp\Big[-\Big(\frac{t}{\lambda}\Big)^{\beta}\Big]}
 #' conditional on its current age.\cr
 #' \cr
@@ -720,17 +701,21 @@ erv_weibull <- function(lifetime, beta, system_age,r) {
   lambda <- lifetime / gamma(1 + 1 / beta)
 
   # CRF for a new system
-  denom0 <- integrate(function(u) exp(-r*u) * exp(-(u/lambda)^beta), 0, upper, rel.tol = 1e-8)$value
-  crf <- 1 / denom0
+   crf <- crf_weibull(lifetime,beta,r)
 
   # Remaining PV at each age t
-  remaining <- sapply(system_age, function(tt) {
-    denom_t <- integrate(function(u) exp(-r*u) * exp(-((tt+u)/lambda)^beta), 0, upper, rel.tol = 1e-8)$value
-    crf * denom_t
+  sapply(system_age, function(tt) {
+    crf*integrate(function(u) exp(-r*u) * exp(-((tt+u)/lambda)^beta), 0, upper, rel.tol = 1e-8)$value
   })
 
-  return(remaining)
 }
+
+
+
+
+
+
+
 
 #' space_heating_requirement
 #'

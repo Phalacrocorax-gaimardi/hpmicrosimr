@@ -203,9 +203,9 @@ initialise_agents <- function(scen,yeartime=2015,cal_run=10){
   agents <- agents %>% dplyr::mutate(ber=ber_from_hli(hli,primary_heat,heating_install_time,params))
   #annualised heating cost
   agents <- agents %>% dplyr::rowwise() %>% dplyr::mutate(eac = annualised_heating_system_cost(hli,primary_heat,
-                                      heating_install_time,"new",floor_area,house_type,construction_year,params,"None"))
+                                      heating_install_time,"new",floor_area,house_type,construction_year,params,"None",existing=TRUE))
   agents <- agents %>% dplyr::rowwise() %>% dplyr::mutate(eac_actual = annualised_heating_system_cost(hli,primary_heat,
-                                    heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = TRUE))
+                                    heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = TRUE,existing=TRUE))
 
   #optionally remove some columns
   agents <- agents %>% dplyr::select(-secondary_heat1,-secondary_heat2)
@@ -508,8 +508,8 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
   if(ignore_social) a_s$q52 <- 0 #no adopters assumed present in local network: next line adds 1
   a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(q52 = min(q52+1,4)) #update q52 encoding 1,2,3,4
   #update eac_actual and kW
-  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = FALSE))
-  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac_actual = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = TRUE))
+  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = FALSE,existing=TRUE))
+  a_s <- a_s %>% dplyr::rowwise() %>% dplyr::mutate(eac_actual = annualised_heating_system_cost(hli,tech,heating_install_time,"new",floor_area,house_type,construction_year,params,"None",include_rebound = TRUE,existing=TRUE))
   #agents_out <- a_s
   #a_s <- a_s %>% dplyr::select(-du_tot)
   if(!quiet) {

@@ -19,7 +19,7 @@ erv_weibull(lifetime, beta, system_age, r)
 vector of residual values
 }
 \description{
-The expected residual or remaining value of an asset such as a heating system with Weibull survival function
+The expected conidtional residual or remaining value of an asset such as a heating system with Weibull survival function
 \deqn{S(t) = \exp\Big[-\Big(\frac{t}{\lambda}\Big)^{\beta}\Big]}
 conditional on its current age.\cr
 \cr

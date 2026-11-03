@@ -15,7 +15,8 @@ annualised_heating_system_cost(
   params,
   grant_type,
   oss_heat_draw = NULL,
-  include_rebound = FALSE
+  include_rebound = FALSE,
+  existing = FALSE
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ annualised_heating_system_cost(
 \item{oss_heat_draw}{NULL,0,1}
 
 \item{include_rebound}{default FALSE}
+
+\item{existing}{TRUE or FALSE}
 }
 \description{
 The annualised heating cost or "equivalent annual cost" equal to the sum of annualised capital cost (calculated with Weibull survival) and operating cost.

@@ -13,7 +13,8 @@ annualised_capex(
   construction_year,
   params,
   grant_type,
-  oss_heat_draw = NULL
+  oss_heat_draw = NULL,
+  existing = FALSE
 )
 }
 \arguments{
@@ -34,24 +35,31 @@ annualised_capex(
 \item{grant_type}{grant type}
 
 \item{oss_heat_draw}{NULL if random 0,1}
+
+\item{existing}{TRUE or FALSE - whether we are evaluating an existing system or a potential new system -default FALSE (new system)}
 }
 \value{
 euro amount
 }
 \description{
-Current equivalent annualised cost of a home heating system installed at installation_time.
-\cr
-this function uses a capital reduction factor with with a technology specific
-Weibull survival function. The annualised capex falls when the system age exceeds the expected lifetime. This corresponds
-to the intuition that older systems that continue to operate are "free".
-\cr
-The discount rate set from calibration (params$r.). A present bias (above a capex threshold) params$beta. is included.
+Equivalent annualised cost of a home heating system.\cr
+}
+\details{
+The discount rate set from calibration (params$r.). A present bias params$beta. (above a threshold) is assumed.
+The value returned by \code{annualised_capex()} depends on whether the system is new or for an existing system installed at \code{installation_time}. A new system is selected by setting \code{existing} to \code{FALSE}. In this
+case \code{annualised_capex()} returns
+\deqn{crf_{weibull} \times capex}
+where \eqn{crf_{Weibull}} is the capital reduction factor for a system with Weibull survival function. On the other hand, for an existing system (finite age) \code{annualised_capex} returns
+\deqn{(crf_{weibull}- r erv_{weibull})\times capex}
+\code{erv_weibull()} returns the
+The difference between these quantities \eqn{r erv_{weibull}} can be interpreted as a penalty for retiring a heating system before it
+has failed.
 }
 \examples{
-sapply(2010:2040, function(y) annualised_capex("heat_pump",18,2010,"swap","detached",2003,scenario_params(sD,y),"WarmerHomes"))
+sapply(2010:2040, function(y) annualised_capex("heat_pump",18,2010,"swap","detached",2003,scenario_params(sD,y),"WarmerHomes", existing=FALSE))
 params <- scenario_params(sD,2026)
 replicate(100,annualised_capex("heat_pump",13,params$yeartime,"new","detached",2003,params,"None",oss_heat_draw=NULL)) \%>\% table()
 params$beta. <- 0.5
 annualised_capex("heat_pump",8,params$yeartime,"new","detached",2003,params,"OSS",0)
-annualised_capex("heat_pump",8,params$yeartime,"new","detached",2003,params,"BetterEnergyHomes",0)
+annualised_capex("heat_pump",8,params$yeartime,"new","detached",2003,params,"BetterEnergyHomes",0,existing=TRUE)
 }
