@@ -586,6 +586,8 @@ optimise_upgrade <- function(hli_old,tech_old,installation_time,house_type,store
      hli_max <- heat_loss_indicator(target_ber,tech_new,params$yeartime,params)
      #if tech_new is a heat pump, hli_new must be below threshold
      hli_max <- ifelse(hli_max < params$hli_heat_pump_threshold,hli_max,params$hli_heat_pump_threshold)
+     #ensure than hli_max is lower than hli_old to avoid downgrades
+     hli_max <- min(hli_max, hli_old)
      if(optimiser=="Brent") {result <- optim(par=hli_old,fn=fun,lower=0.25,upper=hli_max,method="Brent")}
      else{result <- nloptr::directL(fn = fun,lower = 0.25,upper = hli_max,
        control = list(
@@ -788,14 +790,15 @@ heat_pump_savings <- function(hli,tech_old,installation_time,house_type,storeys,
 
 #' heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,0,params,is_fuel_allowance=FALSE,include_grants=TRUE)
 
-#' heat_pump_upgrade_savings(1.1,"heat_pump",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=TRUE,include_grants=TRUE)
+#' heat_pump_upgrade_savings(2.2,"heat_pump",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=TRUE,include_grants=TRUE)
 #'
 #' heat_pump_upgrade_savings(3.5,"gas",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
 #' heat_pump_upgrade_savings(3.96,"oil",2000,"semi_detached",2,1944,"Munster",106,0.1,params,is_fuel_allowance=TRUE,include_grants = FALSE)
 #'
 heat_pump_upgrade_savings <-  function(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance,include_grants,optimiser="Brent"){
   #
-  backflow <- TRUE #allow households with heat pumps to revert to gas, with no "status quo bias"
+  backflow <- FALSE #allow households with heat pumps to revert to gas, with no "status quo bias"
+  #dont allow existing heat pump adiopters to revert to gas during an efficiency upgrade
   optimiser <- match.arg(optimiser, c("Brent", "DirectL"))
   df <- optimise_upgrade(hli_old,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,eta,params,is_fuel_allowance,include_grants,include_rebound=FALSE,optimiser)
   stopifnot(dim(df)[1]==2)
@@ -848,8 +851,10 @@ heat_pump_upgrade_savings <-  function(hli_old,tech_old,installation_time,house_
     df1 <- df1 %>% dplyr::mutate(savings=dplyr::if_else(params$yeartime > params$warmer_homes_heat_pump,-1,1)) #1 assures heat pump is never chosen before warmer_homes_heat_pump
   }
   df1$eac_old <- df$old_cost[1]
-  if(tech_old=="heat_pump" & !backflow) {df1$switch_cost <- Inf
-  df1$savings <- Inf}
+  if(tech_old=="heat_pump" & !backflow) {
+  df1$savings <- Inf
+  df1$eac_switch <- Inf
+  df$tech_cost_switch <- Inf}
   return(df1)
 }
 
@@ -966,7 +971,7 @@ fabric_grant <- function(hli_old,hli_new,tech_old,tech_new,heating_install_time,
 
   #Input validation with more informative messages
   stopifnot(house_type %in% c("semi_detached", "detached", "apartment", "terraced","apartment"))
-  stopifnot((hli_old < 20) & (hli_new < 20))
+  if(!((hli_old < 20) & (hli_new < 20))) stop(paste("hli_old=",hli_old,"hli_new=",hli_new))
   #set.seed(as.integer(Sys.time()))
   #hli_old <- heat_loss_indicator(ber_old,tech_old,heating_install_time,params)
   #hli_new <- heat_loss_indicator(ber_new,tech_new,params$yeartime,params)

@@ -215,7 +215,8 @@ initialise_agents <- function(scen,yeartime=2015,cal_run=10){
   #compute eta values based on macro-calibration parameter
   agents <- agents %>% dplyr::ungroup() %>% dplyr::mutate(eta=exp(log_eta_bar + rnorm(dplyr::n(),0,0.1481237))) %>% dplyr::select(-log_eta_bar)
   agents <- agents %>% dplyr::mutate(eta = eta/mean(eta)) %>% dplyr::mutate(eta = params$eta.*eta)
-
+  #esnue no HLI exceeds 15
+  agents <- agents %>% dplyr::mutate(hli = pmin(hli, 20))
   return(agents %>% dplyr::ungroup())
 }
 
