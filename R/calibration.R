@@ -64,7 +64,7 @@ calABM <- function(sD,Nrun=4,n_unused_cores=2,use_parallel=T,nu=0.4,p=0.004,r=0.
 #' @export
 #'
 #' @examples
-#' #test <- calABM2(sD,2,2,F)
+#' #test <- calABM2(sD,1,use_parallel=F,nu=0.35,p=0.02,beta=0.8,r=0.05,eta=0.1,tau=0.02)
 
 calABM2 <- function(sD, Nrun=4,n_unused_cores=2, use_parallel=T, nu=0.4,p=0.04,beta=0.8,r=0.03,eta=0.05,tau=0.02,rho=0.3,quiet=TRUE){
 
@@ -130,14 +130,16 @@ cal_summary <- function(abm, cal_params, cal_date = "2025-11-01", start_date = "
   n_heat_pump_0 <- hp_at(start_d)
   n_b2 <- eff_at(cal_d, "n_b2")
   n_b2_0 <- eff_at(start_d, "n_b2")
+  n_b2_grants <- eff_at(cal_d,"n_b2_grant")
   #NB: n_fabric_total has always reported n_b2 at cal_date. The cumulative number of fabric upgrades is
   #eff_at(cal_d, "n_upgrade"), which may be what was intended.
   n_fabric_total <- n_b2
-  n_heat_pump_grants <- sum(test$grants$n_hp_grant[test$grants$date == cal_d])
+  n_heat_pump_grant <- sum(test$grants$n_hp_grant[test$grants$date == cal_d])
   cals <- cal_params %>% dplyr::bind_cols(tibble::tibble(
     n_heat = n_heat_pump - n_heat_pump_0, n_heat_2015 = n_heat_pump_0,
-    n_heat_pump_grants = n_heat_pump_grants,
-    number_b2 = n_b2 - n_b2_0, number_b2_2015 = n_b2_0,
+    n_heat_pump_grant = n_heat_pump_grant,
+    n_b2 = n_b2 - n_b2_0, number_b2_2015 = n_b2_0,
+    n_b2_grants = n_heat_pump_grant,
     oss_total = grant_at("OSS", "grants_Meuro"),
     warmerhomes_total = grant_at("WarmerHomes", "grants_Meuro"),
     betterenergy_total = grant_at("BetterEnergyHomes", "grants_Meuro"),

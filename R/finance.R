@@ -971,7 +971,7 @@ fabric_grant <- function(hli_old,hli_new,tech_old,tech_new,heating_install_time,
 
   #Input validation with more informative messages
   stopifnot(house_type %in% c("semi_detached", "detached", "apartment", "terraced","apartment"))
-  if(!((hli_old < 20) & (hli_new < 20))) stop(paste("hli_old=",hli_old,"hli_new=",hli_new))
+  if(!((hli_old <= 20) & (hli_new <= 20))) stop(paste("hli_old=",hli_old,"hli_new=",hli_new))
   #set.seed(as.integer(Sys.time()))
   #hli_old <- heat_loss_indicator(ber_old,tech_old,heating_install_time,params)
   #hli_new <- heat_loss_indicator(ber_new,tech_new,params$yeartime,params)

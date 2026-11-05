@@ -53,5 +53,5 @@ macro-calibration of hpmicrosimr using mclapply on linux systems (on Windows it 
 returns the same calibration data as calABM. The hypothetical bias parameter lambda. is left at its value in sD.
 }
 \examples{
-#test <- calABM2(sD,2,2,F)
+#test <- calABM2(sD,1,use_parallel=F,nu=0.35,p=0.02,beta=0.8,r=0.05,eta=0.1,tau=0.02)
 }
