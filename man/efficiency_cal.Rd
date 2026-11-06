@@ -17,6 +17,7 @@ efficiency_cal
 }
 \description{
 cumulative total number of b2 or better upgrades and heat pumps installed with SEAI grant assistance on the calibrations dates
+Note he that B2s achieved through solar PV installations are removed from this data. Remarkably few B2 are achieved through fabric upgrades alone
 }
 \details{
 \url{https://www.seai.ie/grants/home-energy-grants/home-upgrades}
