@@ -15,7 +15,11 @@ heating_upgrade_tensor(
   construction_year,
   region,
   floor_area,
-  eta,
+  c_max = 480,
+  c_min = 45,
+  h_0 = 2.4,
+  k = 2.8,
+  eta = 0,
   params,
   is_fuel_allowance = FALSE,
   include_grants = TRUE,
@@ -44,6 +48,14 @@ heating_upgrade_tensor(
 \item{region}{region}
 
 \item{floor_area}{floor area of property in m2}
+
+\item{c_max}{marginal cost for HLI improvement in the inefficient limit}
+
+\item{c_min}{marginal cost fro HLI improvement in the efficient limit}
+
+\item{h_0}{cost cross-over location}
+
+\item{k}{cost cross-over scale}
 
 \item{eta}{heterogeneous disruption parameter}
 
@@ -88,11 +100,11 @@ The \code{old_cost} include the previous opex (potentially higher because of low
 
 params <- scenario_params(sD,2028)
 
-heating_upgrade_tensor(2.31,2.31,"gas",2027.5,"gas","semi_detached",2,1990,"Dublin",100,eta=0.16,params,FALSE,TRUE,FALSE,grant_draw=NULL,oss_heat_draw = NULL)
+heating_upgrade_tensor(2.31,2.31,"gas",2027.5,"gas","semi_detached",2,1990,"Dublin",100,c_max=480,c_min=45,h_0=2.4,k=2.8,eta=0.16,params,FALSE,TRUE,FALSE,grant_draw=NULL,oss_heat_draw = NULL)
 
-heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0.05,params,FALSE,TRUE,include_rebound=FALSE)
-heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,eta=0,params,FALSE,TRUE,include_rebound=FALSE)
-heating_upgrade_tensor(2,1.2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)
-heating_upgrade_tensor(1.8,1.8,"heat_pump",installation_time=2012,"gas","semi_detached",2, construction_year=2012,"Munster",100,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)
+heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,c_max=480,c_min=45,h_0=2.4,k=2.8,eta=0.05,params,FALSE,TRUE,include_rebound=FALSE)
+heating_upgrade_tensor(4,2,"oil",2000,"heat_pump","terraced",2,1980,"Munster",90,c_max=480,c_min=45,h_0=2.4,k=2.8,eta=0,params,FALSE,TRUE,include_rebound=FALSE)
+heating_upgrade_tensor(2,1.2,"oil",2000,"heat_pump","semi_detached",2, 1980,"Munster",100,c_max=480,c_min=45,h_0=2.4,k=2.8,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)
+heating_upgrade_tensor(1.8,1.8,"heat_pump",installation_time=2012,"gas","semi_detached",2, construction_year=2012,"Munster",100,c_max=480,c_min=45,h_0=2.4,k=2.8,eta=0.12,params,FALSE,TRUE,include_rebound=FALSE)
 ber_from_hli(1.27,"gas",params$yeartime,params)
 }

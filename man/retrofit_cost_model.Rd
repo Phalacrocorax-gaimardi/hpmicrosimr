@@ -11,6 +11,10 @@ retrofit_cost_model(
   storeys,
   region = "Dublin",
   floor_area = 100,
+  c_max = 480,
+  c_min = 45,
+  h_0 = 2.4,
+  k = 2.8,
   params
 )
 }
@@ -27,6 +31,14 @@ retrofit_cost_model(
 
 \item{floor_area}{floor area (m2)}
 
+\item{c_max}{marginal upgrade cost efficient limit}
+
+\item{c_min}{marginal upgrade cost inefficient limit}
+
+\item{h_0}{cost crossover}
+
+\item{k}{cost crossover scale}
+
 \item{params}{current parameters}
 }
 \value{
@@ -42,11 +54,11 @@ Economies of scale currently use a \eqn{area^\frac{2}{3}} scaling law.
 }
 \examples{
 params <- scenario_params(sD,2018)
-retrofit_cost_model(5,4,"semi_detached",2,"Dublin",100,params)
+retrofit_cost_model(5,4,"semi_detached",2,"Dublin",100,c_max=480,c_min=45,h_0=2.4,k=2.8,params)
 params <- scenario_params(sD,2024)
-retrofit_cost_model(5,4,"semi_detached",2,"Dublin",100,params)
-retrofit_cost_model(5,2.3,"semi_detached",2,"Dublin",100,params)
-retrofit_cost_model(4.5,2.0,"detached",2,"Munster",100,params)
-retrofit_cost_model(2.41,1.91,"detached",1,"Dublin",175,params) #UCD example
+retrofit_cost_model(5,4,"semi_detached",2,"Dublin",100,c_max=480,c_min=45,h_0=2.4,k=2.8,params)
+retrofit_cost_model(5,2.3,"semi_detached",2,"Dublin",100,c_max=480,c_min=45,h_0=2.4,k=2.8,params)
+retrofit_cost_model(4.5,2.0,"detached",2,"Munster",100,c_max=480,c_min=45,h_0=2.4,k=2.8,params)
+retrofit_cost_model(2.41,1.91,"detached",1,"Dublin",175,c_max=480,c_min=45,h_0=2.4,k=2.8,params) #UCD example
 
 }

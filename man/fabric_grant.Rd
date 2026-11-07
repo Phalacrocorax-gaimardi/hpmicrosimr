@@ -15,6 +15,10 @@ fabric_grant(
   house_type,
   storeys,
   floor_area = 100,
+  c_max = 480,
+  c_min = 45,
+  h_0 = 2.4,
+  k = 2.8,
   is_fuel_allowance = FALSE,
   params,
   randomise = TRUE,
@@ -42,6 +46,14 @@ fabric_grant(
 
 \item{floor_area}{m2}
 
+\item{c_max}{efficient}
+
+\item{c_min}{inefficient}
+
+\item{h_0}{crossover}
+
+\item{k}{cost scale}
+
 \item{is_fuel_allowance}{TRUE/FALSE}
 
 \item{params}{parameters}
@@ -62,11 +74,11 @@ fabric upgrade grant of euro700 is applied.
 \examples{
 
 params <- scenario_params(sD,2028)
-fabric_grant(3,2,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
+fabric_grant(3,2,"gas","gas",2010,2003,"Dublin","detached",2,100,480,45,2.4,2.8, FALSE,params,randomise=TRUE)
 
-fabric_grant(4,2.4,"gas","gas",2010,2003,"Dublin","detached",2,100, FALSE,params,randomise=TRUE)
+fabric_grant(4,2.4,"gas","gas",2010,2003,"Dublin","detached",2,100,480,45,2.4,2.8, FALSE,params,randomise=TRUE)
 
-fabric_grant(3,2.1,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=TRUE,params,randomise=TRUE)
+fabric_grant(3,2.1,"gas","gas",2010,2003,"Dublin","detached",2,100,480,45,2.4,2.8, is_fuel_allowance=TRUE,params,randomise=TRUE)
 
-fabric_grant(2,1,"gas","gas",2010,2003,"Dublin","detached",2,100, is_fuel_allowance=FALSE,params,randomise=TRUE)
+fabric_grant(2,1,"gas","gas",2010,2003,"Dublin","detached",2,100,480,45,2.4,2.8, is_fuel_allowance=FALSE,params,randomise=TRUE)
 }

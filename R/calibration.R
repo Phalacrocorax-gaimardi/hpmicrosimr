@@ -96,12 +96,13 @@ cal_summary <- function(abm, cal_params, cal_date = "2025-11-01", start_date = "
 
   heat_pumps <- test$tech %>% dplyr::filter(date %in% cal_dates, tech == "heat_pump") %>% dplyr::ungroup() %>%
     dplyr::select(date, n_heat_pump = n_tech)
-  #efficiencies <- test$efficiency %>% dplyr::filter(date %in% cal_dates) %>% dplyr::ungroup() %>%
-  #  dplyr::inner_join(heat_pumps, by = "date")
+
   hp_grants <- test$grants %>% dplyr::filter(date %in% cal_dates) %>%
     dplyr::group_by(date) %>%
     dplyr::summarise(n_heat_pump_grants = sum(n_hp_grant), .groups = "drop")
 
+  # test$efficiency now also carries n_b2_grant_failure, n_b2_grant_upgrade,
+  # n_b2_grant_fabric_only and n_b2_grant_upgrade_hp, so they pass straight through here
   efficiencies <- test$efficiency %>% dplyr::filter(date %in% cal_dates) %>% dplyr::ungroup() %>%
     dplyr::inner_join(heat_pumps, by = "date") %>%
     dplyr::left_join(hp_grants, by = "date") %>%
@@ -128,28 +129,35 @@ cal_summary <- function(abm, cal_params, cal_date = "2025-11-01", start_date = "
 
   n_heat_pump <- hp_at(cal_d)
   n_heat_pump_0 <- hp_at(start_d)
-  n_b2 <- eff_at(cal_d, "n_b2")
+  n_b2 <- eff_at(cal_d, "n_b2")           # total B2-or-better homes in the population
   n_b2_0 <- eff_at(start_d, "n_b2")
-  n_b2_grants <- eff_at(cal_d,"n_b2_grant")
   #NB: n_fabric_total has always reported n_b2 at cal_date. The cumulative number of fabric upgrades is
-  #eff_at(cal_d, "n_upgrade"), which may be what was intended.
+  #n_upgrade below, which may be what was intended.
   n_fabric_total <- n_b2
   n_heat_pump_grant <- sum(test$grants$n_hp_grant[test$grants$date == cal_d])
   cals <- cal_params %>% dplyr::bind_cols(tibble::tibble(
     n_heat = n_heat_pump - n_heat_pump_0, n_heat_2015 = n_heat_pump_0,
     n_heat_pump_grant = n_heat_pump_grant,
     n_b2 = n_b2 - n_b2_0, number_b2_2015 = n_b2_0,
-    n_b2_grants = n_heat_pump_grant,
+    n_b2_total = n_b2,
+    # grant-assisted B2 crossings and their routes
+    n_b2_grant             = eff_at(cal_d, "n_b2_grant"),
+    n_b2_grant_failure     = eff_at(cal_d, "n_b2_grant_failure"),
+    n_b2_grant_upgrade     = eff_at(cal_d, "n_b2_grant_upgrade"),
+    n_b2_grant_fabric_only = eff_at(cal_d, "n_b2_grant_fabric_only"),
+    n_b2_grant_upgrade_hp  = eff_at(cal_d, "n_b2_grant_upgrade_hp"),
+    n_upgrade = eff_at(cal_d, "n_upgrade"),
     oss_total = grant_at("OSS", "grants_Meuro"),
     warmerhomes_total = grant_at("WarmerHomes", "grants_Meuro"),
     betterenergy_total = grant_at("BetterEnergyHomes", "grants_Meuro"),
-    n_oss = grant_at("OSS", "n_grant"),
-    n_warmerhomes = grant_at("WarmerHomes", "n_grant"),
-    n_betterenergy = grant_at("BetterEnergyHomes", "n_grant"),
+    n_oss = grant_at("OSS", "n_all_grant"),
+    n_warmerhomes = grant_at("WarmerHomes", "n_all_grant"),
+    n_betterenergy = grant_at("BetterEnergyHomes", "n_all_grant"),
     n_fabric_total = n_fabric_total))
 
   list(parameters = cals, efficiency = efficiencies, grants = grants)
 }
+
 
 
 #' run_calibration
@@ -302,29 +310,30 @@ summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
     dplyr::summarise(
       upgrade_grants   = sum(upgrade_grant),
       heat_pump_grants = sum(heat_pump_grant),
-      n_grant    = sum(upgrade_grant > 0 | heat_pump_grant > 0, na.rm = TRUE),
+      n_all_grant    = sum(upgrade_grant > 0 | heat_pump_grant > 0, na.rm = TRUE),
+      n_fabric_only_grant = sum(upgrade_grant > 0 & ((heat_pump_grant == 0) | is.na(heat_pump_grant)), na.rm = TRUE),
       n_b2_grant = sum((upgrade_grant > 0 | heat_pump_grant > 0) & ber < 125 & ber_prev >= 125, na.rm = TRUE),
       n_hp_grant = sum(heat_pump_grant > 0 & tech == "heat_pump", na.rm = TRUE),
       .groups = "drop"
     ) %>%
     dplyr::full_join(grant_grid, by = c("simulation", "date", "grant_type")) %>%
-    dplyr::mutate(dplyr::across(c(upgrade_grants, heat_pump_grants, n_grant, n_b2_grant, n_hp_grant),
+    dplyr::mutate(dplyr::across(c(upgrade_grants, heat_pump_grants, n_all_grant, n_fabric_only_grant, n_b2_grant, n_hp_grant),
                                 ~ tidyr::replace_na(.x, 0))) %>%
     dplyr::arrange(simulation, grant_type, date) %>%
     dplyr::group_by(simulation, grant_type) %>%
-    dplyr::mutate(dplyr::across(c(upgrade_grants, heat_pump_grants, n_grant, n_b2_grant, n_hp_grant), cumsum)) %>%
+    dplyr::mutate(dplyr::across(c(upgrade_grants, heat_pump_grants, n_all_grant, n_fabric_only_grant,n_b2_grant, n_hp_grant), cumsum)) %>%
     dplyr::ungroup() %>%
     dplyr::inner_join(df0, by = "simulation") %>%
-    dplyr::mutate(dplyr::across(c(upgrade_grants, heat_pump_grants, n_grant, n_b2_grant, n_hp_grant),
+    dplyr::mutate(dplyr::across(c(upgrade_grants, heat_pump_grants, n_all_grant, n_b2_grant, n_hp_grant),
                                 ~ .x / n0 * housing_stock_oo)) %>%
     dplyr::group_by(grant_type, date) %>%
-    dplyr::summarise(dplyr::across(c(upgrade_grants, heat_pump_grants, n_grant, n_b2_grant, n_hp_grant), mean),
+    dplyr::summarise(dplyr::across(c(upgrade_grants, heat_pump_grants, n_all_grant, n_b2_grant, n_hp_grant), mean),
                      .groups = "drop") %>%
     dplyr::mutate(grants_Meuro = (upgrade_grants + heat_pump_grants) / 1e6) %>%
     dplyr::select(grant_type, date, upgrade_grants, heat_pump_grants, grants_Meuro,
-                  n_grant, n_b2_grant, n_hp_grant)
+                  n_all_grant, n_b2_grant, n_hp_grant)
   # ------------------------------------------------------------
-  # Cumulative fabric-upgrade events, with or without grant supposrt (lots of micro actions)
+  # Cumulative fabric-upgrade events, with or without grant support (lots of micro actions)
   # ------------------------------------------------------------
 
   nupgrades <- abm %>%
@@ -361,37 +370,56 @@ summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
     )
 
   # ------------------------------------------------------------
-  # Building efficiency and B2-or-better stock
+  # Building efficiency and B2-or-better stock.
+  # eff$n_b2 is the total number of B2-or-better homes in the population
+  # (stock, scaled to housing_stock_oo); n_b2_grant* are cumulative grant-assisted crossings.
   # ------------------------------------------------------------
   # ------------------------------------------------------------
   # Cumulative grant-assisted B2 events: a grant-assisted upgrade that takes a
   # home from above B2 (ber >= 125) to B2 or better (ber < 125).
   # Comparable to the SEAI count of grant-assisted B2s.
   # ------------------------------------------------------------
+  # Splits grant-assisted B2 events by route:
+  #   failure = heating-system failure replacement (upgrade == FALSE)
+  #   upgrade = voluntary efficiency upgrade       (upgrade == TRUE)
+  # Upgrades are split again by whether a heat pump was installed in that step
+  # (tech is heat_pump now and was not in the previous record):
+  #   fabric_only = upgrade, no heat pump installed (includes homes that already had one)
+  #   upgrade_hp  = upgrade with a new heat pump installed
+  b2_cols <- c("n_b2_grant", "n_b2_grant_failure", "n_b2_grant_upgrade",
+               "n_b2_grant_fabric_only", "n_b2_grant_upgrade_hp")
+
   nb2_grant <- abm %>%
     dplyr::arrange(simulation, serial, date) %>%
     dplyr::group_by(simulation, serial) %>%
-    dplyr::mutate(ber_prev = dplyr::lag(ber, default = Inf)) %>%
+    dplyr::mutate(ber_prev = dplyr::lag(ber, default = Inf),
+                  tech_prev = dplyr::lag(tech)) %>%
     dplyr::ungroup() %>%
     dplyr::filter(
       date <= cal_d,
-    #  upgrade, #inclde B2s achieved through heating system failures and heat pump grants
       !is.na(grant_type), grant_type != "None",
-      upgrade_grant > 0 | heat_pump_grant > 0,
-      ber < 125, ber_prev >= 125
-    ) %>%
+      upgrade_grant > 0 | heat_pump_grant > 0, ber < 125, ber_prev >= 125) %>%
+    dplyr::mutate(hp_installed = tech == "heat_pump" & !dplyr::coalesce(tech_prev == "heat_pump", FALSE)) %>%
     dplyr::group_by(simulation, date) %>%
-    dplyr::summarise(n_b2_grant = dplyr::n(), .groups = "drop") %>%
+    dplyr::summarise(
+      n_b2_grant         = dplyr::n(),
+      n_b2_grant_failure = sum(!upgrade, na.rm = TRUE),
+      n_b2_grant_upgrade = sum(upgrade, na.rm = TRUE),
+      n_b2_grant_fabric_only = sum(upgrade & !hp_installed, na.rm = TRUE),
+      n_b2_grant_upgrade_hp  = sum(upgrade & hp_installed, na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
     dplyr::full_join(simulation_dates, by = c("simulation", "date")) %>%
-    dplyr::mutate(n_b2_grant = tidyr::replace_na(n_b2_grant, 0L)) %>%
+    dplyr::mutate(dplyr::across(dplyr::all_of(b2_cols), ~ tidyr::replace_na(.x, 0L))) %>%
     dplyr::arrange(simulation, date) %>%
     dplyr::group_by(simulation) %>%
-    dplyr::mutate(n_b2_grant = cumsum(n_b2_grant)) %>%
+    dplyr::mutate(dplyr::across(dplyr::all_of(b2_cols), cumsum)) %>%
     dplyr::ungroup() %>%
     dplyr::inner_join(df0, by = "simulation") %>%
-    dplyr::mutate(n_b2_grant = n_b2_grant / n0 * housing_stock_oo) %>%
+    dplyr::mutate(dplyr::across(dplyr::all_of(b2_cols), ~ .x / n0 * housing_stock_oo)) %>%
     dplyr::group_by(date) %>%
-    dplyr::summarise(n_b2_grant = mean(n_b2_grant), .groups = "drop")
+    dplyr::summarise(dplyr::across(dplyr::all_of(b2_cols), mean), .groups = "drop")
+
   eff <- abm %>%
     dplyr::group_by(simulation, date) %>%
     dplyr::summarise(
@@ -451,7 +479,7 @@ cal_error <- function(abm_cal) {
 
   df_grant <- abm_cal$grants %>% dplyr::inner_join(grants_cal)
   df_grant <- df_grant %>% dplyr::filter(date %in% cal_dates) %>%
-    dplyr::mutate(n_error = (n_grant - n_obsv)/n_obsv,
+    dplyr::mutate(n_error = (n_all_grant - n_obsv)/n_obsv,
            euro_error = (grants_Meuro - Meuro_obsv)/Meuro_obsv)
 
   err_2025 <- sum((df_grant %>% dplyr::filter(date=="2025-11-01") %>% dplyr::pull(n_error))^2) #mse relative number of grants

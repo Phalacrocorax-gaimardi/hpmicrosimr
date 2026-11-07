@@ -13,6 +13,10 @@ heat_pump_upgrade_savings(
   construction_year,
   region,
   floor_area,
+  c_max,
+  c_min,
+  h_0,
+  k,
   eta,
   params,
   is_fuel_allowance,
@@ -36,6 +40,14 @@ heat_pump_upgrade_savings(
 \item{region}{region}
 
 \item{floor_area}{floor area in m2}
+
+\item{c_max}{marginal cost efficient limit}
+
+\item{c_min}{marginal cost inefficient limit}
+
+\item{h_0}{cross-over location}
+
+\item{k}{cross-over scale}
 
 \item{eta}{heterogeneous disruption parameter}
 
@@ -64,13 +76,13 @@ For WarmerHomes, it is assumed that pre-2025 retrofits "stick" to current heatin
 
 params <- scenario_params(sD,2035)
 set.seed(100)
-heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
+heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,480,45,2.4,2.8,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
 set.seed(100)
-heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE,optimiser="DirectL")
-heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,0,params,is_fuel_allowance=FALSE,include_grants=TRUE)
-heat_pump_upgrade_savings(2.2,"heat_pump",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=TRUE,include_grants=TRUE)
+heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,480,45,2.4,2.8,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE,optimiser="DirectL")
+heat_pump_upgrade_savings(4.31,"electricity",2000,"semi_detached",2,1990,"Munster",106,480,45,2.4,2.8,0,params,is_fuel_allowance=FALSE,include_grants=TRUE)
+heat_pump_upgrade_savings(2.2,"heat_pump",2000,"semi_detached",2,1990,"Munster",106,480,45,2.4,2.8,0.12,params,is_fuel_allowance=TRUE,include_grants=TRUE)
 
-heat_pump_upgrade_savings(3.5,"gas",2000,"semi_detached",2,1990,"Munster",106,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
-heat_pump_upgrade_savings(3.96,"oil",2000,"semi_detached",2,1944,"Munster",106,0.1,params,is_fuel_allowance=TRUE,include_grants = FALSE)
+heat_pump_upgrade_savings(3.5,"gas",2000,"semi_detached",2,1990,"Munster",106,480,45,2.4,2.8,0.12,params,is_fuel_allowance=FALSE,include_grants=TRUE)
+heat_pump_upgrade_savings(3.96,"oil",2000,"semi_detached",2,1944,"Munster",106,480,45,2.4,2.8,0.1,params,is_fuel_allowance=TRUE,include_grants = FALSE)
 
 }

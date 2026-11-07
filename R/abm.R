@@ -217,6 +217,14 @@ initialise_agents <- function(scen,yeartime=2015,cal_run=10){
   agents <- agents %>% dplyr::mutate(eta = eta/mean(eta)) %>% dplyr::mutate(eta = params$eta.*eta)
   #esnue no HLI exceeds 15
   agents <- agents %>% dplyr::mutate(hli = pmin(hli, 20))
+  #add heterogenous fabric upgrade cost factors
+  sigma_c_cost <- scen %>% dplyr::filter(parameter=="fabric_upgrade_cost_variability") %>% dplyr::pull(value)
+  sigma_h_cost <- scen %>% dplyr::filter(parameter=="fabric_upgrade_cost_crossover_variability") %>% dplyr::pull(value)
+  agents <- agents %>% dplyr::mutate(c_cost = exp(rnorm(dplyr::n(),0,sigma_c_cost))-0.5*sigma_c_cost^2,
+                                     h_cost = rnorm(dplyr::n(),0,sigma_h_cost))
+  agents <- agents %>% dplyr::inner_join(upgrade_logistic_cost_model,by=c("house_type","storeys"))
+  agents <- agents %>% dplyr::mutate(c_max=c_cost*c_max,c_min=c_cost*c_min,h_0 = h_0 + h_cost,k=k) %>% dplyr::select(-c_cost,-h_cost)
+
   return(agents %>% dplyr::ungroup())
 }
 
@@ -315,8 +323,8 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
   hp_savings_env <- function(hli,tech, house_type,storeys, construction_year, region, floor_area,eta) {
     heat_pump_savings(hli,tech, params$yeartime, house_type, storeys,construction_year, region, floor_area, eta,params)
   }
-  hp_upgrade_savings_env <- function(hli,tech, heating_install_time,house_type, storeys,construction_year, region, floor_area,eta,fuel_allowance) {
-    heat_pump_upgrade_savings(hli,tech, heating_install_time, house_type,storeys, construction_year, region, floor_area, eta, params,fuel_allowance,include_grants = TRUE)
+  hp_upgrade_savings_env <- function(hli,tech, heating_install_time,house_type, storeys,construction_year, region, floor_area,c_max,c_min,h_0,k,eta,fuel_allowance) {
+    heat_pump_upgrade_savings(hli,tech, heating_install_time, house_type,storeys, construction_year, region, floor_area, c_max,c_min,h_0,k,eta, params,fuel_allowance,include_grants = TRUE)
   }
 
   ########################
@@ -401,7 +409,7 @@ update_agents <- function(scen,yeartime,agents_in, social_network,ignore_social=
   ######################
   #print("b_s2")
   b_s2$upgrade <- TRUE
-  b_s0 <- b_s2 %>% dplyr::select(hli,tech,heating_install_time,house_type,storeys, construction_year, region, floor_area,eta,fuel_allowance)
+  b_s0 <- b_s2 %>% dplyr::select(hli,tech,heating_install_time,house_type,storeys, construction_year, region, floor_area,c_max,c_min,h_0,k,eta,fuel_allowance)
   #df <- purrr::pmap(b_s0,optimise_heat_env)
   df <- purrr::pmap(b_s0,hp_upgrade_savings_env)
   df <- do.call(rbind,df)
