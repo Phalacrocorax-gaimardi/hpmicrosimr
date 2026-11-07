@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.11</span>
       </span>
     </div>
 
@@ -133,14 +133,14 @@
 <span class="r-in"><span><span class="co"># theoretical cost without rebound</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span><span class="fl">100</span>,<span class="fu">annualised_heating_system_cost</span><span class="op">(</span><span class="fl">2.3</span>,<span class="st">"heat_pump"</span>,<span class="va">params</span><span class="op">$</span><span class="va">yeartime</span>,<span class="st">"new"</span>,<span class="fl">100</span>,<span class="st">"semi_detached"</span>,<span class="fl">1997</span>,grant_type<span class="op">=</span><span class="st">"OSS"</span>,<span class="va">params</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> .</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1464.46097451618 1761.07912862075 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1498.60201615224 1795.22017025681 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               51               49 </span>
 <span class="r-in"><span><span class="co"># actual cost with rebound</span></span></span>
 <span class="r-in"><span><span class="fu">annualised_heating_system_cost</span><span class="op">(</span><span class="fl">2.4</span>,<span class="st">"oil"</span>,<span class="fl">2010</span>,<span class="st">"new"</span>,<span class="fl">100</span>,<span class="st">"semi_detached"</span>,<span class="fl">1997</span>,grant_type<span class="op">=</span><span class="st">"None"</span>,<span class="va">params</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1968.742</span>
 <span class="r-in"><span><span class="va">params</span><span class="op">$</span><span class="va">beta.</span> <span class="op">&lt;-</span> <span class="fl">0.5</span></span></span>
 <span class="r-in"><span><span class="fu">annualised_heating_system_cost</span><span class="op">(</span><span class="fl">2.4</span>,<span class="st">"heat_pump"</span>,<span class="fl">2010</span>,<span class="st">"new"</span>,<span class="fl">100</span>,<span class="st">"semi_detached"</span>,<span class="fl">1997</span>,grant_type<span class="op">=</span><span class="st">"None"</span>,<span class="va">params</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3622.929</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3668.253</span>
 <span class="r-in"><span><span class="fu">annualised_heating_system_cost</span><span class="op">(</span><span class="fl">2.4</span>,<span class="st">"wood"</span>,<span class="fl">2010</span>,<span class="st">"new"</span>,<span class="fl">100</span>,<span class="st">"semi_detached"</span>,<span class="fl">1997</span>,<span class="va">params</span>,grant_type<span class="op">=</span><span class="st">"BetterEnergyHomes"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2016.452</span>
 </code></pre></div>

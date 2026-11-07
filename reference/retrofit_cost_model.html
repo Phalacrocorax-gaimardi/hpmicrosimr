@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.11</span>
       </span>
     </div>
 
@@ -61,6 +61,10 @@
 <span>  <span class="va">storeys</span>,</span>
 <span>  region <span class="op">=</span> <span class="st">"Dublin"</span>,</span>
 <span>  floor_area <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  c_max <span class="op">=</span> <span class="fl">480</span>,</span>
+<span>  c_min <span class="op">=</span> <span class="fl">45</span>,</span>
+<span>  h_0 <span class="op">=</span> <span class="fl">2.4</span>,</span>
+<span>  k <span class="op">=</span> <span class="fl">2.8</span>,</span>
 <span>  <span class="va">params</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -93,6 +97,22 @@
 <dd><p>floor area (m2)</p></dd>
 
 
+<dt id="arg-c-max">c_max<a class="anchor" aria-label="anchor" href="#arg-c-max"></a></dt>
+<dd><p>marginal upgrade cost efficient limit</p></dd>
+
+
+<dt id="arg-c-min">c_min<a class="anchor" aria-label="anchor" href="#arg-c-min"></a></dt>
+<dd><p>marginal upgrade cost inefficient limit</p></dd>
+
+
+<dt id="arg-h-">h_0<a class="anchor" aria-label="anchor" href="#arg-h-"></a></dt>
+<dd><p>cost crossover</p></dd>
+
+
+<dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
+<dd><p>cost crossover scale</p></dd>
+
+
 <dt id="arg-params">params<a class="anchor" aria-label="anchor" href="#arg-params"></a></dt>
 <dd><p>current parameters</p></dd>
 
@@ -110,17 +130,17 @@
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2018</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">5</span>,<span class="fl">4</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="st">"Dublin"</span>,<span class="fl">100</span>,<span class="va">params</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4795.228</span>
+<span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">5</span>,<span class="fl">4</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="st">"Dublin"</span>,<span class="fl">100</span>,c_max<span class="op">=</span><span class="fl">480</span>,c_min<span class="op">=</span><span class="fl">45</span>,h_0<span class="op">=</span><span class="fl">2.4</span>,k<span class="op">=</span><span class="fl">2.8</span>,<span class="va">params</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5393.189</span>
 <span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2024</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">5</span>,<span class="fl">4</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="st">"Dublin"</span>,<span class="fl">100</span>,<span class="va">params</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5106.27</span>
-<span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">5</span>,<span class="fl">2.3</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="st">"Dublin"</span>,<span class="fl">100</span>,<span class="va">params</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 26623.29</span>
-<span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">4.5</span>,<span class="fl">2.0</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="st">"Munster"</span>,<span class="fl">100</span>,<span class="va">params</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 34861.98</span>
-<span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">2.41</span>,<span class="fl">1.91</span>,<span class="st">"detached"</span>,<span class="fl">1</span>,<span class="st">"Dublin"</span>,<span class="fl">175</span>,<span class="va">params</span><span class="op">)</span> <span class="co">#UCD example</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 39700.22</span>
+<span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">5</span>,<span class="fl">4</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="st">"Dublin"</span>,<span class="fl">100</span>,c_max<span class="op">=</span><span class="fl">480</span>,c_min<span class="op">=</span><span class="fl">45</span>,h_0<span class="op">=</span><span class="fl">2.4</span>,k<span class="op">=</span><span class="fl">2.8</span>,<span class="va">params</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5743.017</span>
+<span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">5</span>,<span class="fl">2.3</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="st">"Dublin"</span>,<span class="fl">100</span>,c_max<span class="op">=</span><span class="fl">480</span>,c_min<span class="op">=</span><span class="fl">45</span>,h_0<span class="op">=</span><span class="fl">2.4</span>,k<span class="op">=</span><span class="fl">2.8</span>,<span class="va">params</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 31070.09</span>
+<span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">4.5</span>,<span class="fl">2.0</span>,<span class="st">"detached"</span>,<span class="fl">2</span>,<span class="st">"Munster"</span>,<span class="fl">100</span>,c_max<span class="op">=</span><span class="fl">480</span>,c_min<span class="op">=</span><span class="fl">45</span>,h_0<span class="op">=</span><span class="fl">2.4</span>,k<span class="op">=</span><span class="fl">2.8</span>,<span class="va">params</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 32498.68</span>
+<span class="r-in"><span><span class="fu">retrofit_cost_model</span><span class="op">(</span><span class="fl">2.41</span>,<span class="fl">1.91</span>,<span class="st">"detached"</span>,<span class="fl">1</span>,<span class="st">"Dublin"</span>,<span class="fl">175</span>,c_max<span class="op">=</span><span class="fl">480</span>,c_min<span class="op">=</span><span class="fl">45</span>,h_0<span class="op">=</span><span class="fl">2.4</span>,k<span class="op">=</span><span class="fl">2.8</span>,<span class="va">params</span><span class="op">)</span> <span class="co">#UCD example</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 29544.84</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

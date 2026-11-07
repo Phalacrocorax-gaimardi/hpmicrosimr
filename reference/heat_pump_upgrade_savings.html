@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.11</span>
       </span>
     </div>
 
@@ -63,6 +63,10 @@
 <span>  <span class="va">construction_year</span>,</span>
 <span>  <span class="va">region</span>,</span>
 <span>  <span class="va">floor_area</span>,</span>
+<span>  <span class="va">c_max</span>,</span>
+<span>  <span class="va">c_min</span>,</span>
+<span>  <span class="va">h_0</span>,</span>
+<span>  <span class="va">k</span>,</span>
 <span>  <span class="va">eta</span>,</span>
 <span>  <span class="va">params</span>,</span>
 <span>  <span class="va">is_fuel_allowance</span>,</span>
@@ -107,6 +111,22 @@
 <dd><p>floor area in m2</p></dd>
 
 
+<dt id="arg-c-max">c_max<a class="anchor" aria-label="anchor" href="#arg-c-max"></a></dt>
+<dd><p>marginal cost efficient limit</p></dd>
+
+
+<dt id="arg-c-min">c_min<a class="anchor" aria-label="anchor" href="#arg-c-min"></a></dt>
+<dd><p>marginal cost inefficient limit</p></dd>
+
+
+<dt id="arg-h-">h_0<a class="anchor" aria-label="anchor" href="#arg-h-"></a></dt>
+<dd><p>cross-over location</p></dd>
+
+
+<dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
+<dd><p>cross-over scale</p></dd>
+
+
 <dt id="arg-eta">eta<a class="anchor" aria-label="anchor" href="#arg-eta"></a></dt>
 <dd><p>heterogeneous disruption parameter</p></dd>
 
@@ -145,63 +165,63 @@ For WarmerHomes, it is assumed that pre-2025 retrofits "stick" to current heatin
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="scenario_params.html">scenario_params</a></span><span class="op">(</span><span class="va">sD</span>,<span class="fl">2035</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">4.31</span>,<span class="st">"electricity"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">0.12</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">4.31</span>,<span class="st">"electricity"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">480</span>,<span class="fl">45</span>,<span class="fl">2.4</span>,<span class="fl">2.8</span>,<span class="fl">0.12</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   hli_stick eac_stick upgrade_cost_stick tech_cost_stick grant_type_stick </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      3.21      <span style="text-decoration: underline;">5</span>521               <span style="text-decoration: underline;">5</span>824            <span style="text-decoration: underline;">1</span>607 BetterEnergyHomes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      3.28      <span style="text-decoration: underline;">6</span>017               <span style="text-decoration: underline;">6</span>067            <span style="text-decoration: underline;">1</span>626 BetterEnergyHomes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: upgrade_grant_stick &lt;dbl&gt;, heat_pump_grant_stick &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   hli_switch &lt;dbl&gt;, eac_switch &lt;dbl&gt;, upgrade_cost_switch &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   tech_cost_switch &lt;dbl&gt;, grant_type_switch &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   upgrade_grant_switch &lt;dbl&gt;, heat_pump_grant_switch &lt;dbl&gt;, savings &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   eac_old &lt;dbl&gt;</span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">4.31</span>,<span class="st">"electricity"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">0.12</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span>,optimiser<span class="op">=</span><span class="st">"DirectL"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">4.31</span>,<span class="st">"electricity"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">480</span>,<span class="fl">45</span>,<span class="fl">2.4</span>,<span class="fl">2.8</span>,<span class="fl">0.12</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span>,optimiser<span class="op">=</span><span class="st">"DirectL"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   hli_stick eac_stick upgrade_cost_stick tech_cost_stick grant_type_stick </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      3.22      <span style="text-decoration: underline;">5</span>520               <span style="text-decoration: underline;">5</span>754            <span style="text-decoration: underline;">1</span>610 BetterEnergyHomes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      3.30      <span style="text-decoration: underline;">6</span>015               <span style="text-decoration: underline;">5</span>860            <span style="text-decoration: underline;">1</span>634 BetterEnergyHomes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: upgrade_grant_stick &lt;dbl&gt;, heat_pump_grant_stick &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   hli_switch &lt;dbl&gt;, eac_switch &lt;dbl&gt;, upgrade_cost_switch &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   tech_cost_switch &lt;dbl&gt;, grant_type_switch &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   upgrade_grant_switch &lt;dbl&gt;, heat_pump_grant_switch &lt;dbl&gt;, savings &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   eac_old &lt;dbl&gt;</span></span>
-<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">4.31</span>,<span class="st">"electricity"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">0</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">4.31</span>,<span class="st">"electricity"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">480</span>,<span class="fl">45</span>,<span class="fl">2.4</span>,<span class="fl">2.8</span>,<span class="fl">0</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   hli_stick eac_stick upgrade_cost_stick tech_cost_stick grant_type_stick </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      2.55      <span style="text-decoration: underline;">4</span>495              <span style="text-decoration: underline;">14</span>006            <span style="text-decoration: underline;">1</span>415 BetterEnergyHomes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      2.62      <span style="text-decoration: underline;">4</span>941              <span style="text-decoration: underline;">14</span>738            <span style="text-decoration: underline;">1</span>437 BetterEnergyHomes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: upgrade_grant_stick &lt;dbl&gt;, heat_pump_grant_stick &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   hli_switch &lt;dbl&gt;, eac_switch &lt;dbl&gt;, upgrade_cost_switch &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   tech_cost_switch &lt;dbl&gt;, grant_type_switch &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   upgrade_grant_switch &lt;dbl&gt;, heat_pump_grant_switch &lt;dbl&gt;, savings &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   eac_old &lt;dbl&gt;</span></span>
-<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">2.2</span>,<span class="st">"heat_pump"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">0.12</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">TRUE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">2.2</span>,<span class="st">"heat_pump"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">480</span>,<span class="fl">45</span>,<span class="fl">2.4</span>,<span class="fl">2.8</span>,<span class="fl">0.12</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">TRUE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   hli_stick eac_stick upgrade_cost_stick tech_cost_stick grant_type_stick</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>       2.2      <span style="text-decoration: underline;">2</span>711                  0           <span style="text-decoration: underline;">10</span>662 None            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>       2.2      <span style="text-decoration: underline;">2</span>749                  0           <span style="text-decoration: underline;">10</span>662 None            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: upgrade_grant_stick &lt;dbl&gt;, heat_pump_grant_stick &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   hli_switch &lt;dbl&gt;, eac_switch &lt;dbl&gt;, upgrade_cost_switch &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   tech_cost_switch &lt;dbl&gt;, grant_type_switch &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   upgrade_grant_switch &lt;dbl&gt;, heat_pump_grant_switch &lt;dbl&gt;, savings &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   eac_old &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">3.5</span>,<span class="st">"gas"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">0.12</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">3.5</span>,<span class="st">"gas"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1990</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">480</span>,<span class="fl">45</span>,<span class="fl">2.4</span>,<span class="fl">2.8</span>,<span class="fl">0.12</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">FALSE</span>,include_grants<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   hli_stick eac_stick upgrade_cost_stick tech_cost_stick grant_type_stick </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      3.38      <span style="text-decoration: underline;">3</span>355                724            <span style="text-decoration: underline;">2</span>466 BetterEnergyHomes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      3.40      <span style="text-decoration: underline;">3</span>368                730            <span style="text-decoration: underline;">2</span>470 BetterEnergyHomes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: upgrade_grant_stick &lt;dbl&gt;, heat_pump_grant_stick &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   hli_switch &lt;dbl&gt;, eac_switch &lt;dbl&gt;, upgrade_cost_switch &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   tech_cost_switch &lt;dbl&gt;, grant_type_switch &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   upgrade_grant_switch &lt;dbl&gt;, heat_pump_grant_switch &lt;dbl&gt;, savings &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   eac_old &lt;dbl&gt;</span></span>
-<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">3.96</span>,<span class="st">"oil"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1944</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">0.1</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">TRUE</span>,include_grants <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">heat_pump_upgrade_savings</span><span class="op">(</span><span class="fl">3.96</span>,<span class="st">"oil"</span>,<span class="fl">2000</span>,<span class="st">"semi_detached"</span>,<span class="fl">2</span>,<span class="fl">1944</span>,<span class="st">"Munster"</span>,<span class="fl">106</span>,<span class="fl">480</span>,<span class="fl">45</span>,<span class="fl">2.4</span>,<span class="fl">2.8</span>,<span class="fl">0.1</span>,<span class="va">params</span>,is_fuel_allowance<span class="op">=</span><span class="cn">TRUE</span>,include_grants <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   hli_stick eac_stick upgrade_cost_stick tech_cost_stick grant_type_stick</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      3.90      <span style="text-decoration: underline;">3</span>502                261            <span style="text-decoration: underline;">2</span>976 None            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      3.95      <span style="text-decoration: underline;">3</span>503                 65            <span style="text-decoration: underline;">2</span>992 None            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: upgrade_grant_stick &lt;dbl&gt;, heat_pump_grant_stick &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   hli_switch &lt;dbl&gt;, eac_switch &lt;dbl&gt;, upgrade_cost_switch &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   tech_cost_switch &lt;dbl&gt;, grant_type_switch &lt;chr&gt;,</span></span>
