@@ -311,7 +311,7 @@ summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
       upgrade_grants   = sum(upgrade_grant),
       heat_pump_grants = sum(heat_pump_grant),
       n_all_grant    = sum(upgrade_grant > 0 | heat_pump_grant > 0, na.rm = TRUE),
-      n_fabric_only_grant = sum(upgrade_grant > 0 & ((heat_pump_grant == 0) | is.na(heat_pump_grant)), na.rm = TRUE),
+      #n_fabric_only_grant = sum(upgrade_grant > 0 & ((heat_pump_grant == 0) | is.na(heat_pump_grant)), na.rm = TRUE),
       n_b2_grant = sum((upgrade_grant > 0 | heat_pump_grant > 0) & ber < 125 & ber_prev >= 125, na.rm = TRUE),
       n_hp_grant = sum(heat_pump_grant > 0 & tech == "heat_pump", na.rm = TRUE),
       .groups = "drop"

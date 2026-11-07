@@ -220,12 +220,13 @@ initialise_agents <- function(scen,yeartime=2015,cal_run=10){
   #add heterogenous fabric upgrade cost factors
   sigma_c_cost <- scen %>% dplyr::filter(parameter=="fabric_upgrade_cost_variability") %>% dplyr::pull(value)
   sigma_h_cost <- scen %>% dplyr::filter(parameter=="fabric_upgrade_cost_crossover_variability") %>% dplyr::pull(value)
-  agents <- agents %>% dplyr::mutate(c_cost = exp(rnorm(dplyr::n(),0,sigma_c_cost))-0.5*sigma_c_cost^2,
+  agents <- agents %>% dplyr::mutate(c_cost = exp(rnorm(dplyr::n(),0,sigma_c_cost)-0.5*sigma_c_cost^2),
                                      h_cost = rnorm(dplyr::n(),0,sigma_h_cost))
-  agents <- agents %>% dplyr::inner_join(upgrade_logistic_cost_model,by=c("house_type","storeys"))
+  agents <- agents %>% dplyr::mutate(storeys_key=ifelse(house_type=="apartment",1,pmin(storeys,2))) %>%
+    dplyr::left_join(upgrade_logistic_cost_model,by=c("house_type","storeys_key"="storeys"))
   agents <- agents %>% dplyr::mutate(c_max=c_cost*c_max,c_min=c_cost*c_min,h_0 = h_0 + h_cost,k=k) %>% dplyr::select(-c_cost,-h_cost)
-
-  return(agents %>% dplyr::ungroup())
+  stopifnot(!anyNA(agents$c_max))
+  return(agents %>% dplyr::ungroup() %>% dplyr::select(-storeys_key))
 }
 
 # agents_in <- initialise_agents(sD,2015,100)
