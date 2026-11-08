@@ -300,6 +300,8 @@ summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
     grant_type = schemes
   )
 
+  grant_cols <- c("upgrade_grants","heat_pump_grants","n_all_grant","n_b2_grant","n_hp_grant")
+
   egrants <- abm %>%
     dplyr::arrange(simulation, serial, date) %>%
     dplyr::group_by(simulation, serial) %>%
@@ -317,17 +319,17 @@ summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
       .groups = "drop"
     ) %>%
     dplyr::full_join(grant_grid, by = c("simulation", "date", "grant_type")) %>%
-    dplyr::mutate(dplyr::across(c(upgrade_grants, heat_pump_grants, n_all_grant, n_fabric_only_grant, n_b2_grant, n_hp_grant),
+    dplyr::mutate(dplyr::across(dplyr::all_of(grant_cols),
                                 ~ tidyr::replace_na(.x, 0))) %>%
     dplyr::arrange(simulation, grant_type, date) %>%
     dplyr::group_by(simulation, grant_type) %>%
-    dplyr::mutate(dplyr::across(c(upgrade_grants, heat_pump_grants, n_all_grant, n_fabric_only_grant,n_b2_grant, n_hp_grant), cumsum)) %>%
+    dplyr::mutate(dplyr::across(dplyr::all_of(grant_cols), cumsum)) %>%
     dplyr::ungroup() %>%
     dplyr::inner_join(df0, by = "simulation") %>%
-    dplyr::mutate(dplyr::across(c(upgrade_grants, heat_pump_grants, n_all_grant, n_b2_grant, n_hp_grant),
+    dplyr::mutate(dplyr::across(dplyr::all_of(grant_cols),
                                 ~ .x / n0 * housing_stock_oo)) %>%
     dplyr::group_by(grant_type, date) %>%
-    dplyr::summarise(dplyr::across(c(upgrade_grants, heat_pump_grants, n_all_grant, n_b2_grant, n_hp_grant), mean),
+    dplyr::summarise(dplyr::across(dplyr::all_of(grant_cols), mean),
                      .groups = "drop") %>%
     dplyr::mutate(grants_Meuro = (upgrade_grants + heat_pump_grants) / 1e6) %>%
     dplyr::select(grant_type, date, upgrade_grants, heat_pump_grants, grants_Meuro,
