@@ -50,8 +50,12 @@ cal_error(test)
 test <- calABM2(sD,1,use_parallel=F,nu=100,p=0.0,beta=1,r=0.05,eta=0.,tau=0.0)
 cal_error(test)
 #only behavioural factors in heating system failures - no upgrades
-test <- calABM2(sD,1,use_parallel=F,nu=0,p=0.,beta=1,r=0.05,eta=0.,tau=0.0)
-cal_error(test)
+test0 <- calABM2(sD,1,use_parallel=F,nu=0,p=0.,beta=1,r=0.05,eta=0.,tau=0.0)
+cal_error(test0)
+test1 <- calABM2(sD,1,use_parallel=F,nu=0,p=0.04,beta=1,r=0.05,eta=0.,tau=0.0)
+cal_error(test1)
+test3 <- calABM2(sD,1,use_parallel=F,nu=0,p=0.04,beta=1,r=0.05,eta=0.05,tau=0.02)
+cal_error(test3)
 
 #scans - nu dependence of heat pump uptake from failures
 scan <- tibble()

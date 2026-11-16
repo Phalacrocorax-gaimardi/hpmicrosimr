@@ -54,6 +54,9 @@ where \eqn{crf_{Weibull}} is the capital reduction factor for a system with Weib
 \code{erv_weibull()} returns the
 The difference between these quantities \eqn{r erv_{weibull}} can be interpreted as a penalty for retiring a heating system before it
 has failed.
+
+Note that heat pump grants apply to the first heat pump installation but are not applied to recurring installations. In there words, households
+treat the grant as a one-off subsidy when evaluating the financial benefits of heat pump adoption.
 }
 \examples{
 sapply(2010:2040, function(y) annualised_capex("heat_pump",18,2010,"swap","detached",2003,scenario_params(sD,y),"WarmerHomes", existing=FALSE))

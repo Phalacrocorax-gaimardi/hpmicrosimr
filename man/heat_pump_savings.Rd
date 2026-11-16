@@ -53,6 +53,10 @@ If current system is a heat pump, the choice between a heat pump swap or reversi
 \cr
 This function is used in *update_agents* to determine the new system choice when current heating system fails. A heat pump "disruption" penality is not included in the current version.
 }
+\details{
+In the current version, a hardwired parameter "backflow" determines whether a household with a heat pump failure is allowed to revert to gas. This parameter is set to FALSE
+in the current version.
+}
 \examples{
 params <- scenario_params(sD,2025)
 heat_pump_savings(2.31,"heat_pump",2010,"detached",2,1995,"Munster",120,0.12,params)

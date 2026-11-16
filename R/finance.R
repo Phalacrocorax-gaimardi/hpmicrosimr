@@ -102,6 +102,9 @@ heating_system_capital_cost <- function(tech,kW,installation_type="new",house_ty
 #' \code{erv_weibull()} returns the
 #' The difference between these quantities \eqn{r erv_{weibull}} can be interpreted as a penalty for retiring a heating system before it
 #' has failed.
+#' @details
+#' Note that heat pump grants apply to the first heat pump installation but are not applied to recurring installations. In there words, households
+#' treat the grant as a one-off subsidy when evaluating the financial benefits of heat pump adoption.
 #'
 #'
 #' @param tech heating technology
@@ -114,6 +117,7 @@ heating_system_capital_cost <- function(tech,kW,installation_type="new",house_ty
 #' @param grant_type grant type
 #' @param oss_heat_draw NULL if random 0,1
 #' @param existing TRUE or FALSE - whether we are evaluating an existing system or a potential new system -default FALSE (new system)
+#'
 #'
 #' @returns euro amount
 #' @export
@@ -137,20 +141,23 @@ annualised_capex <- function(tech,kW,installation_time, installation_type,house_
   #
   #ifelse(installation_time < params$yeartime,
   #capex <- heating_system_capital_cost(tech,kW,installation_type,house_type,construction_year,"None",scenario_params(sD,installation_time),include_vat = TRUE)$cost_after_grant,
-  capex <- heating_system_capital_cost(tech,kW,installation_type,house_type,construction_year,grant_type,oss_heat_draw=oss_heat_draw,params,include_vat = TRUE)$cost_after_grant
-  #)
+  hc <- heating_system_capital_cost(tech,kW,installation_type,house_type,construction_year,grant_type,oss_heat_draw=oss_heat_draw,params,include_vat = TRUE)
+  C <- hc$cost #capital cost before grant
+  G <- hc$grant #one-off grant amount
+
   #
   #print(capex)
   #continuous time discount rate
   r <- log(1+params$r.) #annual to continuous time
   if(existing){
     age <- params$yeartime - installation_time
-    return( capex*(crf_weibull(lifetime,beta,r)-r*erv_weibull(lifetime,beta,age,r)))
+    return( C*(crf_weibull(lifetime,beta,r)-r*erv_weibull(lifetime,beta,age,r)))
   }
-  if(!existing)
+  #if(!existing)
   crf <- crf_weibull(lifetime,beta,r)
-  #effective_bias <- ifelse(grant_type=="OSS", params$beta.*params$eta., params$beta.) #includes "sludge-hassle" for OSS
-  ifelse(capex <= params$present_bias_threshold, capex*crf,crf*(params$present_bias_threshold+ (capex-params$present_bias_threshold)/params$beta.))
+  bias <- function(x) ifelse(x <= params$present_bias_threshold,x,params$present_bias_threshold + (x-params$present_bias_threshold)/params$beta.)
+  crf*C + r*(bias(C-G)-C)
+  #ifelse(capex <= params$present_bias_threshold, capex*crf,crf*(params$present_bias_threshold+ (capex-params$present_bias_threshold)/params$beta.))
   #return(annualised_capex)
 }
 
@@ -476,11 +483,18 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
    crf <- crf_weibull(lifetime,beta,r)
    #effective_bias <- ifelse(grant_type=="OSS", params$beta.*params$eta., params$beta.) #includes "sludge-hassle" for OSS
    #apply a present bias only of the heating system costs exceeds typcial boiler costs. In practice, applies to heat pump only
-   heat_annualised_capex <- ifelse(heating_sys_cost <= params$present_bias_threshold, heating_sys_cost*crf,crf*(params$present_bias_threshold+ (heating_sys_cost-params$present_bias_threshold)/params$beta.))
-   #heat_annualised_capex <- heating_sys_cost*crf/params$beta.
-   #annualised heat grant
-   heat_annualised_grant <- ifelse(include_grants,heat_grant*(crf/params$beta.-params$tau.),0)
-   #for now assume there is only one discount rate
+   #heat_annualised_capex <- ifelse(heating_sys_cost <= params$present_bias_threshold, heating_sys_cost*crf,crf*(params$present_bias_threshold+ (heating_sys_cost-params$present_bias_threshold)/params$beta.))
+   #heat_annualised_grant <- ifelse(include_grants,heat_grant*(crf/params$beta.-params$tau.),0)
+   #immediate outlay to which present bias is applied
+   heat_grant <- ifelse(include_grants,heat_grant,0)
+   bias <- function(x) ifelse(x <= params$present_bias_threshold,x,params$present_bias_threshold + (x-params$present_bias_threshold)/params$beta.)
+   #gross cost - present bias on first purchase, replacements unbiased
+   heat_annualised_capex <- crf*heating_sys_cost+r*(bias(heating_sys_cost)-heating_sys_cost)
+   #
+   heat_annualised_grant <- r*(bias(heating_sys_cost)-bias(heating_sys_cost-heat_grant)-params$tau.*heat_grant)
+
+
+    #for now assume there is only one discount rate
    #infinite lifetime
    #should the heating system be retained or upgraded at this time?
    opex <- heating_system_operating_cost(hli_new,tech_new,params$yeartime,floor_area,params,include_rebound=FALSE)
@@ -725,6 +739,9 @@ optimise_heat <- function(hli,tech_old,installation_time,house_type,storeys,cons
 #' \cr
 #' \cr
 #' This function is used in *update_agents* to determine the new system choice when current heating system fails. A heat pump "disruption" penality is not included in the current version.
+#' @details
+#' In the current version, a hardwired parameter "backflow" determines whether a household with a heat pump failure is allowed to revert to gas. This parameter is set to FALSE
+#' in the current version.
 #'
 #' @param hli current HLI
 #' @param tech_old current tech
@@ -750,7 +767,7 @@ optimise_heat <- function(hli,tech_old,installation_time,house_type,storeys,cons
 
 heat_pump_savings <- function(hli,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,eta,params){
   #
-  backflow <- TRUE #allow households with heat pumps to revert to gas
+  backflow <- FALSE #allow households with heat pumps to revert to gas
   df <- optimise_heat(hli,tech_old,installation_time,house_type,storeys,construction_year,region,floor_area,eta,params,include_rebound=FALSE)
   stick_cost <- df %>% dplyr::filter(tech_old==tech_new) %>% dplyr::pull(new_cost)
   switch_cost <- df %>% dplyr::filter(tech_old!=tech_new) %>% dplyr::pull(new_cost)
