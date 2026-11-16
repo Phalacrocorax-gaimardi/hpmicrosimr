@@ -491,7 +491,7 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
    #gross cost - present bias on first purchase, replacements unbiased
    heat_annualised_capex <- crf*heating_sys_cost+r*(bias(heating_sys_cost)-heating_sys_cost)
    #
-   heat_annualised_grant <- r*(bias(heating_sys_cost)-bias(heating_sys_cost-heat_grant)-params$tau.*heat_grant)
+   heat_annualised_grant <- r*(bias(heating_sys_cost)-bias(heating_sys_cost-heat_grant))-params$tau.*heat_grant
 
 
     #for now assume there is only one discount rate
