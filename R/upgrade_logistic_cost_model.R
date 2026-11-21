@@ -1,10 +1,10 @@
 #' @title upgrade_logistic_cost_model
-#' @description Parameters of the building fabric or envelope upgrade cost model. hpmicrosimr uses a logistic cost model with low marginal cost for inefficient buildings and
-#' and high cost for efficient buildings. The parameters are defined through the marginal cost equation:
+#' @description Parameters of the building fabric or envelope upgrade cost model. \code{hpmicrosimr} uses a simple logistic cost model with a crossover from low marginal cost \eqn{c_min} for inefficient buildings and
+#' to a high marginal cost \eqn{c_max} for efficient buildings. The parameters are defined through the marginal cost equation:
 #'
 #' \deqn{\frac{d C}{d HLI} = \frac{c_{min}}{1+e^{-\left(HLI-h_0\right)/\Delta H}} + \frac{c_{max}}{1+e^{\left(HLI-h_0\right)/\ Delta H}}}
 #'
-#' where \eqn{\Delta H = 1/k}
+#' \code{upgrade_logistic_cost_model} and the function \code{retrofit_cost_model()} uses the parameter \eqn{k \equiv \frac{1}{\Delta H}
 #'
 #' where  is the cost and HLI is the Heat Loss Index.
 #'

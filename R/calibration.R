@@ -487,12 +487,18 @@ cal_error <- function(abm_cal) {
   err_2025 <- sum((df_grant %>% dplyr::filter(date=="2025-11-01") %>% dplyr::pull(n_error))^2) #mse relative number of grants
   err_2025 <- err_2025 + sum((df_grant %>% dplyr::filter(date=="2025-11-01") %>% dplyr::pull(euro_error))^2) #mse relative grant amount
 
-  df_eff <- df_eff %>% dplyr::filter(date=="2025-11-01")
-  err_2025 <- err_2025 + 2.5*sum(df_eff$n_heat_pump_err^2 + df_eff$n_b2_err^2) #give a heavier weighting to efficiency because there are three grant cateogries
+  df_2025 <- df_eff %>% dplyr::filter(date=="2025-11-01")
+  err_2025 <- err_2025 + 2.5*sum(df_2025$n_heat_pump_err^2 + df_2025$n_b2_err^2) #give a heavier weighting to efficiency because there are three grant cateogries
+  #
+  err_2021 <- sum((df_grant %>% dplyr::filter(date=="2021-01-01") %>% dplyr::pull(n_error))^2) #mse relative number of grants
+  err_2021 <- err_2021 + sum((df_grant %>% dplyr::filter(date=="2021-01-01") %>% dplyr::pull(euro_error))^2) #mse relative grant amount
+
+  df_2021 <- df_eff %>% dplyr::filter(date=="2021-01-01")
+  err_2021 <- err_2021 + 2.5*sum(df_2021$n_heat_pump_err^2 + df_2021$n_b2_err^2) #give a heavier weighting to efficiency because there are three grant cateogries
 
   #print(paste("evaluated at nu. =", x[1], "p. = ", x[2], "beta.=", x[3],
   #            "r.=", x[4], "eta=", x[5], "tau=", x[6], "error=", err_2025))
-
-  return(err_2025)
+  #weight 2021 and 2025 relative errors unequally
+  return((err_2025+0.7*err_2021)/1.7)
 }
 

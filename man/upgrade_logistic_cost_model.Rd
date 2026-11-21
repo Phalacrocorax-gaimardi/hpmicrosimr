@@ -19,14 +19,7 @@ A data frame with 7 rows and 6 variables:
 upgrade_logistic_cost_model
 }
 \description{
-Parameters of the building fabric or envelope upgrade cost model. hpmicrosimr uses a logistic cost model with low marginal cost for inefficient buildings and
-and high cost for efficient buildings. The parameters are defined through the marginal cost equation:
 
-\deqn{\frac{d C}{d HLI} = \frac{c_{min}}{1+e^{-\left(HLI-h_0\right)/\Delta H}} + \frac{c_{max}}{1+e^{\left(HLI-h_0\right)/\ Delta H}}}
-
-where \eqn{\Delta H = 1/k}
-
-where  is the cost and HLI is the Heat Loss Index.
 }
 \details{
 Estimated from multiple sources. See detailed workings in /inst/scratch.R

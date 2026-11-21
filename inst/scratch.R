@@ -2,8 +2,6 @@
 # ground floor area and BER rating imputation
 ##############################################
 
-
-
 library(csodata)
 library(data.table)
 library(tidyverse)
