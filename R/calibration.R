@@ -462,13 +462,14 @@ summarise_abm_cal2 <- function(abm, cal_date = "2025-11-01") {
 #' three schemes. To balance error in energy efficiency measure vs grants, the former error is multiplied by a factor of 2.5, so that the error is weighted
 #' towards accuracy .
 #'
-#' @param abm_cal outpit of calABM2()
+#' @param abm_cal output of calABM2()
+#' @param q share of Jan 2021 error to include. q=0 means 2021 is excluded. q=1 means equal share with Nov 2025
 #'
 #' @returns  a positive real number
 #' @export
 #'
 #' @examples
-cal_error <- function(abm_cal) {
+cal_error <- function(abm_cal, q=0) {
   #
   cal_dates <- c("2025-11-01","2021-01-01")
   #df <- calABM(sD, Nrun=32, 2, TRUE, nu=x[1], p=x[2], beta=x[3],r=x[4], eta=x[5], tau=x[6], rho=0.3)
@@ -499,6 +500,6 @@ cal_error <- function(abm_cal) {
   #print(paste("evaluated at nu. =", x[1], "p. = ", x[2], "beta.=", x[3],
   #            "r.=", x[4], "eta=", x[5], "tau=", x[6], "error=", err_2025))
   #weight 2021 and 2025 relative errors unequally
-  return((err_2025+0.7*err_2021)/1.7)
+  return((err_2025+q*err_2021)/(1+q))
 }
 

@@ -4,10 +4,12 @@
 \alias{cal_error}
 \title{cal_error}
 \usage{
-cal_error(abm_cal)
+cal_error(abm_cal, q = 0)
 }
 \arguments{
-\item{abm_cal}{outpit of calABM2()}
+\item{abm_cal}{output of calABM2()}
+
+\item{q}{share of Jan 2021 error to include. q=0 means 2021 is excluded. q=1 means equal share with Nov 2025}
 }
 \value{
 a positive real number
