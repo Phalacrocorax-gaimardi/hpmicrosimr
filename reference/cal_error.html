@@ -18,7 +18,7 @@ to find the optimal behavioural parameter set."><meta property="og:image" conten
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">hpmicrosimr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.14</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.16</span>
       </span>
     </div>
 
@@ -56,7 +56,7 @@ to find the optimal behavioural parameter set.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cal_error</span><span class="op">(</span><span class="va">abm_cal</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cal_error</span><span class="op">(</span><span class="va">abm_cal</span>, q <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -64,7 +64,11 @@ to find the optimal behavioural parameter set.</p>
 
 
 <dl><dt id="arg-abm-cal">abm_cal<a class="anchor" aria-label="anchor" href="#arg-abm-cal"></a></dt>
-<dd><p>outpit of calABM2()</p></dd>
+<dd><p>output of calABM2()</p></dd>
+
+
+<dt id="arg-q">q<a class="anchor" aria-label="anchor" href="#arg-q"></a></dt>
+<dd><p>share of Jan 2021 error to include. q=0 means 2021 is excluded. q=1 means equal share with Nov 2025</p></dd>
 
 </dl></div>
     <div id="value">
