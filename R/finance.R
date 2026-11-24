@@ -453,10 +453,10 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
   #hli_upgrade_capex_with_grant <-  hli_upgrade_capex-ifelse(include_grants,upgrade_grants$grant_value,0) #
   #hli_upgrade_capex_after_grant <- hli_upgrade_capex - fabric_grants$grant_value
   #include present bias (no threshold is applied) and disruption disutility
-  hli_upgrade_annualised_capex <- hli_upgrade_capex*(params$r./params$beta. + eta)
+  hli_upgrade_annualised_capex <- hli_upgrade_capex*(params$r./params$beta.)*(1 + eta)
   #include bias correct (which increases the value of the grrant) and sludge effect (which lowers the value of the grant).
   #the effective grant cannot be negative!
-  hli_upgrade_annualised_grant <- ifelse(include_grants,fabric_grants$grant_value*(params$r./params$beta.-params$tau.),0)
+  hli_upgrade_annualised_grant <- ifelse(include_grants,fabric_grants$grant_value*(params$r./params$beta.)*(1-params$tau.),0)
   #ber_upgrade_annualised_capex <- ber_upgrade_capex*params$r.
   #grant_type <- ifelse(include_grants,upgrade_grants$scheme,"None")
    #inlcude sludge effect for heating grant applications but not disruption
@@ -489,9 +489,10 @@ heating_upgrade_tensor <- function(hli_old,hli_new,tech_old,installation_time,te
    heat_grant <- ifelse(include_grants,heat_grant,0)
    bias <- function(x) ifelse(x <= params$present_bias_threshold,x,params$present_bias_threshold + (x-params$present_bias_threshold)/params$beta.)
    #gross cost - present bias on first purchase, replacements unbiased
+   #no eta effect - already included in theta
    heat_annualised_capex <- crf*heating_sys_cost+r*(bias(heating_sys_cost)-heating_sys_cost)
-   #
-   heat_annualised_grant <- r*(bias(heating_sys_cost)-bias(heating_sys_cost-heat_grant))-params$tau.*heat_grant
+   #reduced value of grant ny slude
+   heat_annualised_grant <- r*(bias(heating_sys_cost)-bias(heating_sys_cost-heat_grant))-r*params$tau.*heat_grant
 
 
     #for now assume there is only one discount rate
